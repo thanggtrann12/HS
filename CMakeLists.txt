@@ -13,6 +13,7 @@ set(SOURCES
   src/Units/Hero.cpp
   src/Game/Game.cpp
   src/Console/Console.cpp
+  src/Socket/Socket.cpp
 
 )
 set(HEADERS
@@ -21,6 +22,8 @@ set(HEADERS
   inc/Units/Hero.h
   inc/Console/Console.h
   inc/Game/Game.h
+  inc/Socket/Socket.h
+  inc/Socket/Ip.h
 )
 add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 target_include_directories(${PROJECT_NAME} PRIVATE inc)
