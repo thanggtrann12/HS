@@ -6,11 +6,14 @@ class Console
 {
 public:
     Console();
-
-    void displayWelcomeMessage(int &choice, std::string &host);
+    void clearConsole();
+    void loadingConsole();
+    void displayWelcomeMessage(int &choice);
     void displayGameState(std::vector<std::string> currentPlayer, std::vector<std::string> opponentPlayer, std::vector<std::string> message);
     void displayGameResult(std::vector<std::string> message);
+    int displayMenu(const std::string &title, const std::vector<std::string> &menuOptions);
     ~Console();
+    void waitForEnter();
 
 private:
 };

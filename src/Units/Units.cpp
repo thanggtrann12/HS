@@ -31,6 +31,10 @@ int Units::getAttack() const
 {
     return _attack;
 }
+void Units::setAttack(int newAtk)
+{
+    _attack -= newAtk;
+}
 
 const std::string &Units::getName() const
 {
@@ -69,7 +73,7 @@ void Units::setActivated(bool state)
 }
 std::string Units::getDescription()
 {
-    return name + " HP: [" + std::to_string(currentHP) + "] Attack: [" + std::to_string(_attack) + "] \n";
+    return name + " HP [" + std::to_string(currentHP) + "] Attack [" + std::to_string(_attack) + "]";
 }
 CardType Units::getCardType() const
 {

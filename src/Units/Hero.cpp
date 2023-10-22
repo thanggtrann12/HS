@@ -26,7 +26,6 @@ void Hero::removeBattleCard(std::shared_ptr<Minion> card)
 
 void Hero::addToBattle(std::shared_ptr<Minion> card)
 {
-    std::cout << "Add to battle: " + card->getName() << std::endl;
     battleCards.push_back(card);
 }
 
@@ -47,19 +46,9 @@ int Hero::getNumCards() const
     return hand.size();
 }
 
-void Hero::displayHand() const
+std::vector<std::shared_ptr<Minion>> &Hero::getHandCards()
 {
-    std::cout << "Player's hand: \n";
-    for (const auto &card : hand)
-    {
-        std::cout << card->getName() << " (HP: " << card->getCurrentHP() << ", Attack: " << card->getAttack() << ") \n";
-    }
-    std::cout << std::endl;
-}
-
-std::vector<std::shared_ptr<Minion>> &Hero::getMinions()
-{
-    return minions;
+    return hand;
 }
 
 std::vector<std::shared_ptr<Minion>> &Hero::getBattleCard()

@@ -15,9 +15,8 @@ public:
     void removeBattleCard(std::shared_ptr<Minion> card);
     std::shared_ptr<Minion> playCard(int index);
     int getNumCards() const;
-    void displayHand() const;
     void addToBattle(std::shared_ptr<Minion> card);
-    std::vector<std::shared_ptr<Minion>> &getMinions();
+    std::vector<std::shared_ptr<Minion>> &getHandCards();
     std::vector<std::shared_ptr<Minion>> &getBattleCard();
 
 private:

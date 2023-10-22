@@ -23,6 +23,7 @@ public:
 
     bool isAlive() const;
     int getAttack() const;
+    void setAttack(int newAtk);
     const std::string &getName() const;
     int getCurrentHP() const;
     void boostAttack(int boost);

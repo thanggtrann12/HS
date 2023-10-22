@@ -2,17 +2,13 @@
 #include "Units/Units.h"
 #include <iostream>
 #include <iomanip>
-#include <arpa/inet.h>
-#include <sys/socket.h>
-#include <termios.h>
-#include <unistd.h>
-#include <cstring>
 
 Game::Game()
 {
     turnCounts = std::vector<int>(2, 0);
     srand(static_cast<unsigned int>(time(nullptr)));
-    console->displayWelcomeMessage(mode);
+    // console->displayWelcomeMessage(mode);
+    // console->loadingConsole();
 
     initializeHeroes();
     initializeCards();
@@ -24,54 +20,40 @@ Game::Game()
  */
 void Game::play()
 {
-    data_t data;
-    MySocket socket(mode);
-    if (mode == 1)
-        console->loadingConsole();
-    while (true)
+    int currentPlayerIndex = 0;
+    int opponentIndex = 1;
+
+    while (heroes[currentPlayerIndex]->isAlive() && heroes[opponentIndex]->isAlive())
     {
-        data_t receivedData;
-        data_t sendData;
-        if (mode == 1)
+        console->clearConsole();
+        if (isTurnCountReached(currentPlayerIndex))
         {
-
-            sendData.choice = 0;
-            sendData.mode = HAND_CARD;
-            for (auto &currentPlayerCard : heroes[clientIndex]->getHandCards())
-            {
-                sendData.clientHandCards.push_back(currentPlayerCard->getDescription());
-            }
-            socket.sendData(sendData);
-            socket.receiveData(receivedData);
-            console->clearConsole();
-            playCard(clientIndex, serverIndex, static_cast<int>(receivedData.choice));
-            std::cout << receivedData.clientHeroStats.size() << std::endl;
-            displayGameState(clientIndex, serverIndex);
-            std::vector<std::string> menuList;
-            for (auto &currentPlayerCard : heroes[serverIndex]->getHandCards())
-            {
-                menuList.push_back(currentPlayerCard->getDescription());
-            }
-            int choice = console->displayMenu("Choose an option (" + std::to_string(menuList.size()) + " options)", menuList);
-
-            menuList.clear();
-            console->clearConsole();
-            playCard(serverIndex, clientIndex, choice);
-            displayGameState(serverIndex, clientIndex);
+            std::cout << heroes[currentPlayerIndex]->getName() << " draw 2 card!" << std::endl;
+            drawCard(currentPlayerIndex);
+            drawCard(currentPlayerIndex);
+            resetTurnCount(currentPlayerIndex);
         }
         else
         {
-            socket.receiveData(receivedData);
-            if (receivedData.mode == HAND_CARD)
-            {
-                int choice = console->displayMenu("Choose an option (" + std::to_string(receivedData.clientHandCards.size()) + " options)", receivedData.clientHandCards);
-                sendData.choice = choice;
-                sendData.mode = PLAY_CARD;
-                socket.sendData(sendData);
-            }
-            displayGameState(clientIndex, serverIndex);
+            turnCounts[currentPlayerIndex]++;
         }
+
+        std::cout << "======================= " << heroes[currentPlayerIndex]->getName() << "'s turn ================================" << std::endl;
+        playCard(currentPlayerIndex, opponentIndex);
+
+        heroes[currentPlayerIndex]->attack(heroes[opponentIndex].get());
+        std::cout << "Cards in battle: " << std::endl;
+        for (auto it : heroes[currentPlayerIndex]->getBattleCard())
+        {
+            std::cout << it->getDescription() << std::endl;
+        }
+        console->clearConsole();
+        displayGameState(currentPlayerIndex, opponentIndex);
+        std::swap(currentPlayerIndex, opponentIndex);
     }
+
+    // Game over
+    displayGameResult(currentPlayerIndex);
 }
 
 /**
@@ -135,12 +117,25 @@ void Game::drawCard(int playerIndex)
  * @param currentPlayerIndex The index of the current player.
  * @param opponentIndex The index of the opponent player.
  */
-void Game::playCard(int currentPlayerIndex, int opponentIndex, int cardChoice)
+void Game::playCard(int currentPlayerIndex, int opponentIndex)
 {
-    // displayHand(currentPlayerIndex);
-    auto playedCard = heroes[currentPlayerIndex]->playCard(cardChoice);
-    heroes[currentPlayerIndex]->attack(heroes[opponentIndex].get());
+    displayHand(currentPlayerIndex);
+    int cardIndex;
+    if (heroes[currentPlayerIndex]->getNumCards() <= 0)
+    {
+        heroes[opponentIndex]->takeDamage(heroes[currentPlayerIndex]->getAttack());
+        message.push_back("Your hand is empty!! Only hero attacked!!");
+        return;
+    }
+    std::vector<std::string> cardList;
+    for (auto &currentPlayerCard : heroes[currentPlayerIndex]->getHandCards())
+    {
+        cardList.push_back(currentPlayerCard->getDescription());
+    }
+    int cardChoice = console->displayMenu(heroes[currentPlayerIndex]->getName() + "'s turn", cardList);
 
+    auto playedCard = heroes[currentPlayerIndex]->playCard(cardChoice);
+    std::cout << playedCard->getName() << std::endl;
     message.push_back("Active: " + playedCard->getDescription());
     if (playedCard)
     {
