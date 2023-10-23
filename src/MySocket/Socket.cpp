@@ -18,23 +18,23 @@ MySocket::~MySocket()
 
 void MySocket::sendData(data_t &sendData)
 {
-    std::string serializedData = std::to_string(sendData.mode) + ":" +
-                                 std::to_string(sendData.choice) + ":";
+    std::string serializedData = std::to_string(sendData.mode) + "+" +
+                                 std::to_string(sendData.choice) + "+";
     for (const std::string &option : sendData.clientHandCards)
     {
         serializedData += option + '\n';
     }
-    serializedData += ":";
+    serializedData += "+";
     for (const std::string &option : sendData.clientHeroStats)
     {
         serializedData += option + '\n';
     }
-    serializedData += ":";
+    serializedData += "+";
     for (const std::string &option : sendData.serverHeroStats)
     {
         serializedData += option + '\n';
     }
-    serializedData += ":";
+    serializedData += "+";
     for (const std::string &option : sendData.gameInfos)
     {
         serializedData += option + '\n';
@@ -48,7 +48,6 @@ void parseStringToVector(const std::string &input, std::vector<std::string> &out
     while (std::getline(ss, line, '\n'))
     {
         output.push_back(line);
-        std::cout << line << std::endl;
     }
 }
 
@@ -56,14 +55,14 @@ int MySocket::receiveData(data_t &receivedData)
 {
     ssize_t bytesReceived;
     char buffer[1024];
-
+    std::cout<<buffer<<std::endl;
     bytesReceived = recv(clientSocket_, buffer, sizeof(buffer), 0);
     std::string receivedString(buffer, bytesReceived);
-    size_t delimiterPos1 = receivedString.find(':');
-    size_t delimiterPos2 = receivedString.find(':', delimiterPos1 + 1);
-    size_t delimiterPos3 = receivedString.find(':', delimiterPos2 + 1);
-    size_t delimiterPos4 = receivedString.find(':', delimiterPos3 + 1);
-    size_t delimiterPos5 = receivedString.find(':', delimiterPos4 + 1);
+    size_t delimiterPos1 = receivedString.find('+');
+    size_t delimiterPos2 = receivedString.find('+', delimiterPos1 + 1);
+    size_t delimiterPos3 = receivedString.find('+', delimiterPos2 + 1);
+    size_t delimiterPos4 = receivedString.find('+', delimiterPos3 + 1);
+    size_t delimiterPos5 = receivedString.find('+', delimiterPos4 + 1);
 
     if (delimiterPos1 != std::string::npos && delimiterPos2 != std::string::npos && delimiterPos3 != std::string::npos &&
         delimiterPos4 != std::string::npos && delimiterPos5 != std::string::npos)
@@ -100,7 +99,7 @@ void MySocket::initializeServer()
     }
 
     serverAddress_.sin_family = AF_INET;
-    serverAddress_.sin_port = htons(8080);
+    serverAddress_.sin_port = htons(8081);
     serverAddress_.sin_addr.s_addr = INADDR_ANY;
 
     if (bind(serverSocket_, (struct sockaddr *)&serverAddress_, sizeof(serverAddress_)) == -1)
@@ -136,7 +135,7 @@ void MySocket::initializeClient()
     }
 
     serverAddress_.sin_family = AF_INET;
-    serverAddress_.sin_port = htons(8080);
+    serverAddress_.sin_port = htons(8081);
     serverAddress_.sin_addr.s_addr = inet_addr("127.0.0.1");
 
     if (connect(clientSocket_, (struct sockaddr *)&serverAddress_, sizeof(serverAddress_)) == -1)

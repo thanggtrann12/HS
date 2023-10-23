@@ -43,21 +43,57 @@ void Game::play()
             }
             socket.sendData(sendData);
             socket.receiveData(receivedData);
+
             console->clearConsole();
+
             playCard(clientIndex, serverIndex, static_cast<int>(receivedData.choice));
-            std::cout << receivedData.clientHeroStats.size() << std::endl;
-            displayGameState(clientIndex, serverIndex);
+            sendData.gameInfos.clear();
+            sendData.clientHandCards.clear();
+            sendData.serverHeroStats.clear();
+            sendData.clientHeroStats.push_back(heroes[clientIndex]->getName());
+            sendData.clientHeroStats.push_back(std::to_string(heroes[clientIndex]->getCurrentHP()));
+            sendData.clientHeroStats.push_back(std::to_string(heroes[clientIndex]->getAttack()));
+            sendData.clientHeroStats.push_back(std::to_string(heroes[serverIndex]->getTotalDamage()));
+
+            sendData.serverHeroStats.push_back(heroes[serverIndex]->getName());
+            sendData.serverHeroStats.push_back(std::to_string(heroes[serverIndex]->getCurrentHP()));
+            sendData.serverHeroStats.push_back(std::to_string(heroes[serverIndex]->getAttack()));
+            sendData.serverHeroStats.push_back(std::to_string(heroes[clientIndex]->getTotalDamage()));
+            sendData.choice = 0;
+            sendData.mode = BATTTLE_STATS;
+            sendData.gameInfos = message;
+            message.clear();
+            socket.sendData(sendData);
             std::vector<std::string> menuList;
             for (auto &currentPlayerCard : heroes[serverIndex]->getHandCards())
             {
                 menuList.push_back(currentPlayerCard->getDescription());
             }
+              console->displayGameState(sendData.clientHeroStats, sendData.serverHeroStats, sendData.gameInfos);
+
             int choice = console->displayMenu("Choose an option (" + std::to_string(menuList.size()) + " options)", menuList);
 
             menuList.clear();
             console->clearConsole();
             playCard(serverIndex, clientIndex, choice);
-            displayGameState(serverIndex, clientIndex);
+            sendData.gameInfos.clear();
+            sendData.clientHandCards.clear();
+            sendData.serverHeroStats.clear();
+            sendData.clientHeroStats.push_back(heroes[clientIndex]->getName());
+            sendData.clientHeroStats.push_back(std::to_string(heroes[clientIndex]->getCurrentHP()));
+            sendData.clientHeroStats.push_back(std::to_string(heroes[clientIndex]->getAttack()));
+            sendData.clientHeroStats.push_back(std::to_string(heroes[serverIndex]->getTotalDamage()));
+
+            sendData.serverHeroStats.push_back(heroes[serverIndex]->getName());
+            sendData.serverHeroStats.push_back(std::to_string(heroes[serverIndex]->getCurrentHP()));
+            sendData.serverHeroStats.push_back(std::to_string(heroes[serverIndex]->getAttack()));
+            sendData.serverHeroStats.push_back(std::to_string(heroes[clientIndex]->getTotalDamage()));
+            sendData.choice = 0;
+            sendData.mode = BATTTLE_STATS;
+            sendData.gameInfos = message;
+            message.clear();
+            socket.sendData(sendData);
+            console->displayGameState(sendData.serverHeroStats, sendData.clientHeroStats, sendData.gameInfos);
         }
         else
         {
@@ -69,7 +105,11 @@ void Game::play()
                 sendData.mode = PLAY_CARD;
                 socket.sendData(sendData);
             }
-            displayGameState(clientIndex, serverIndex);
+            if (receivedData.mode == BATTTLE_STATS)
+            {
+              console->displayGameState(receivedData.clientHeroStats, receivedData.serverHeroStats, receivedData.gameInfos);
+            }
+            // displayGameState(clientIndex, serverIndex);
         }
     }
 }

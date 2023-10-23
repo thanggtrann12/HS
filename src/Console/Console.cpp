@@ -115,8 +115,7 @@ void Console::displayGameState(std::vector<std::string> currentPlayer, std::vect
     int padding = 15;
     if (message.size() > 0)
     {
-        std::cout << "called" << std::endl;
-        std::cout << "================================================================================" << std::endl;
+        std::cout << "================================"<< currentPlayer[0]<<" 's turn ==================================" << std::endl;
         std::cout << "================================================================================" << std::endl;
         for (int i = 0; i < message.size(); i++)
         {
@@ -135,6 +134,8 @@ void Console::displayGameState(std::vector<std::string> currentPlayer, std::vect
     std::cout << "================================================================================" << std::endl;
     std::cout << std::endl;
     std::cout << std::endl;
+    if (currentPlayer.size()>0)
+    {
     std::cout << std::left << std::setw(padding) << currentPlayer[0];
     std::cout << std::left << std::setw(padding + 5) << currentPlayer[1];
     int totalCrAtk = std::stoi(currentPlayer[3]);
@@ -147,10 +148,13 @@ void Console::displayGameState(std::vector<std::string> currentPlayer, std::vect
     {
         minionCrAtk = 0;
     }
+    
     std::cout << std::left << std::fixed << std::setprecision(2) << std::setw(padding + 5) << currentPlayer[2];
     std::cout << std::left << std::fixed << std::setprecision(2) << std::setw(padding) << minionCrAtk;
     std::cout << std::left << std::fixed << std::setprecision(2) << std::setw(padding) << currentPlayer[3] << std::endl;
-
+    }
+    if (opponentPlayer.size()>0)
+    {
     std::cout << std::endl;
     std::cout << std::endl;
     std::cout << std::left << std::setw(padding) << opponentPlayer[0];
@@ -168,7 +172,7 @@ void Console::displayGameState(std::vector<std::string> currentPlayer, std::vect
     std::cout << std::left << std::fixed << std::setprecision(2) << std::setw(padding + 5) << opponentPlayer[2];
     std::cout << std::left << std::fixed << std::setprecision(2) << std::setw(padding) << minionOpAtk;
     std::cout << std::left << std::fixed << std::setprecision(2) << std::setw(padding) << opponentPlayer[3] << std::endl;
-
+    }
     std::cout << std::endl;
     std::cout << std::endl;
     std::cout << "================================================================================" << std::endl;
@@ -267,7 +271,7 @@ void Console::loadingConsole()
 {
     int total = 100;
     int width = 50;
-    int delay = 50;
+    int delay = 20;
 
     std::cout << "              Please waiting when loading resource!" << std::endl;
     for (int i = 0; i <= total; ++i)
