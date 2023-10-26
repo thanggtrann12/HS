@@ -10,13 +10,13 @@
 
 Game::Game()
 {
-    turnCounts = std::vector<int>(2, 0);
-    srand(static_cast<unsigned int>(time(nullptr)));
-    console->displayWelcomeMessage(mode);
+  turnCounts = std::vector<int>(2, 0);
+  srand(static_cast<unsigned int>(time(nullptr)));
+  console->displayWelcomeMessage(mode);
 
-    initializeHeroes();
-    initializeCards();
-    dealInitialCards();
+  initializeHeroes();
+  initializeCards();
+  dealInitialCards();
 }
 
 /**
@@ -24,94 +24,67 @@ Game::Game()
  */
 void Game::play()
 {
-    data_t data;
-    MySocket socket(mode);
+  data_t data;
+  MySocket socket(mode);
+  if (mode == 1)
+    console->loadingConsole();
+  while (true)
+  {
+    data_t receivedData;
+    data_t sendData;
     if (mode == 1)
-        console->loadingConsole();
-    while (true)
     {
-        data_t receivedData;
-        data_t sendData;
-        if (mode == 1)
-        {
 
-            sendData.choice = 0;
-            sendData.mode = HAND_CARD;
-            for (auto &currentPlayerCard : heroes[clientIndex]->getHandCards())
-            {
-                sendData.clientHandCards.push_back(currentPlayerCard->getDescription());
-            }
-            socket.sendData(sendData);
-            socket.receiveData(receivedData);
+      sendData.choice = 0;
+      sendData.mode = HAND_CARD;
+      for (auto &currentPlayerCard : heroes[clientIndex]->getHandCards())
+      {
+        sendData.clientHandCards.push_back(currentPlayerCard->getDescription());
+      }
+      socket.sendData(sendData);
+      socket.receiveData(receivedData);
 
-            console->clearConsole();
+      console->clearConsole();
 
-            playCard(clientIndex, serverIndex, static_cast<int>(receivedData.choice));
-            sendData.gameInfos.clear();
-            sendData.clientHandCards.clear();
-            sendData.serverHeroStats.clear();
-            sendData.clientHeroStats.push_back(heroes[clientIndex]->getName());
-            sendData.clientHeroStats.push_back(std::to_string(heroes[clientIndex]->getCurrentHP()));
-            sendData.clientHeroStats.push_back(std::to_string(heroes[clientIndex]->getAttack()));
-            sendData.clientHeroStats.push_back(std::to_string(heroes[serverIndex]->getTotalDamage()));
+      playCard(clientIndex, serverIndex, static_cast<int>(receivedData.choice));
+      sendData.choice = 0;
+      sendData.mode = BATTTLE_STATS;
+      getGameStats(sendData);
+      socket.sendData(sendData);
+      std::vector<std::string> menuList;
+      for (auto &currentPlayerCard : heroes[serverIndex]->getHandCards())
+      {
+        menuList.push_back(currentPlayerCard->getDescription());
+      }
+      console->displayGameState(sendData.clientHeroStats, sendData.serverHeroStats, sendData.gameInfos);
+      calculatePlayerTurnCount();
+      int choice = console->displayMenu("Choose an option (" + std::to_string(menuList.size()) + " options)", menuList);
 
-            sendData.serverHeroStats.push_back(heroes[serverIndex]->getName());
-            sendData.serverHeroStats.push_back(std::to_string(heroes[serverIndex]->getCurrentHP()));
-            sendData.serverHeroStats.push_back(std::to_string(heroes[serverIndex]->getAttack()));
-            sendData.serverHeroStats.push_back(std::to_string(heroes[clientIndex]->getTotalDamage()));
-            sendData.choice = 0;
-            sendData.mode = BATTTLE_STATS;
-            sendData.gameInfos = message;
-            message.clear();
-            socket.sendData(sendData);
-            std::vector<std::string> menuList;
-            for (auto &currentPlayerCard : heroes[serverIndex]->getHandCards())
-            {
-                menuList.push_back(currentPlayerCard->getDescription());
-            }
-              console->displayGameState(sendData.clientHeroStats, sendData.serverHeroStats, sendData.gameInfos);
-
-            int choice = console->displayMenu("Choose an option (" + std::to_string(menuList.size()) + " options)", menuList);
-
-            menuList.clear();
-            console->clearConsole();
-            playCard(serverIndex, clientIndex, choice);
-            sendData.gameInfos.clear();
-            sendData.clientHandCards.clear();
-            sendData.serverHeroStats.clear();
-            sendData.clientHeroStats.push_back(heroes[clientIndex]->getName());
-            sendData.clientHeroStats.push_back(std::to_string(heroes[clientIndex]->getCurrentHP()));
-            sendData.clientHeroStats.push_back(std::to_string(heroes[clientIndex]->getAttack()));
-            sendData.clientHeroStats.push_back(std::to_string(heroes[serverIndex]->getTotalDamage()));
-
-            sendData.serverHeroStats.push_back(heroes[serverIndex]->getName());
-            sendData.serverHeroStats.push_back(std::to_string(heroes[serverIndex]->getCurrentHP()));
-            sendData.serverHeroStats.push_back(std::to_string(heroes[serverIndex]->getAttack()));
-            sendData.serverHeroStats.push_back(std::to_string(heroes[clientIndex]->getTotalDamage()));
-            sendData.choice = 0;
-            sendData.mode = BATTTLE_STATS;
-            sendData.gameInfos = message;
-            message.clear();
-            socket.sendData(sendData);
-            console->displayGameState(sendData.serverHeroStats, sendData.clientHeroStats, sendData.gameInfos);
-        }
-        else
-        {
-            socket.receiveData(receivedData);
-            if (receivedData.mode == HAND_CARD)
-            {
-                int choice = console->displayMenu("Choose an option (" + std::to_string(receivedData.clientHandCards.size()) + " options)", receivedData.clientHandCards);
-                sendData.choice = choice;
-                sendData.mode = PLAY_CARD;
-                socket.sendData(sendData);
-            }
-            if (receivedData.mode == BATTTLE_STATS)
-            {
-              console->displayGameState(receivedData.clientHeroStats, receivedData.serverHeroStats, receivedData.gameInfos);
-            }
-            // displayGameState(clientIndex, serverIndex);
-        }
+      menuList.clear();
+      console->clearConsole();
+      playCard(serverIndex, clientIndex, choice);
+      sendData.choice = 0;
+      sendData.mode = BATTTLE_STATS;
+      getGameStats(sendData);
+      socket.sendData(sendData);
+      console->displayGameState(sendData.serverHeroStats, sendData.clientHeroStats, sendData.gameInfos);
     }
+    else
+    {
+      socket.receiveData(receivedData);
+      if (receivedData.mode == HAND_CARD)
+      {
+        int choice = console->displayMenu("Choose an option (" + std::to_string(receivedData.clientHandCards.size()) + " options)", receivedData.clientHandCards);
+        sendData.choice = choice;
+        sendData.mode = PLAY_CARD;
+        socket.sendData(sendData);
+      }
+      if (receivedData.mode == BATTTLE_STATS)
+      {
+        console->displayGameState(receivedData.clientHeroStats, receivedData.serverHeroStats, receivedData.gameInfos);
+      }
+    }
+  }
 }
 
 /**
@@ -119,8 +92,8 @@ void Game::play()
  */
 void Game::initializeHeroes()
 {
-    heroes.push_back(std::make_shared<Hero>("Butcher", 120, 6));
-    heroes.push_back(std::make_shared<Hero>("Slark", 72, 10));
+  heroes.push_back(std::make_shared<Hero>("Butcher", 120, 6));
+  heroes.push_back(std::make_shared<Hero>("Slark", 72, 10));
 }
 
 /**
@@ -128,11 +101,11 @@ void Game::initializeHeroes()
  */
 void Game::initializeCards()
 {
-    cards.push_back(std::make_shared<Minion>("Ragnaros the Firelord", 1, 3, CardType::MINION));
-    cards.push_back(std::make_shared<Minion>("Bloodmage Thalnos", 1, 1, CardType::MINION));
-    cards.push_back(std::make_shared<FlametongueTotem>());
-    cards.push_back(std::make_shared<Brawl>());
-    cards.push_back(std::make_shared<Minion>("Techies", 2, 1, CardType::TECHIES));
+  cards.push_back(std::make_shared<Minion>("Ragnaros the Firelord", 1, 3, CardType::MINION));
+  cards.push_back(std::make_shared<Minion>("Bloodmage Thalnos", 1, 1, CardType::MINION));
+  cards.push_back(std::make_shared<FlametongueTotem>());
+  cards.push_back(std::make_shared<Brawl>());
+  cards.push_back(std::make_shared<Minion>("Techies", 2, 1, CardType::TECHIES));
 }
 
 /**
@@ -140,13 +113,13 @@ void Game::initializeCards()
  */
 void Game::dealInitialCards()
 {
-    for (auto &hero : heroes)
+  for (auto &hero : heroes)
+  {
+    for (int i = 0; i < 10; ++i)
     {
-        for (int i = 0; i < 10; ++i)
-        {
-            hero->addCard(drawRandomCard());
-        }
+      hero->addCard(drawRandomCard());
     }
+  }
 }
 
 /**
@@ -155,8 +128,8 @@ void Game::dealInitialCards()
  */
 std::shared_ptr<Minion> Game::drawRandomCard()
 {
-    int randomIndex = rand() % cards.size();
-    return cards[randomIndex];
+  int randomIndex = rand() % cards.size();
+  return cards[randomIndex];
 }
 
 /**
@@ -165,9 +138,9 @@ std::shared_ptr<Minion> Game::drawRandomCard()
  */
 void Game::drawCard(int playerIndex)
 {
-    auto drawnCard = drawRandomCard();
-    heroes[playerIndex]->addCard(drawnCard);
-    std::cout << heroes[playerIndex]->getName() << " draws " << drawnCard->getName() << "." << std::endl;
+  auto drawnCard = drawRandomCard();
+  heroes[playerIndex]->addCard(drawnCard);
+  std::cout << heroes[playerIndex]->getName() << " draws " << drawnCard->getName() << "." << std::endl;
 }
 
 /**
@@ -177,92 +150,92 @@ void Game::drawCard(int playerIndex)
  */
 void Game::playCard(int currentPlayerIndex, int opponentIndex, int cardChoice)
 {
-    // displayHand(currentPlayerIndex);
-    auto playedCard = heroes[currentPlayerIndex]->playCard(cardChoice);
-    heroes[currentPlayerIndex]->attack(heroes[opponentIndex].get());
 
-    message.push_back("Active: " + playedCard->getDescription());
-    if (playedCard)
+  auto playedCard = heroes[currentPlayerIndex]->playCard(cardChoice);
+  heroes[currentPlayerIndex]->attack(heroes[opponentIndex].get());
+
+  message.push_back("Active: " + playedCard->getDescription());
+  if (playedCard)
+  {
+    message.push_back("Active: ");
+    message.push_back("- " + playedCard->getDescription());
+    displayBattlefield(opponentIndex);
+    if (playedCard->getCardType() == CardType::BRAWL)
     {
-        message.push_back("Active: ");
-        message.push_back("- " + playedCard->getDescription());
-        displayBattlefield(opponentIndex);
-        if (playedCard->getCardType() == CardType::BRAWL)
+      if (resolveBrawl(opponentIndex))
+      {
+        heroes[currentPlayerIndex]->removeBattleCard(playedCard);
+      }
+      else
+      {
+        message.push_back("Brawl still on battlefield");
+      }
+    }
+    else if (auto totem = std::dynamic_pointer_cast<FlametongueTotem>(playedCard))
+    {
+      if (!totem->isActivated() && heroes[currentPlayerIndex]->getBattleCard().size() > 0)
+      {
+        for (auto &currentPlayerCard : heroes[currentPlayerIndex]->getBattleCard())
         {
-            if (resolveBrawl(opponentIndex))
+          if (currentPlayerCard->getCardType() != CardType::SHAMAN && currentPlayerCard->getCardType() != CardType::BRAWL)
+          {
+            message.push_back("Flametongue Totem activated, apply bonus");
+            totem->applyBuff(heroes[currentPlayerIndex]->getBattleCard());
+          }
+        }
+        totem->setActivated(true);
+      }
+    }
+    else
+      for (auto &currentPlayerCard : heroes[currentPlayerIndex]->getBattleCard())
+      {
+
+        std::vector<std::shared_ptr<Minion>> cardsToRemove;
+        int shamanCount = 0;
+        for (auto &opponentPlayerCard : heroes[opponentIndex]->getBattleCard())
+        {
+          if (opponentPlayerCard->getCardType() != CardType::BRAWL)
+          {
+            if (currentPlayerCard->getAttack() >= opponentPlayerCard->getCurrentHP())
             {
-                heroes[currentPlayerIndex]->removeBattleCard(playedCard);
+
+              if (opponentPlayerCard->getCardType() == CardType::TECHIES)
+              {
+                int damageToHero = 3;
+                heroes[opponentIndex]->takeDamage(damageToHero);
+                heroes[currentPlayerIndex]->takeDamage(damageToHero);
+                message.push_back("Techies deals " + std::to_string(damageToHero) + " damage to both heroes");
+              }
+              if (opponentPlayerCard->getCardType() == CardType::SHAMAN)
+              {
+                shamanCount++;
+              }
+              cardsToRemove.push_back(opponentPlayerCard);
             }
             else
             {
-                message.push_back("Brawl still on battlefield");
+              opponentPlayerCard->takeDamage(currentPlayerCard->getAttack());
+              message.push_back("- Card " + opponentPlayerCard->getName() + "HP left: " + std::to_string(opponentPlayerCard->getCurrentHP()));
             }
+          }
         }
-        else if (auto totem = std::dynamic_pointer_cast<FlametongueTotem>(playedCard))
+        for (auto &opponentPlayerCard : heroes[opponentIndex]->getBattleCard())
         {
-            if (!totem->isActivated() && heroes[currentPlayerIndex]->getBattleCard().size() > 0)
-            {
-                for (auto &currentPlayerCard : heroes[currentPlayerIndex]->getBattleCard())
-                {
-                    if (currentPlayerCard->getCardType() != CardType::SHAMAN && currentPlayerCard->getCardType() != CardType::BRAWL)
-                    {
-                        message.push_back("Flametongue Totem activated, apply bonus");
-                        totem->applyBuff(heroes[currentPlayerIndex]->getBattleCard());
-                    }
-                }
-                totem->setActivated(true);
-            }
+          opponentPlayerCard->setAttack(shamanCount);
         }
-        else
-            for (auto &currentPlayerCard : heroes[currentPlayerIndex]->getBattleCard())
-            {
-
-                std::vector<std::shared_ptr<Minion>> cardsToRemove;
-                int shamanCount = 0;
-                for (auto &opponentPlayerCard : heroes[opponentIndex]->getBattleCard())
-                {
-                    if (opponentPlayerCard->getCardType() != CardType::BRAWL)
-                    {
-                        if (currentPlayerCard->getAttack() >= opponentPlayerCard->getCurrentHP())
-                        {
-
-                            if (opponentPlayerCard->getCardType() == CardType::TECHIES)
-                            {
-                                int damageToHero = 3;
-                                heroes[opponentIndex]->takeDamage(damageToHero);
-                                heroes[currentPlayerIndex]->takeDamage(damageToHero);
-                                message.push_back("Techies deals " + std::to_string(damageToHero) + " damage to both heroes");
-                            }
-                            if (opponentPlayerCard->getCardType() == CardType::SHAMAN)
-                            {
-                                shamanCount++;
-                            }
-                            cardsToRemove.push_back(opponentPlayerCard);
-                        }
-                        else
-                        {
-                            opponentPlayerCard->takeDamage(currentPlayerCard->getAttack());
-                            message.push_back("- Card " + opponentPlayerCard->getName() + "HP left: " + std::to_string(opponentPlayerCard->getCurrentHP()));
-                        }
-                    }
-                }
-                for (auto &opponentPlayerCard : heroes[opponentIndex]->getBattleCard())
-                {
-                    opponentPlayerCard->setAttack(shamanCount);
-                }
-                if (cardsToRemove.size() > 0)
-                {
-                    message.push_back("Card eliminated: ");
-                    for (auto &card : cardsToRemove)
-                    {
-                        message.push_back("- " + card->getDescription());
-                        heroes[opponentIndex]->removeBattleCard(card);
-                    }
-                }
-                heroes[opponentIndex]->takeDamage(currentPlayerCard->getAttack());
-            }
-    }
-    displayBattlefield(currentPlayerIndex);
+        if (cardsToRemove.size() > 0)
+        {
+          message.push_back("Card eliminated: ");
+          for (auto &card : cardsToRemove)
+          {
+            message.push_back("- " + card->getDescription());
+            heroes[opponentIndex]->removeBattleCard(card);
+          }
+        }
+        heroes[opponentIndex]->takeDamage(currentPlayerCard->getAttack());
+      }
+  }
+  displayBattlefield(currentPlayerIndex);
 }
 
 /**
@@ -272,46 +245,46 @@ void Game::playCard(int currentPlayerIndex, int opponentIndex, int cardChoice)
  */
 bool Game::resolveBrawl(int opponentIndex)
 {
-    auto &opponentMinions = heroes[opponentIndex]->getBattleCard();
-    if (opponentMinions.size() > 0)
+  auto &opponentMinions = heroes[opponentIndex]->getBattleCard();
+  if (opponentMinions.size() > 0)
+  {
+    bool nonBrawlCardFound = false;
+    for (int i = 0; i < opponentMinions.size(); i++)
     {
-        bool nonBrawlCardFound = false;
-        for (int i = 0; i < opponentMinions.size(); i++)
+      int randomIndex = rand() % opponentMinions.size();
+      std::shared_ptr<Minion> destroyedMinion = opponentMinions[randomIndex];
+
+      if (destroyedMinion->getCardType() != CardType::BRAWL)
+      {
+        message.push_back("Brawl is resolved!");
+        message.push_back("Player " + heroes[opponentIndex]->getName() + "'s " + destroyedMinion->getName() + " is destroyed!");
+
+        if (destroyedMinion->getCardType() == CardType::TECHIES)
         {
-            int randomIndex = rand() % opponentMinions.size();
-            std::shared_ptr<Minion> destroyedMinion = opponentMinions[randomIndex];
-
-            if (destroyedMinion->getCardType() != CardType::BRAWL)
-            {
-                message.push_back("Brawl is resolved!");
-                message.push_back("Player " + heroes[opponentIndex]->getName() + "'s " + destroyedMinion->getName() + " is destroyed!");
-
-                if (destroyedMinion->getCardType() == CardType::TECHIES)
-                {
-                    int damageToHero = 3;
-                    heroes[opponentIndex]->takeDamage(damageToHero);
-                    heroes[1 - opponentIndex]->takeDamage(damageToHero);
-                    message.push_back("Techies deals " + std::to_string(damageToHero) + " damage to both heroes");
-                }
-
-                opponentMinions.erase(opponentMinions.begin() + randomIndex);
-                nonBrawlCardFound = true;
-                break;
-            }
+          int damageToHero = 3;
+          heroes[opponentIndex]->takeDamage(damageToHero);
+          heroes[1 - opponentIndex]->takeDamage(damageToHero);
+          message.push_back("Techies deals " + std::to_string(damageToHero) + " damage to both heroes");
         }
 
-        if (!nonBrawlCardFound)
-        {
-            message.push_back("All cards in Player " + heroes[opponentIndex]->getName() + "'s BattleCard are brawls.");
-        }
+        opponentMinions.erase(opponentMinions.begin() + randomIndex);
+        nonBrawlCardFound = true;
+        break;
+      }
+    }
 
-        return nonBrawlCardFound;
-    }
-    else
+    if (!nonBrawlCardFound)
     {
-        message.push_back("Player " + heroes[opponentIndex]->getName() + " has no minions to destroy.");
-        return false;
+      message.push_back("All cards in Player " + heroes[opponentIndex]->getName() + "'s BattleCard are brawls.");
     }
+
+    return nonBrawlCardFound;
+  }
+  else
+  {
+    message.push_back("Player " + heroes[opponentIndex]->getName() + " has no minions to destroy.");
+    return false;
+  }
 }
 
 /**
@@ -319,25 +292,22 @@ bool Game::resolveBrawl(int opponentIndex)
  * @param currentPlayerIndex The index of the current player.
  * @param opponentIndex The index of the opponent player.
  */
-void Game::displayGameState(int currentPlayerIndex, int opponentIndex)
+void Game::getGameStats(data_t &data)
 {
-    // Display game state in a table
-    std::vector<std::string> currentPlayer;
-    std::vector<std::string> opponentPlayer;
+  data.gameInfos.clear();
+  data.clientHandCards.clear();
+  data.serverHeroStats.clear();
+  data.clientHeroStats.push_back(heroes[clientIndex]->getName());
+  data.clientHeroStats.push_back(std::to_string(heroes[clientIndex]->getCurrentHP()));
+  data.clientHeroStats.push_back(std::to_string(heroes[clientIndex]->getAttack()));
+  data.clientHeroStats.push_back(std::to_string(heroes[serverIndex]->getTotalDamage()));
 
-    currentPlayer.push_back(heroes[currentPlayerIndex]->getName());
-    currentPlayer.push_back(std::to_string(heroes[currentPlayerIndex]->getCurrentHP()));
-    currentPlayer.push_back(std::to_string(heroes[currentPlayerIndex]->getAttack()));
-    currentPlayer.push_back(std::to_string(heroes[opponentIndex]->getTotalDamage()));
-
-    opponentPlayer.push_back(heroes[opponentIndex]->getName());
-    opponentPlayer.push_back(std::to_string(heroes[opponentIndex]->getCurrentHP()));
-    opponentPlayer.push_back(std::to_string(heroes[opponentIndex]->getAttack()));
-    opponentPlayer.push_back(std::to_string(heroes[currentPlayerIndex]->getTotalDamage()));
-    console->displayGameState(currentPlayer, opponentPlayer, message);
-    message.clear();
-    currentPlayer.clear();
-    opponentPlayer.clear();
+  data.serverHeroStats.push_back(heroes[serverIndex]->getName());
+  data.serverHeroStats.push_back(std::to_string(heroes[serverIndex]->getCurrentHP()));
+  data.serverHeroStats.push_back(std::to_string(heroes[serverIndex]->getAttack()));
+  data.serverHeroStats.push_back(std::to_string(heroes[clientIndex]->getTotalDamage()));
+  data.gameInfos = message;
+  message.clear();
 }
 
 /**
@@ -346,8 +316,8 @@ void Game::displayGameState(int currentPlayerIndex, int opponentIndex)
  */
 void Game::displayGameResult(int winnerIndex)
 {
-    std::cout << "Player " << (winnerIndex + 1) << " wins!" << std::endl;
-    std::cout << heroes[winnerIndex]->getDescription() << std::endl;
+  std::cout << "Player " << (winnerIndex + 1) << " wins!" << std::endl;
+  std::cout << heroes[winnerIndex]->getDescription() << std::endl;
 }
 
 /**
@@ -356,37 +326,37 @@ void Game::displayGameResult(int winnerIndex)
  */
 void Game::displayBattlefield(int currentPlayerIndex)
 {
-    message.push_back("Player: " + heroes[currentPlayerIndex]->getName());
-    message.push_back("On battlefield:");
-    if (heroes[currentPlayerIndex]->getBattleCard().empty())
+  message.push_back("Player: " + heroes[currentPlayerIndex]->getName());
+  message.push_back("On battlefield:");
+  if (heroes[currentPlayerIndex]->getBattleCard().empty())
+  {
+    message.push_back("Empty");
+  }
+  else
+  {
+    for (auto &currentPlayerCard : heroes[currentPlayerIndex]->getBattleCard())
     {
-        message.push_back("Empty");
+      message.push_back("- " + currentPlayerCard->getDescription());
+    }
+  }
+}
+
+bool Game::calculatePlayerTurnCount()
+{
+  for (int playerIndex = 0; playerIndex < 2; playerIndex++)
+  {
+    if (turnCounts[playerIndex] == 2)
+    {
+      message.push_back(heroes[playerIndex]->getName() + " draw 2 cards!");
+      for (int i = 0; i < 2; i++)
+      {
+        drawCard(playerIndex);
+      }
+      turnCounts[playerIndex] = 0;
     }
     else
     {
-        for (auto &currentPlayerCard : heroes[currentPlayerIndex]->getBattleCard())
-        {
-            message.push_back("- " + currentPlayerCard->getDescription());
-        }
+      turnCounts[playerIndex]++;
     }
-}
-
-bool Game::isTurnCountReached(int playerIndex)
-{
-    return turnCounts[playerIndex] >= 2;
-}
-
-void Game::resetTurnCount(int playerIndex)
-{
-    turnCounts[playerIndex] = 0;
-}
-
-void Game::displayHand(int playerIndex) const
-{
-
-    for (const auto &card : heroes[playerIndex]->getHandCards())
-    {
-        std::cout << card->getName() << " (HP: " << card->getCurrentHP() << ", Attack: " << card->getAttack() << ") \n";
-    }
-    std::cout << std::endl;
+  }
 }
