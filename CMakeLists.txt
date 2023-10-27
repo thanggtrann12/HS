@@ -8,22 +8,21 @@ project(
 
 set(SOURCES
   main.cpp
-  src/Units/Units.cpp
-  src/Units/Minion.cpp
-  src/Units/Hero.cpp
+  src/Entity/Entity.cpp
+  src/Entity/Minion.cpp
+  src/Entity/Hero.cpp
   src/Game/Game.cpp
   src/Console/Console.cpp
-  src/MySocket/Socket.cpp
+  # src/MySocket/Socket.cpp
 
 )
 set(HEADERS
-  inc/Units/Units.h
-  inc/Units/Minion.h
-  inc/Units/Hero.h
+  inc/Entity/Entity.h
+  inc/Entity/Minion.h
   inc/Console/Console.h
   inc/Game/Game.h
-  inc/MySocket/Socket.h
-  inc/MySocket/Ip.h
+  # inc/MySocket/Socket.h
+  # inc/MySocket/Ip.h
 )
 add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 target_include_directories(${PROJECT_NAME} PRIVATE inc)
