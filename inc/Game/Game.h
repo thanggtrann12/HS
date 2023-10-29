@@ -14,25 +14,25 @@ class Console;
 class Game
 {
 public:
-  Game();
-  void play();
+    Game();
+    void play();
 
 private:
-  void initializeHeroes();
-  void initializeCards();
-  void dealInitialCards();
-  void removeEntitiesOnTable(uint8_t playerIndex, uint8_t entities);
-  void removeEntitiesOnHand(uint8_t playerIndex, uint8_t entities);
-  void addBattleEntities(uint8_t playerIndex, uint8_t entities);
-  void activateEntitiesAndHeroAttack(uint8_t playerIndex, uint8_t entityIndex);
+    void initializeHeroes();
+    void initializeCards();
+    void dealInitialCards();
+    void removeEntityFromTable(int playerIndex, int entityIndex);
+    void removeEntityFromHand(int playerIndex, int entityIndex);
+    void addEntityToTable(int playerIndex, int entityIndex);
+    void activateEntity(int playerIndex);
 
 protected:
-  Console *console;
-  Hero playerHero;
-  std::vector<std::shared_ptr<GameEntity>> cardsPool;
-  std::vector<GameData_t> playerData;
-  int CLIENT_INDEX = 0;
-  int SERVER_INDEX = 1;
+    Console *console;
+    Hero playerHero;
+    std::vector<std::shared_ptr<Minion>> cardsPool;
+    std::vector<GameData_t> playerData;
+    int CLIENT_INDEX = 0;
+    int SERVER_INDEX = 1;
 };
 
 #endif // GAME_H

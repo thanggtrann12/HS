@@ -1,119 +1,92 @@
 #include "Entity/Minion.h"
 #include <iostream>
-void FlametongueTotem::applyEffect(std::vector<GameData_t> player, uint8_t entitiesIndex, uint8_t playerIndex)
+#include <algorithm>
+void Minion::DameToAllEntities(GameData_t &player, int damage)
 {
-  if (!player[playerIndex].tableEntities.empty())
-  {
-    player[playerIndex].stats.push_back("Card buffed: ");
-    auto &playedCard = player[playerIndex].handEntities[entitiesIndex];
-    for (auto &minion : player[playerIndex].tableEntities)
+    for (auto &entity : player.tableEntities)
     {
-      if (minion->GetEntitiesType() != EntityType::SHAMAN && !playedCard->IsApply())
-      {
-        minion->SetAttack(shamanbuff);
-        playedCard->Applied();
-        player[playerIndex].stats.push_back(minion->GetDescription());
-      }
+        entity->TakeDamage(damage);
     }
-  }
+    player.hero->TakeDamage(damage);
+}
+void FlametongueTotem::applyEffect(std::vector<GameData_t> &player, int playerIndex)
+{
+    if (!player[playerIndex].tableEntities.empty())
+    {
+        player[playerIndex].stats.push_back("Card buffed: ");
+        for (auto &minion : player[playerIndex].tableEntities)
+        {
+            if (minion->GetEntitiesType() != EntityType::SHAMAN && minion->GetEntitiesType() != EntityType::BRAWL)
+            {
+                minion->SetAttack(shamanbuff);
+                player[playerIndex].stats.push_back("  -" + minion->GetDescription());
+            }
+        }
+    }
 }
 
-void RagnarosTheFirelord::applyEffect(std::vector<GameData_t> player, uint8_t entitiesIndex, uint8_t playerIndex)
+void RagnarosTheFirelord::applyEffect(std::vector<GameData_t> &player, int playerIndex)
 {
-  uint8_t currentPlayer = playerIndex;
-  uint8_t oppenentPlayer = 1 - playerIndex;
-  auto &playedCard = player[currentPlayer].handEntities[entitiesIndex];
-  if (player[oppenentPlayer].tableEntities.size() > 0)
-  {
-    player[oppenentPlayer].stats.push_back("Card eliminated: ");
-    for (auto &minion : player[oppenentPlayer].tableEntities)
-    {
-      minion->TakeDamage(playedCard->GetAttack());
-      if (!minion->IsAlive())
-      {
-        if (minion->GetEntitiesType() == EntityType::TECHIES)
-        {
-          Techies techiesInstance;
-          techiesInstance.applyEffect(player, entitiesIndex, playerIndex);
-        }
-        if (minion->GetEntitiesType() == EntityType::SHAMAN)
-        {
-          shamanCnt++;
-        }
-        player[oppenentPlayer].stats.push_back("- " + minion->GetName());
-      }
-    }
-    for (auto &minion : player[oppenentPlayer].tableEntities)
-    {
-      if (minion->IsAlive())
-      {
-        minion->SetAttack(-shamanCnt);
-      }
-    }
-  }
+    // Techies techiesInstance;
+    DameToAllEntities(player[1 - playerIndex], playerIndex);
 }
 
-void BloodmageThalnos::applyEffect(std::vector<GameData_t> player, uint8_t entitiesIndex, uint8_t playerIndex)
+void BloodmageThalnos::applyEffect(std::vector<GameData_t> &player, int playerIndex)
 {
-  uint8_t currentPlayer = playerIndex;
-  uint8_t oppenentPlayer = 1 - playerIndex;
-  auto &playedCard = player[currentPlayer].handEntities[entitiesIndex];
-  if (player[oppenentPlayer].tableEntities.size() > 0)
-  {
-    player[oppenentPlayer].stats.push_back("Card eliminated: ");
-    for (auto &minion : player[oppenentPlayer].tableEntities)
-    {
-      minion->TakeDamage(playedCard->GetAttack());
-      if (!minion->IsAlive())
-      {
-        if (minion->GetEntitiesType() == EntityType::TECHIES)
-        {
-          Techies techiesInstance;
-          techiesInstance.applyEffect(player, entitiesIndex, playerIndex);
-        }
-        if (minion->GetEntitiesType() == EntityType::SHAMAN)
-        {
-          shamanCnt++;
-        }
-        player[oppenentPlayer].stats.push_back("- " + minion->GetName());
-      }
-    }
-    for (auto &minion : player[oppenentPlayer].tableEntities)
-    {
-      if (minion->IsAlive())
-      {
-        minion->SetAttack(-shamanCnt);
-      }
-    }
-  }
+    // Techies techiesInstance;
+    // techiesInstance.applyEffect(player, playerIndex);
+    DameToAllEntities(player[1 - playerIndex], playerIndex);
 }
 
-void Brawl::applyEffect(std::vector<GameData_t> player, uint8_t entitiesIndex, uint8_t playerIndex)
+void Brawl::applyEffect(std::vector<GameData_t> &player, int playerIndex)
 {
-  uint8_t currentPlayer = playerIndex;
-  uint8_t oppenentPlayer = 1 - playerIndex;
-  auto &opponentPlayerEntities = player[oppenentPlayer].tableEntities;
-  if (opponentPlayerEntities.size() > 0)
-  {
-    int randomIndex = rand() % opponentPlayerEntities.size();
-    player[oppenentPlayer].stats.push_back(player[oppenentPlayer].tableEntities[randomIndex]->GetName() + " have been eleminated");
-    opponentPlayerEntities.erase(opponentPlayerEntities.begin() + randomIndex);
-    if (opponentPlayerEntities[randomIndex]->GetEntitiesType() == EntityType::TECHIES)
+    int currentPlayer = playerIndex;
+    int opponentPlayer = 1 - playerIndex;
+    auto &opponentPlayerEntities = player[opponentPlayer].tableEntities;
+
+    if (!opponentPlayerEntities.empty())
     {
-      player[oppenentPlayer].stats.push_back("Techies have been eleminated");
-      Techies techiesInstance;
-      techiesInstance.applyEffect(player, entitiesIndex, playerIndex);
+        int randomIndex = rand() % opponentPlayerEntities.size();
+
+        if (randomIndex >= 0 && randomIndex < opponentPlayerEntities.size())
+        {
+            auto &eliminatedEntity = opponentPlayerEntities[randomIndex];
+
+            player[opponentPlayer].stats.push_back(player[opponentPlayer].hero->GetName() + "'s " + eliminatedEntity->GetName() + " have been eliminated");
+
+            if (eliminatedEntity->GetEntitiesType() == EntityType::TECHIES)
+            {
+                player[opponentPlayer].stats.push_back("Techies have been eliminated");
+
+                if (currentPlayer < player.size() && opponentPlayer < player.size())
+                {
+                    player[currentPlayer].hero->AttackHero(player[opponentPlayer].hero, player[currentPlayer].hero->GetAttack());
+                    player[currentPlayer].stats.push_back(player[currentPlayer].hero->GetName() + " gets 3 damage on Techies eliminated");
+                    player[opponentPlayer].hero->AttackHero(player[currentPlayer].hero, player[opponentPlayer].hero->GetAttack());
+                    player[opponentPlayer].stats.push_back(player[opponentPlayer].hero->GetName() + " gets 3 damage on Techies eliminated");
+                }
+            }
+
+            if (randomIndex >= 0 && randomIndex < opponentPlayerEntities.size())
+            {
+                opponentPlayerEntities.erase(opponentPlayerEntities.begin() + randomIndex);
+            }
+        }
     }
-  }
 }
 
-void Techies::applyEffect(std::vector<GameData_t> player, uint8_t entitiesIndex, uint8_t playerIndex)
+void Techies::applyEffect(std::vector<GameData_t> &player, int playerIndex)
 {
-  UNUSED(entitiesIndex);
-  uint8_t currentPlayer = playerIndex;
-  uint8_t oppenentPlayer = 1 - playerIndex;
-  player[currentPlayer].hero->AttackHero(player[oppenentPlayer].hero, player[currentPlayer].hero->GetAttack());
-  player[currentPlayer].stats.push_back(player[currentPlayer].hero->GetName() + " get 3 damage on Techies eleminated");
-  player[oppenentPlayer].hero->AttackHero(player[currentPlayer].hero, player[oppenentPlayer].hero->GetAttack());
-  player[oppenentPlayer].stats.push_back(player[oppenentPlayer].hero->GetName() + " get 3 damage on Techies eleminated");
+    int currentPlayer = playerIndex;
+    int opponentPlayer = 1 - playerIndex;
+    // for (auto entity : player[opponentPlayer].tableEntities)
+    // {
+    //     if (entity->GetEntitiesType() == EntityType::TECHIES && !entity->IsAlive())
+    //     {
+    //         player[currentPlayer].hero->AttackHero(player[opponentPlayer].hero, player[currentPlayer].hero->GetAttack());
+    //         player[currentPlayer].stats.push_back(player[currentPlayer].hero->GetName() + " gets 3 damage on Techies eliminated");
+    //         player[opponentPlayer].hero->AttackHero(player[currentPlayer].hero, player[opponentPlayer].hero->GetAttack());
+    //         player[opponentPlayer].stats.push_back(player[opponentPlayer].hero->GetName() + " gets 3 damage on Techies eliminated");
+    //     }
+    // }
 }

@@ -115,7 +115,7 @@ void Console::displayGameState(std::vector<std::string> currentPlayer, std::vect
     int padding = 15;
     if (message.size() > 0)
     {
-        std::cout << "================================"<< currentPlayer[0]<<" 's turn ==================================" << std::endl;
+        std::cout << "================================" << currentPlayer[0] << " 's turn ==================================" << std::endl;
         std::cout << "================================================================================" << std::endl;
         for (int i = 0; i < message.size(); i++)
         {
@@ -134,44 +134,44 @@ void Console::displayGameState(std::vector<std::string> currentPlayer, std::vect
     std::cout << "================================================================================" << std::endl;
     std::cout << std::endl;
     std::cout << std::endl;
-    if (currentPlayer.size()>0)
+    if (currentPlayer.size() > 0)
     {
-    std::cout << std::left << std::setw(padding) << currentPlayer[0];
-    std::cout << std::left << std::setw(padding + 5) << currentPlayer[1];
-    int totalCrAtk = std::stoi(currentPlayer[3]);
-    int minionCrAtk;
-    if (totalCrAtk > 0)
-    {
-        minionCrAtk = std::stoi(currentPlayer[3]) - std::stoi(currentPlayer[2]);
+        std::cout << std::left << std::setw(padding) << currentPlayer[0];
+        std::cout << std::left << std::setw(padding + 5) << currentPlayer[1];
+        int totalCrAtk = std::stoi(currentPlayer[3]);
+        int minionCrAtk;
+        if (totalCrAtk > 0)
+        {
+            minionCrAtk = std::stoi(currentPlayer[3]) - std::stoi(currentPlayer[2]);
+        }
+        else
+        {
+            minionCrAtk = 0;
+        }
+
+        std::cout << std::left << std::fixed << std::setprecision(2) << std::setw(padding + 5) << currentPlayer[2];
+        std::cout << std::left << std::fixed << std::setprecision(2) << std::setw(padding) << minionCrAtk;
+        std::cout << std::left << std::fixed << std::setprecision(2) << std::setw(padding) << currentPlayer[3] << std::endl;
     }
-    else
+    if (opponentPlayer.size() > 0)
     {
-        minionCrAtk = 0;
-    }
-    
-    std::cout << std::left << std::fixed << std::setprecision(2) << std::setw(padding + 5) << currentPlayer[2];
-    std::cout << std::left << std::fixed << std::setprecision(2) << std::setw(padding) << minionCrAtk;
-    std::cout << std::left << std::fixed << std::setprecision(2) << std::setw(padding) << currentPlayer[3] << std::endl;
-    }
-    if (opponentPlayer.size()>0)
-    {
-    std::cout << std::endl;
-    std::cout << std::endl;
-    std::cout << std::left << std::setw(padding) << opponentPlayer[0];
-    std::cout << std::left << std::setw(padding + 5) << opponentPlayer[1];
-    int totalOpAtk = 0;
-    int minionOpAtk;
-    if (totalOpAtk > 0)
-    {
-        minionOpAtk = std::stoi(opponentPlayer[3]) - std::stoi(opponentPlayer[2]);
-    }
-    else
-    {
-        minionOpAtk = 0;
-    }
-    std::cout << std::left << std::fixed << std::setprecision(2) << std::setw(padding + 5) << opponentPlayer[2];
-    std::cout << std::left << std::fixed << std::setprecision(2) << std::setw(padding) << minionOpAtk;
-    std::cout << std::left << std::fixed << std::setprecision(2) << std::setw(padding) << opponentPlayer[3] << std::endl;
+        std::cout << std::endl;
+        std::cout << std::endl;
+        std::cout << std::left << std::setw(padding) << opponentPlayer[0];
+        std::cout << std::left << std::setw(padding + 5) << opponentPlayer[1];
+        int totalOpAtk = 0;
+        int minionOpAtk;
+        if (totalOpAtk > 0)
+        {
+            minionOpAtk = std::stoi(opponentPlayer[3]) - std::stoi(opponentPlayer[2]);
+        }
+        else
+        {
+            minionOpAtk = 0;
+        }
+        std::cout << std::left << std::fixed << std::setprecision(2) << std::setw(padding + 5) << opponentPlayer[2];
+        std::cout << std::left << std::fixed << std::setprecision(2) << std::setw(padding) << minionOpAtk;
+        std::cout << std::left << std::fixed << std::setprecision(2) << std::setw(padding) << opponentPlayer[3] << std::endl;
     }
     std::cout << std::endl;
     std::cout << std::endl;
@@ -210,15 +210,17 @@ int Console::displayMenu(const std::string &title, const std::vector<std::string
     while (1)
     {
         std::cout << "\033[H\033[J";
-        int width = 80;
+        int width = 100;
         int height = menuOptions.size() + 4;
         std::cout << '+' << std::string(width - 2, '-') << '+' << std::endl;
         int titlePadding = (width - title.length() - 4) / 2;
         std::cout << "|";
-        std::cout << std::string(titlePadding, ' ') << "\033[35m" << title << "\033[0m";
+        std::cout << std::string(titlePadding, ' ') << "\033[35m" << std::left << std::setw(title.length()) << title << "\033[0m";
         std::cout << std::string(width - title.length() - titlePadding - 2, ' ') << "|" << std::endl;
         std::cout << '+' << std::string(width - 2, '-') << '+' << std::endl;
+
         if (numOptions > 0)
+        {
             for (int i = 0; i < numOptions; ++i)
             {
                 if (i == currentIndex)
@@ -229,13 +231,16 @@ int Console::displayMenu(const std::string &title, const std::vector<std::string
                 {
                     std::cout << "|    ";
                 }
-                int padding = (width - menuOptions[i].length() - 6) / 2;
-                std::cout << std::string(padding, ' ') << menuOptions[i] << std::string(width - menuOptions[i].length() - padding - 6, ' ') << "\033[0m|" << std::endl;
+                int padding = 5;
+                std::cout << std::string(padding, ' ') << std::left << menuOptions[i] << std::string(width - menuOptions[i].length() - padding - 6, ' ') << "\033[0m|" << std::endl;
             }
+        }
         else
         {
-            std::cout << "|              You are ran out of cards, only hero attack!                     |" << std::endl;
+            std::cout << "| " << std::left << std::setw(width - 4) << "You are ran out of cards, only hero attack!"
+                      << " |" << std::endl;
         }
+
         std::cout << '+' << std::string(width - 2, '-') << '+' << std::endl;
 
         key = getchar();
@@ -265,6 +270,35 @@ int Console::displayMenu(const std::string &title, const std::vector<std::string
 
     tcsetattr(STDIN_FILENO, TCSANOW, &original_termios);
     return -1;
+}
+
+void Console::displayTableEntitiesMenu(const std::string &title, const std::vector<std::string> &tableEntities)
+{
+    int numOptions = tableEntities.size();
+
+    int width = 120;
+    int height = tableEntities.size() + 4;
+    std::cout << '+' << std::string(width - 2, '-') << '+' << std::endl;
+    int titlePadding = (width - title.length() - 4) / 2;
+    std::cout << "|";
+    std::cout << std::string(titlePadding, ' ') << "\033[35m" << std::left << std::setw(title.length()) << title << "\033[0m";
+    std::cout << std::string(width - title.length() - titlePadding - 2, ' ') << "|" << std::endl;
+    std::cout << '+' << std::string(width - 2, '-') << '+' << std::endl;
+
+    if (numOptions > 0)
+    {
+        for (int i = 0; i < numOptions; ++i)
+        {
+            std::cout << "|    " << std::left << tableEntities[i] << std::string(width - tableEntities[i].length() - 6, ' ') << "|" << std::endl;
+        }
+    }
+    else
+    {
+        std::cout << "| " << std::left << std::setw(width - 4) << "No table entities to display."
+                  << " |" << std::endl;
+    }
+
+    std::cout << '+' << std::string(width - 2, '-') << '+' << std::endl;
 }
 
 void Console::loadingConsole()

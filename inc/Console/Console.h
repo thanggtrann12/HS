@@ -12,6 +12,7 @@ public:
     void displayGameState(std::vector<std::string> currentPlayer, std::vector<std::string> opponentPlayer, std::vector<std::string> message);
     void displayGameResult(std::vector<std::string> message);
     int displayMenu(const std::string &title, const std::vector<std::string> &menuOptions);
+    void displayTableEntitiesMenu(const std::string &title, const std::vector<std::string> &tableEntities);
     ~Console();
     void waitForEnter();
 

@@ -5,71 +5,62 @@
 #include <vector>
 #include <memory>
 #define UNUSED(x) (void)(x)
+class Minion;
+typedef struct
+{
+    std::shared_ptr<Hero> hero;
+    std::vector<std::shared_ptr<Minion>> tableEntities;
+    std::vector<std::shared_ptr<Minion>> handEntities;
+    std::vector<std::string> stats;
+    int turnCount = 0;
+} GameData_t;
 class Minion : public GameEntity
 {
 public:
-  Minion(std::string n, int a, int h, std::string sk, EntityType tp)
-      : GameEntity(n, a, h, sk, tp) {}
-  int shamanCnt;
+    Minion(std::string n, int a, int h, std::string sk, EntityType tp)
+        : GameEntity(n, a, h, sk, tp) {}
+    virtual void applyEffect(std::vector<GameData_t> &player, int playerIndex) = 0;
+    void DameToAllEntities(GameData_t &player, int damage);
+    int shamanCnt;
 };
 
 class FlametongueTotem : public Minion
 {
 public:
-  FlametongueTotem()
-      : Minion("Flametongue Totem", 0, 3, "Provides +1 Attack to adjacent minions", EntityType::MINION){};
-  void applyEffect(std::vector<GameData_t> player, uint8_t entitiesIndex, uint8_t playerIndex) override;
-  std::shared_ptr<GameEntity> createInstance() override
-  {
-    return std::make_shared<FlametongueTotem>();
-  }
+    FlametongueTotem()
+        : Minion("Flametongue Totem", 0, 3, "Provides +1 Attack to alliance minions", EntityType::SHAMAN) { SetIsUsed(false); };
+    void applyEffect(std::vector<GameData_t> &player, int playerIndex) override;
 
 private:
-  const uint8_t shamanbuff = 1;
+    const int shamanbuff = 1;
 };
 
 class RagnarosTheFirelord : public Minion
 {
 public:
-  RagnarosTheFirelord()
-      : Minion("Ragnaros the Firelord", 0, 3, "Normal Attack", EntityType::MINION){};
-  void applyEffect(std::vector<GameData_t> player, uint8_t entitiesIndex, uint8_t playerIndex) override;
-  std::shared_ptr<GameEntity> createInstance() override
-  {
-    return std::make_shared<RagnarosTheFirelord>();
-  }
+    RagnarosTheFirelord()
+        : Minion("Ragnaros the Firelord", 3, 1, "Normal Attack", EntityType::MINION) { SetIsUsed(false); };
+    void applyEffect(std::vector<GameData_t> &player, int playerIndex) override;
 };
 class BloodmageThalnos : public Minion
 {
 public:
-  BloodmageThalnos()
-      : Minion("Bloodmage Thalnos", 1, 1, "Normal Attack", EntityType::MINION){};
-  void applyEffect(std::vector<GameData_t> player, uint8_t entitiesIndex, uint8_t playerIndex) override;
-  std::shared_ptr<GameEntity> createInstance() override
-  {
-    return std::make_shared<BloodmageThalnos>();
-  }
+    BloodmageThalnos()
+        : Minion("Bloodmage Thalnos", 1, 1, "Normal Attack", EntityType::MINION) { SetIsUsed(false); };
+    void applyEffect(std::vector<GameData_t> &player, int playerIndex) override;
 };
 class Brawl : public Minion
 {
 public:
-  Brawl()
-      : Minion("Brawl", 0, 0, "Destroy a random minion of the opposite player", EntityType::BRAWL){};
-  void applyEffect(std::vector<GameData_t> player, uint8_t entitiesIndex, uint8_t playerIndex) override;
-  std::shared_ptr<GameEntity> createInstance() override
-  {
-    return std::make_shared<Brawl>();
-  }
+    Brawl()
+        : Minion("Brawl", 0, 0, "Destroy a random minion of the opposite player", EntityType::BRAWL) { SetIsUsed(false); };
+    void applyEffect(std::vector<GameData_t> &player, int playerIndex) override;
 };
 class Techies : public Minion
 {
 public:
-  Techies()
-      : Minion("Techies", 2, 1, "On dead it deals 3 damage to both hero", EntityType::TECHIES){};
-  void applyEffect(std::vector<GameData_t> player, uint8_t entitiesIndex, uint8_t playerIndex) override;
-  std::shared_ptr<GameEntity> createInstance() override
-  {
-    return std::make_shared<Techies>();
-  }
+    Techies()
+        : Minion("Techies", 1, 2, "On dead it deals 3 damage to both hero", EntityType::TECHIES) { SetIsUsed(false); };
+    void applyEffect(std::vector<GameData_t> &player, int playerIndex) override;
 };
 #endif // MINION_H
