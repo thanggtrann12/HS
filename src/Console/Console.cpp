@@ -272,7 +272,7 @@ int Console::displayMenu(const std::string &title, const std::vector<std::string
     return -1;
 }
 
-void Console::displayTableEntitiesMenu(const std::string &title, const std::vector<std::string> &tableEntities)
+void Console::displayTableStats(const std::string &title, const std::vector<std::string> &tableEntities)
 {
     int numOptions = tableEntities.size();
 
