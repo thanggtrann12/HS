@@ -13,7 +13,7 @@ set(SOURCES
   src/Entity/Hero.cpp
   src/Game/Game.cpp
   src/Console/Console.cpp
-  # src/MySocket/Socket.cpp
+  src/MySocket/Socket.cpp
 
 )
 set(HEADERS
@@ -21,8 +21,9 @@ set(HEADERS
   inc/Entity/Minion.h
   inc/Console/Console.h
   inc/Game/Game.h
-  # inc/MySocket/Socket.h
-  # inc/MySocket/Ip.h
+  inc/MySocket/Socket.h
+  inc/Game/GameData.h
+
 )
 add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 target_include_directories(${PROJECT_NAME} PRIVATE inc)

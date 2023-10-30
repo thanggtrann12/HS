@@ -1,19 +1,11 @@
 #ifndef MINION_H
 #define MINION_H
 
+#include "Game/GameData.h"
 #include "Entity/Entity.h"
 #include <vector>
 #include <memory>
-#define UNUSED(x) (void)(x)
-class Minion;
-typedef struct
-{
-    std::shared_ptr<Hero> hero;
-    std::vector<std::shared_ptr<Minion>> tableEntities;
-    std::vector<std::shared_ptr<Minion>> handEntities;
-    std::vector<std::string> stats;
-    int turnCount = 0;
-} GameData_t;
+
 class Minion : public GameEntity
 {
 public:
@@ -28,7 +20,7 @@ class FlametongueTotem : public Minion
 {
 public:
     FlametongueTotem()
-        : Minion("Flametongue Totem", 0, 3, "Provides +1 Attack to alliance minions", EntityType::SHAMAN) { SetIsUsed(false); };
+        : Minion("Flametongue Totem", 0, 3, "Provides 1 Attack to alliance minions", EntityType::SHAMAN) { SetIsUsed(false); };
     void applyEffect(std::vector<GameData_t> &player, int playerIndex) override;
 
 private:

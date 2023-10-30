@@ -1,4 +1,5 @@
 #include "Entity/Entity.h"
+#include "Entity/Hero.h"
 #include <iostream>
 #include <algorithm>
 void Hero::InitHeroes()

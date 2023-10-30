@@ -9,10 +9,10 @@ public:
     void clearConsole();
     void loadingConsole();
     void displayWelcomeMessage(int &choice);
-    void displayGameState(std::vector<std::string> currentPlayer, std::vector<std::string> opponentPlayer, std::vector<std::string> message);
     void displayGameResult(std::vector<std::string> message);
     int displayMenu(const std::string &title, const std::vector<std::string> &menuOptions);
     void displayTableStats(const std::string &title, const std::vector<std::string> &tableEntities);
+    void displayHandEntities(const GameStats_t &data);
     ~Console();
     void waitForEnter();
 

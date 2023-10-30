@@ -1,4 +1,5 @@
 #include "Entity/Entity.h"
+#include "Entity/Hero.h"
 #include <iostream>
 GameEntity::GameEntity(std::string n, int a, int h, std::string sk, EntityType tp)
     : name(n), attack(a), health(h), skill(sk), type(tp) { maxhealth = health; }
@@ -6,6 +7,10 @@ GameEntity::GameEntity(std::string n, int a, int h, std::string sk, EntityType t
 std::string GameEntity::GetName() const
 {
     return name;
+}
+std::string GameEntity::GetSkill() const
+{
+    return skill;
 }
 int GameEntity::GetAttack() const
 {
@@ -49,6 +54,25 @@ bool GameEntity::IsUsed() const
 void GameEntity::SetIsUsed(bool use)
 {
     used = use;
+}
+
+std::string GameEntity::EntityTypeToString(EntityType entityType)
+{
+    switch (entityType)
+    {
+    case EntityType::MINION:
+        return "MINION ";
+    case EntityType::BRAWL:
+        return "BRAWL  ";
+    case EntityType::TECHIES:
+        return "TECHIES";
+    case EntityType::SHAMAN:
+        return "SHAMAN ";
+    case EntityType::HERO:
+        return "HERO";
+    default:
+        return "UNKNOWN";
+    }
 }
 
 GameEntity::~GameEntity() {}

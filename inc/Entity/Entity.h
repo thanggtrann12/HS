@@ -22,6 +22,7 @@ public:
     GameEntity() : name("DefaultName"), attack(0), health(0), skill("DefaultSkill"), type(EntityType::HERO) {}
     GameEntity(std::string n, int a, int h, std::string sk, EntityType tp);
     std::string GetName() const;
+    std::string GetSkill() const;
     int GetAttack() const;
     int GetHealth() const;
     bool IsAlive();
@@ -32,6 +33,7 @@ public:
     void SetAttack(int _newAtk);
     bool IsUsed() const;
     void SetIsUsed(bool used);
+    std::string EntityTypeToString(EntityType entityType);
     virtual ~GameEntity();
 
 protected:
@@ -42,18 +44,6 @@ protected:
     int attack;
     int health;
     int maxhealth;
-};
-class Hero : public GameEntity
-{
-public:
-    Hero() : GameEntity() {}
-    Hero(std::string n, int a, int h, const std::string &sk, EntityType tp) : GameEntity(n, a, h, sk, tp) {}
-    void InitHeroes();
-    bool IsAlive();
-    std::vector<std::shared_ptr<Hero>> &GetHeroes();
-
-private:
-    std::vector<std::shared_ptr<Hero>> heroes;
 };
 
 #endif // UNITS_H
