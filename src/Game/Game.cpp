@@ -86,6 +86,7 @@ void Game::play()
         addEntityToTable(CLIENT_INDEX, cardChoice);
         removeEntityFromHand(CLIENT_INDEX, cardChoice);
         activateEntity(CLIENT_INDEX);
+        showTableStats(CLIENT_INDEX);
         cardList.clear();
       }
       else
@@ -205,8 +206,7 @@ void Game::addEntityToTable(int playerIndex, int entityIndex)
 void Game::activateEntity(int playerIndex)
 {
   int totalMinionsDamage = 0;
-  std::vector<std::string> tableEntitiesPlayer1;
-  std::vector<std::string> tableEntitiesPlayer2;
+
   if (!playerData[playerIndex].tableEntities.empty())
   {
     tableEntitiesPlayer1.push_back("Active: ");
@@ -249,8 +249,6 @@ void Game::activateEntity(int playerIndex)
   tableEntitiesPlayer1.push_back(playerData[playerIndex].hero->GetName() + " attack " + playerData[1 - playerIndex].hero->GetName() + " with " + std::to_string(playerData[playerIndex].hero->GetAttack()) + " and minion attack with: [" + std::to_string(totalMinionsDamage) + "] damage");
   playerData[playerIndex].hero->AttackHero(playerData[1 - playerIndex].hero, playerData[playerIndex].hero->GetAttack());
   tableEntitiesPlayer1.push_back(playerData[playerIndex].hero->GetName() + "'s health left [" + std::to_string((playerData[playerIndex].hero->GetHealth())) + "]");
-  console->clearConsole();
-  console->displayTableStats(playerData[playerIndex].hero->GetName() + "'s table entities", tableEntitiesPlayer1);
 
   tableEntitiesPlayer2.push_back(playerData[1 - playerIndex].hero->GetName() + " have been attacked by " + playerData[playerIndex].hero->GetName() + " with " + std::to_string(playerData[playerIndex].hero->GetAttack()) + " and minion attack " + std::to_string(totalMinionsDamage));
   for (int i = 0; i < playerData[1 - playerIndex].stats.size(); i++)
@@ -258,7 +256,22 @@ void Game::activateEntity(int playerIndex)
     tableEntitiesPlayer2.push_back(playerData[1 - playerIndex].stats[i]);
   }
   tableEntitiesPlayer2.push_back(playerData[1 - playerIndex].hero->GetName() + "'s health left [" + std::to_string((playerData[1 - playerIndex].hero->GetHealth())) + "]");
-  console->displayTableStats(playerData[1 - playerIndex].hero->GetName() + "'s table stats", tableEntitiesPlayer2);
+}
+std::vector<std::vector<std::string>> Game::getGameStats()
+{
+  std::vector<std::vector<std::string>> gameStats;
+  gameStats.push_back(tableEntitiesPlayer1);
+  gameStats.push_back(tableEntitiesPlayer2);
   tableEntitiesPlayer1.clear();
   tableEntitiesPlayer2.clear();
+  return gameStats;
+}
+
+void Game::showTableStats(int playerIndex)
+{
+
+  std::vector<std::vector<std::string>> stats = getGameStats();
+  console->clearConsole();
+  console->displayTableStats(playerData[playerIndex].hero->GetName() + "'s table entities", stats[playerIndex]);
+  console->displayTableStats(playerData[1 - playerIndex].hero->GetName() + "'s table stats", stats[1 - playerIndex]);
 }
