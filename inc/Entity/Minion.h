@@ -1,7 +1,7 @@
 #ifndef MINION_H
 #define MINION_H
 
-#include "Game/GameData.h"
+#include "Helper/Helper.h"
 #include "Entity/Entity.h"
 #include <vector>
 #include <memory>

@@ -5,25 +5,28 @@ project(
   HeartStone
   VERSION 1.0
   LANGUAGES CXX)
-
+add_definitions(-DLOG_FILE_PATH="${CMAKE_SOURCE_DIR}/generated/logfile.log")
 set(SOURCES
   main.cpp
-  src/Entity/Entity.cpp
-  src/Entity/Minion.cpp
-  src/Entity/Hero.cpp
-  src/Game/Game.cpp
-  src/Console/Console.cpp
-  src/MySocket/Socket.cpp
-
+  ${CMAKE_SOURCE_DIR}/src/Entity/Entity.cpp
+  ${CMAKE_SOURCE_DIR}/src/Entity/Minion.cpp
+  ${CMAKE_SOURCE_DIR}/src/Entity/Hero.cpp
+  ${CMAKE_SOURCE_DIR}/src/Game/Game.cpp
+  ${CMAKE_SOURCE_DIR}/src/Console/Console.cpp
+  ${CMAKE_SOURCE_DIR}/src/MySocket/Socket.cpp
 )
+
 set(HEADERS
-  inc/Entity/Entity.h
-  inc/Entity/Minion.h
-  inc/Console/Console.h
-  inc/Game/Game.h
-  inc/MySocket/Socket.h
-  inc/Game/GameData.h
-
+  ${CMAKE_SOURCE_DIR}/inc/Entity/Entity.h
+  ${CMAKE_SOURCE_DIR}/inc/Entity/Minion.h
+  ${CMAKE_SOURCE_DIR}/inc/Console/Console.h
+  ${CMAKE_SOURCE_DIR}/inc/Game/Game.h
+  ${CMAKE_SOURCE_DIR}/inc/MySocket/Socket.h
+  ${CMAKE_SOURCE_DIR}/inc/Helper/Helper.h
 )
+
+set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/build)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/generated)
 add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
-target_include_directories(${PROJECT_NAME} PRIVATE inc)
+
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/inc)
