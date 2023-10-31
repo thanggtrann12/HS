@@ -105,7 +105,7 @@ void MySocket::sendGameStats(const GameStats_t &player1Stats, const GameStats_t 
     serializedData += serializeVector(player2Stats.cardSkills) + "+";
     serializedData += serializeVector(player2Stats.health) + "+";
     serializedData += serializeVector(player2Stats.attack) + "+";
-    serializedData += serializeVector(player2Stats.activate);
+    serializedData += serializeVector(player2Stats.activate)+ "+";
 
     sendData(serializedData);
 }
@@ -132,7 +132,6 @@ int MySocket::receiveGameStats(GameStats_t &player1Stats, GameStats_t &player2St
         allData.push_back(token);
         receivedString.erase(0, pos + 1);
     }
-    std::cout << allData.size() << std::endl;
     if (allData.size() >= 7)
     {
         player1Stats.basicHeroStats = allData[0];
@@ -157,7 +156,7 @@ int MySocket::receiveGameStats(GameStats_t &player1Stats, GameStats_t &player2St
         parseStringToVector(allData[15], player2Stats.activate);
     }
 
-    return (allData.size() >= 16) ? 0 : -1;
+    return (allData.size() >= 15) ? 0 : -1;
 }
 
 void MySocket::initializeServer()

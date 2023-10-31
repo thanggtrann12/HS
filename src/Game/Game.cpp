@@ -155,7 +155,6 @@ void Game::playServerMode(MySocket &socket)
   removeEntityFromHand(SERVER_INDEX, playerChoice);
   activateEntity(SERVER_INDEX);
   showTableStats(SERVER_INDEX);
-
   currentPlayer = getGameStatsForPlayer(SERVER_INDEX);
   opponentPlayer = getGameStatsForPlayer(CLIENT_INDEX);
   socket.sendGameStats(currentPlayer, opponentPlayer);
