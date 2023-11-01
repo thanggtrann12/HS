@@ -161,7 +161,6 @@ void Game::playServerMode(MySocket &socket)
   playerData[CLIENT_INDEX].stats.clear();
   playerData[SERVER_INDEX].stats.clear();
   cardList.clear();
-  std::cout << "Wait for other turn" << std::endl;
   clearPlayerDataStats();
 }
 
@@ -381,9 +380,11 @@ void Game::showEntitiesOnTable(const GameStats_t &currentPlayer, const GameStats
 {
   console->clearConsole();
 
-  console->displayTableStats(currentPlayer.basicHeroStats, currentPlayer.stats);
+  // console->displayTableStats(currentPlayer.basicHeroStats, currentPlayer.stats);
   console->displayHandEntities(currentPlayer);
-  std::cout << "\n\n\n";
+    for (const std::string& line : waitTemplate) {
+        std::cout << line << std::endl;
+    }
   console->displayHandEntities(opponentPlayer);
-  console->displayTableStats(opponentPlayer.basicHeroStats, opponentPlayer.stats);
+  // console->displayTableStats(opponentPlayer.basicHeroStats, opponentPlayer.stats);
 }
