@@ -11,18 +11,18 @@ set(SOURCES
   ${CMAKE_SOURCE_DIR}/src/Entity/Entity.cpp
   ${CMAKE_SOURCE_DIR}/src/Entity/Minion.cpp
   ${CMAKE_SOURCE_DIR}/src/Entity/Hero.cpp
-  ${CMAKE_SOURCE_DIR}/src/Game/Game.cpp
-  ${CMAKE_SOURCE_DIR}/src/Console/Console.cpp
+  ${CMAKE_SOURCE_DIR}/src/GameEngine/GameEngine.cpp
   ${CMAKE_SOURCE_DIR}/src/MySocket/Socket.cpp
+  ${CMAKE_SOURCE_DIR}/src/GameUi/GameUi.cpp
 )
 
 set(HEADERS
   ${CMAKE_SOURCE_DIR}/inc/Entity/Entity.h
   ${CMAKE_SOURCE_DIR}/inc/Entity/Minion.h
-  ${CMAKE_SOURCE_DIR}/inc/Console/Console.h
-  ${CMAKE_SOURCE_DIR}/inc/Game/Game.h
+  ${CMAKE_SOURCE_DIR}/inc/GameEngine/GameEngine.h
   ${CMAKE_SOURCE_DIR}/inc/MySocket/Socket.h
   ${CMAKE_SOURCE_DIR}/inc/Helper/Helper.h
+  ${CMAKE_SOURCE_DIR}/inc/GameUi/GameUi.h
 )
 
 set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/build)

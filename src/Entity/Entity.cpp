@@ -60,8 +60,10 @@ std::string GameEntity::EntityTypeToString(EntityType entityType)
 {
     switch (entityType)
     {
-    case EntityType::MINION:
-        return "MINION ";
+    case EntityType::FIRELORD:
+        return "FIRELORD ";
+    case EntityType::THALNOS:
+        return "THALNOS ";
     case EntityType::BRAWL:
         return "BRAWL  ";
     case EntityType::TECHIES:

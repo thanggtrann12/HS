@@ -8,6 +8,8 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #include "Helper/Helper.h"
+#include "Entity/Entity.h"
+
 #define PORT 8081
 
 class MySocket
@@ -26,13 +28,10 @@ public:
     }
 
     ~MySocket();
-    void sendPlayerHandEntities(GameData_t &data);
-    int receiveHandEntities(std::vector<std::string> &handEntities);
-    void sendData(const std::string &serializedData);
+    void sendInitCardPool(const EntityType *entities);
+    bool receiveInitCardPool(std::vector<std::shared_ptr<Minion>> &client, std::vector<std::shared_ptr<Minion>> &server);
     void sendPlayerChoice(int choice);
     int receivePlayerChoice();
-    void sendGameStats(const GameStats_t &player1Stats, const GameStats_t &player2Stats);
-    int receiveGameStats(GameStats_t &player1Stats, GameStats_t &player2Stats);
 
 private:
     int mode_;

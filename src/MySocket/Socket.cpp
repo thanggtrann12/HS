@@ -8,6 +8,7 @@
 #include <cstring>
 #include <iostream>
 #include <iomanip>
+#include "Entity/Entity.h"
 #include "Entity/Minion.h"
 MySocket::~MySocket()
 {
@@ -16,56 +17,65 @@ MySocket::~MySocket()
         close(clientSocket_);
     }
 }
-void parseStringToVector(const std::string &input, std::vector<std::string> &output)
+
+void MySocket::sendInitCardPool(const EntityType *entities)
 {
-    std::istringstream ss(input);
-    std::string line;
-    while (std::getline(ss, line, '\n'))
+    size_t arraySize = 20;
+    ssize_t sentBytes = send(clientSocket_, entities, arraySize * sizeof(EntityType), 0);
+}
+std::shared_ptr<Minion> createMinionFromEntityType(EntityType entity)
+{
+    switch (entity)
     {
-        output.push_back(line);
+    case EntityType::FIRELORD:
+        return std::make_shared<RagnarosTheFirelord>();
+    case EntityType::THALNOS:
+        return std::make_shared<BloodmageThalnos>();
+    case EntityType::BRAWL:
+        return std::make_shared<Brawl>();
+    case EntityType::TECHIES:
+        return std::make_shared<Techies>();
+    case EntityType::SHAMAN:
+        return std::make_shared<FlametongueTotem>();
+    default:
+        return nullptr;
     }
 }
-std::string serializeVector(const std::vector<std::string> &vec)
+bool MySocket::receiveInitCardPool(std::vector<std::shared_ptr<Minion>> &client, std::vector<std::shared_ptr<Minion>> &server)
 {
-    std::string serialized;
-    for (const auto &item : vec)
+    EntityType entities[20];
+    size_t arraySize = 20;
+    ssize_t receivedBytes = recv(clientSocket_, entities, arraySize * sizeof(EntityType), 0);
+
+    if (receivedBytes == -1)
     {
-        serialized += item + '\n';
+        perror("Receive failed");
+        return false;
     }
-    return serialized;
-}
-void MySocket::sendData(const std::string &serializedData)
-{
-
-    send(clientSocket_, serializedData.c_str(), serializedData.size(), 0);
-}
-
-int MySocket::receiveHandEntities(std::vector<std::string> &handEntities)
-{
-    ssize_t bytesReceived;
-    char buffer[1024];
-    bytesReceived = recv(clientSocket_, buffer, sizeof(buffer), 0);
-    if (bytesReceived <= 0)
+    else if (receivedBytes == 0)
     {
-        return -1; // Handle error or disconnection
+        return false;
     }
 
-    std::string receivedString(buffer, bytesReceived);
-    parseStringToVector(receivedString, handEntities);
-    if (handEntities.size() > 0)
-        return 0;
-    return -1;
-}
-
-void MySocket::sendPlayerHandEntities(GameData_t &data)
-{
-    std::string serializedData;
-
-    for (auto &entity : data.handEntities)
+    for (size_t i = 0; i < 10; i++)
     {
-        serializedData += entity->GetDescription() + '\n';
+        std::shared_ptr<Minion> minion = createMinionFromEntityType(entities[i]);
+        if (minion)
+        {
+            client.emplace_back(minion);
+        }
     }
-    sendData(serializedData);
+
+    for (size_t i = 10; i < 20; i++)
+    {
+        std::shared_ptr<Minion> minion = createMinionFromEntityType(entities[i]);
+        if (minion)
+        {
+            server.emplace_back(minion);
+        }
+    }
+
+    return true;
 }
 
 void MySocket::sendPlayerChoice(int choice)
@@ -82,81 +92,6 @@ int MySocket::receivePlayerChoice()
         return -1;
     }
     return receivedInt;
-}
-
-void MySocket::sendGameStats(const GameStats_t &player1Stats, const GameStats_t &player2Stats)
-{
-    std::string serializedData;
-
-    // Serialize player1Stats
-    serializedData += player1Stats.basicHeroStats + "+";
-    serializedData += serializeVector(player1Stats.stats) + "+";
-    serializedData += serializeVector(player1Stats.cardNames) + "+";
-    serializedData += serializeVector(player1Stats.cardTypes) + "+";
-    serializedData += serializeVector(player1Stats.cardSkills) + "+";
-    serializedData += serializeVector(player1Stats.health) + "+";
-    serializedData += serializeVector(player1Stats.attack) + "+";
-    serializedData += serializeVector(player1Stats.activate) + "+";
-    // Serialize player2Stats
-    serializedData += player2Stats.basicHeroStats + "+";
-    serializedData += serializeVector(player2Stats.stats) + "+";
-    serializedData += serializeVector(player2Stats.cardNames) + "+";
-    serializedData += serializeVector(player2Stats.cardTypes) + "+";
-    serializedData += serializeVector(player2Stats.cardSkills) + "+";
-    serializedData += serializeVector(player2Stats.health) + "+";
-    serializedData += serializeVector(player2Stats.attack) + "+";
-    serializedData += serializeVector(player2Stats.activate)+ "+";
-
-    sendData(serializedData);
-}
-
-int MySocket::receiveGameStats(GameStats_t &player1Stats, GameStats_t &player2Stats)
-{
-    char buffer[4056];
-    ssize_t bytesReceived = recv(clientSocket_, buffer, sizeof(buffer), 0);
-
-    if (bytesReceived < 0)
-    {
-        // Handle the error or connection termination
-        return -1;
-    }
-
-    std::string receivedString(buffer, bytesReceived);
-
-    std::vector<std::string> allData;
-    size_t pos = 0;
-    std::string token;
-    while ((pos = receivedString.find('+')) != std::string::npos)
-    {
-        token = receivedString.substr(0, pos);
-        allData.push_back(token);
-        receivedString.erase(0, pos + 1);
-    }
-    if (allData.size() >= 7)
-    {
-        player1Stats.basicHeroStats = allData[0];
-        parseStringToVector(allData[1], player1Stats.stats);
-        parseStringToVector(allData[2], player1Stats.cardNames);
-        parseStringToVector(allData[3], player1Stats.cardTypes);
-        parseStringToVector(allData[4], player1Stats.cardSkills);
-        parseStringToVector(allData[5], player1Stats.health);
-        parseStringToVector(allData[6], player1Stats.attack);
-        parseStringToVector(allData[7], player1Stats.activate);
-    }
-
-    if (allData.size() >= 15)
-    {
-        player2Stats.basicHeroStats = allData[8];
-        parseStringToVector(allData[9], player2Stats.stats);
-        parseStringToVector(allData[10], player2Stats.cardNames);
-        parseStringToVector(allData[11], player2Stats.cardTypes);
-        parseStringToVector(allData[12], player2Stats.cardSkills);
-        parseStringToVector(allData[13], player2Stats.health);
-        parseStringToVector(allData[14], player2Stats.attack);
-        parseStringToVector(allData[15], player2Stats.activate);
-    }
-
-    return (allData.size() >= 15) ? 0 : -1;
 }
 
 void MySocket::initializeServer()

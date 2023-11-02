@@ -31,14 +31,14 @@ class RagnarosTheFirelord : public Minion
 {
 public:
     RagnarosTheFirelord()
-        : Minion("Ragnaros the Firelord", 3, 1, "Normal Attack", EntityType::MINION) { SetIsUsed(false); };
+        : Minion("Ragnaros the Firelord", 3, 1, "Normal Attack", EntityType::FIRELORD) { SetIsUsed(false); };
     void applyEffect(std::vector<GameData_t> &player, int playerIndex) override;
 };
 class BloodmageThalnos : public Minion
 {
 public:
     BloodmageThalnos()
-        : Minion("Bloodmage Thalnos", 1, 1, "Normal Attack", EntityType::MINION) { SetIsUsed(false); };
+        : Minion("Bloodmage Thalnos", 1, 1, "Normal Attack", EntityType::THALNOS) { SetIsUsed(false); };
     void applyEffect(std::vector<GameData_t> &player, int playerIndex) override;
 };
 class Brawl : public Minion

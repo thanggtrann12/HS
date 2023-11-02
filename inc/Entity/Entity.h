@@ -9,7 +9,8 @@ class GameEntity;
 
 enum class EntityType
 {
-    MINION,
+    FIRELORD,
+    THALNOS,
     BRAWL,
     TECHIES,
     SHAMAN,

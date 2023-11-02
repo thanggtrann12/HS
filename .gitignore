@@ -4,7 +4,7 @@ bin/
 generated/
 *.exe
 *.o
-
+test
 # Ignore logs and temporary files
 *.log
 .tmp/

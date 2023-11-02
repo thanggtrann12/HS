@@ -1,9 +1,9 @@
-#include "Game/Game.h"
+#include "GameEngine/GameEngine.h"
 
 int main()
 {
-  Game game;
-  game.play();
+    GameEngine game;
+    game.play();
 
-  return 0;
+    return 0;
 }
