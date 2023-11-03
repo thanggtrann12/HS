@@ -173,9 +173,6 @@ void GameEngine::GameEngine_onOfflineMode()
   std::vector<std::string> cardList;
   while (true)
   {
-    ui->GameUi_displayResult(GameData);
-    MySocket nullSocket(3);
-    GameEngine_checkPlayerTurnCount(nullSocket);
     int choiceCard = ui->GameUi_getChoiceWithCardList(GameData[CLIENT_INDEX].handEntities);
     GameEngine_handingPlayerTurn(CLIENT_INDEX, choiceCard);
     ui->GameUi_waitForConfirm();
