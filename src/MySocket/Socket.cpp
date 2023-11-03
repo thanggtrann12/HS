@@ -45,6 +45,8 @@ bool MySocket::receiveInitCardPool(std::vector<std::shared_ptr<Minion>> &client,
 {
     EntityType entities[20];
     size_t arraySize = 20;
+    client.clear();
+    server.clear();
     ssize_t receivedBytes = recv(clientSocket_, entities, arraySize * sizeof(EntityType), 0);
 
     if (receivedBytes == -1)

@@ -33,6 +33,7 @@ private:
     void GameEngine_onClientMode(MySocket &socket);
     void GameEngine_onServerMode(MySocket &socket);
     void GameEngine_onOfflineMode();
+    void GameEngine_checkPlayerTurnCount(MySocket &socket);
     void clearPlayerDataStats();
     void GameEngine_handingPlayerTurn(int playerIndex, int choice);
 

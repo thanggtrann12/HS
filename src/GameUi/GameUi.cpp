@@ -1,5 +1,6 @@
 #include "GameUi/GameUi.h"
 #include "Entity/Minion.h"
+#include "Entity/Hero.h"
 #include "Helper/Helper.h"
 #include <iostream>
 #include <string>
@@ -30,12 +31,23 @@ std::pair<std::vector<T>, std::vector<T>> splitVector(const std::vector<T> &inpu
     return result;
 }
 
-void GameUi::GameUi_waitForNextTurn()
+void GameUi::GameUi_waitForConfirm()
 {
-    std::cout << "Press Enter to continue ....";
+    std::cout <<std::string(120, ' ') << "Press Enter to continue ....";
     int key = getchar();
     if (key == 10)
         return;
+}
+
+void GameUi::GameUi_waitForNextTurn()
+{
+    std::cout<<std::string(120, ' ') << "Please wait for other turn..."<<std::endl;
+
+}
+
+void GameUi::GameUi_prepareConsole()
+{
+  system("clear");
 }
 
 void GameUi::GameUi_displayEntireTable(const std::vector<GameData_t> &tableData)
@@ -467,3 +479,21 @@ int GameUi::GameUi_getChoiceWithCardList(const std::vector<std::shared_ptr<Minio
     tcsetattr(STDIN_FILENO, TCSANOW, &original_termios);
     return -1;
 }
+
+void GameUi::GameUi_displayResult(const std::vector<GameData_t> &tableData)
+{
+
+  auto printWinnerMessages = [](const std::vector<std::string>& winnerMessages) {
+      for (const auto& e : winnerMessages) {
+          std::cout << std::string(50, ' ') << e << std::endl;
+      };
+  };
+  if (!tableData[0].hero->IsAlive() || !tableData[1].hero->IsAlive()) {
+      const auto& winnerMessages =
+          (tableData[0].hero->GetName() == "Slark") ? HERO_SLARK_WINNER : HERO_BUTCHER_WINNER;
+  GameUi_prepareConsole();
+      printWinnerMessages(winnerMessages);
+  GameUi_waitForConfirm();
+  }
+}
+

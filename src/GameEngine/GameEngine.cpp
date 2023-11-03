@@ -14,11 +14,9 @@ GameEngine::GameEngine()
     ui->GameUi_displayMenuOption(option);
     while (option == SHOW_GAME_RULES)
     {
-        // console->displayWelcomeMessage(mode);
         if (option == SHOW_GAME_RULES)
         {
             ui->GameUi_displayGameRules();
-            // console->waitForEnter();
         }
     }
 
@@ -60,7 +58,6 @@ void GameEngine::GameEngine_generateCardPocket()
 
 void GameEngine::GameEngine_generateEntitiesForEachMode(MySocket &socket)
 {
-    std::cout << "GameEngine_generateEntitiesForEachMode" << std::endl;
     EntityType entities[(option == CLIENT_MODE ? GameData[0].handEntities.size() : 2 * GameData[0].handEntities.size())];
     int entitiesCount = 0;
     switch (option)
@@ -68,13 +65,11 @@ void GameEngine::GameEngine_generateEntitiesForEachMode(MySocket &socket)
     case CLIENT_MODE:
         if (socket.receiveInitCardPool(ClientData.handEntities, ServerData.handEntities))
         {
-            for (auto &e : ServerData.handEntities)
-            {
-                entities[entitiesCount] = e->GetEntitiesType();
-                entitiesCount++;
-            }
+        GameData[CLIENT_INDEX].handEntities = ClientData.handEntities;
+        GameData[SERVER_INDEX].handEntities = ServerData.handEntities;
         }
-        break;
+
+        return;
     case SERVER_MODE:
         for (int playerIndex = 0; playerIndex < 2; playerIndex++)
             for (auto &e : GameData[playerIndex].handEntities)
@@ -83,6 +78,9 @@ void GameEngine::GameEngine_generateEntitiesForEachMode(MySocket &socket)
                 entitiesCount++;
             }
         socket.sendInitCardPool(entities);
+        break;
+    default:
+        /* in ofline mode, data have been generated at begin, no need any actions*/
         break;
     }
 }
@@ -106,16 +104,13 @@ void GameEngine::GameEngine_distributeCardToPlayerHand()
 void GameEngine::play()
 {
     MySocket socket(option);
-    GameEngine_generateEntitiesForEachMode(socket);
-    if (option == CLIENT_MODE)
-    {
-        std::cout << "ClientData.handEntities size: " << ClientData.handEntities.size() << std::endl;
-        GameData[CLIENT_INDEX].handEntities = ClientData.handEntities;
-        GameData[SERVER_INDEX].handEntities = ServerData.handEntities;
-    }
+   
+    // GameEngine_generateEntitiesForEachMode(socket);
 
     while (true)
     {
+      GameEngine_checkPlayerTurnCount(socket);
+      ui->GameUi_displayResult(GameData);
         switch (option)
         {
         case CLIENT_MODE:
@@ -139,18 +134,41 @@ void GameEngine::GameEngine_onClientMode(MySocket &socket)
     ui->GameUi_waitForNextTurn();
     int serverChoiceCard = socket.receivePlayerChoice();
     GameEngine_handingPlayerTurn(SERVER_INDEX, serverChoiceCard);
-    ui->GameUi_waitForNextTurn();
+    ui->GameUi_waitForConfirm();
 }
 
 void GameEngine::GameEngine_onServerMode(MySocket &socket)
 {
+  
     int clientChoiceCard = socket.receivePlayerChoice();
     GameEngine_handingPlayerTurn(CLIENT_INDEX, clientChoiceCard);
-    ui->GameUi_waitForNextTurn();
+    ui->GameUi_waitForConfirm();
     int choiceCard = ui->GameUi_getChoiceWithCardList(GameData[SERVER_INDEX].handEntities);
     GameEngine_handingPlayerTurn(SERVER_INDEX, choiceCard);
     socket.sendPlayerChoice(choiceCard);
     ui->GameUi_waitForNextTurn();
+}
+
+void GameEngine::GameEngine_checkPlayerTurnCount(MySocket &socket)
+{
+for (int playerIndex = 0; playerIndex < GameData.size(); playerIndex++) // Change '=' to '<'
+{
+    if (GameData[playerIndex].turnCount == 2)
+    {
+        for (int i = 0; i < 2; i++)
+        {
+            int randomIndex = rand() % cardsPool.size();
+            std::shared_ptr<Minion> minion = std::dynamic_pointer_cast<Minion>(cardsPool[randomIndex]);
+            if (minion)
+            {
+                GameData[playerIndex].handEntities.push_back(minion);
+            }
+        }
+        GameData[playerIndex].turnCount = 0;
+    }
+}
+
+  GameEngine_generateEntitiesForEachMode(socket);
 }
 
 void GameEngine::GameEngine_onOfflineMode()
@@ -159,29 +177,25 @@ void GameEngine::GameEngine_onOfflineMode()
     while (true)
     {
         // console->clearConsole();
+        ui->GameUi_displayResult(GameData);
+        ui->GameUi_waitForConfirm();
+        // if (cardList.size() > 0)
+        // {
+        //     if (GameData[CLIENT_INDEX].hero->IsAlive())
+        //     {
+        //         int choiceCard = ui->GameUi_getChoiceWithCardList(GameData[CLIENT_INDEX].handEntities);
+        //         GameEngine_handingPlayerTurn(CLIENT_INDEX, choiceCard);
+        //     }
+        //     else
+        //     {
+        //         // console->clearConsole();
+        //         std::cout << "Player Winner: " + GameData[SERVER_INDEX].hero->GetDescription() << std::endl;
+        //         // console->waitForEnter();
+        //     }
+        // }
+        // // console->waitForEnter();
 
-        for (auto &currentPlayerCard : GameData[CLIENT_INDEX].handEntities)
-        {
-            currentPlayerCard->SetIsUsed(false);
-            cardList.push_back(currentPlayerCard->GetDescription());
-        }
-        if (cardList.size() > 0)
-        {
-            if (GameData[CLIENT_INDEX].hero->IsAlive())
-            {
-                // int cardChoice = console->displayMenu(GameData[CLIENT_INDEX].hero->GetName() + "'s HP [" + std::to_string(GameData[CLIENT_INDEX].hero->GetHealth()) + "] turn with round [" + std::to_string(GameData[CLIENT_INDEX].turnCount + 1) + "]", cardList);
-                // GameEngine_handingPlayerTurn(CLIENT_INDEX, cardChoice);
-            }
-            else
-            {
-                // console->clearConsole();
-                std::cout << "Player Winner: " + GameData[SERVER_INDEX].hero->GetDescription() << std::endl;
-                // console->waitForEnter();
-            }
-        }
-        // console->waitForEnter();
-
-        std::swap(CLIENT_INDEX, SERVER_INDEX);
+        // std::swap(CLIENT_INDEX, SERVER_INDEX);
     }
 }
 
@@ -194,9 +208,9 @@ void GameEngine::clearPlayerDataStats()
 void GameEngine::GameEngine_handingPlayerTurn(int playerIndex, int choice)
 {
     GameData[playerIndex].turnCount++;
-    std::cout << GameData[playerIndex].handEntities.size() << std::endl;
     GameEngine_placeCardToBattleYard(playerIndex, choice);
     GameEngine_activeCardOnBattleYard(playerIndex);
+    ui->GameUi_prepareConsole();
     ui->GameUi_displayEntireTable(GameData);
     clearPlayerDataStats();
 }
@@ -278,7 +292,6 @@ void GameEngine::GameEngine_placeCardToBattleYard(int playerIndex, int entityInd
 void GameEngine::GameEngine_activeCardOnBattleYard(int playerIndex)
 {
     int totalMinionsDamage = 0;
-    std::cout << GameData[playerIndex].tableEntities.size() << std::endl;
     if (!GameData[playerIndex].tableEntities.empty())
     {
         for (size_t entityIndex = 0; entityIndex < GameData[playerIndex].tableEntities.size(); ++entityIndex)

@@ -4,17 +4,16 @@
 #include <iostream>
 #include <string>
 typedef std::vector<std::string> card_template_t;
-const std::string EXTERNAL_BORDER_CHAR_UP_DOWN = "║";
-const std::string EXTERNAL_BORDER_CHAR_LEFT_RIGHT = "═";
+const std::string EXTERNAL_BORDER_CHAR_UP_DOWN = "┃";
+const std::string EXTERNAL_BORDER_CHAR_LEFT_RIGHT = "━";
 const std::string EXTERNAL_BORDER_CHAR_TOP_LEFT = "╔";
 const std::string EXTERNAL_BORDER_CHAR_TOP_RIGHT = "╗";
 const std::string EXTERNAL_BORDER_CHAR_BOTTOM_LEFT = "╚";
-
 const std::string EXTERNAL_BORDER_CHAR_BOTTOM_RIGHT = "╝";
+
 const char DELIMITER = '\v';
 
-const card_template_t CARD_TEMPLATE_MINION_WITH_ABILITY =
-    {
+const card_template_t CARD_TEMPLATE_MINION_WITH_ABILITY = {
         "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓",
         "┃    ~NNNNNNNNNNNNNNNNNNNNN~    ┃",
         "┠───────────────┬───────────────┨",
@@ -27,8 +26,7 @@ const card_template_t CARD_TEMPLATE_MINION_WITH_ABILITY =
         "┃  ~A~│                   │~H~  ┃",
         "┗━━━━━┷━━━━━━━━━━━━━━━━━━━┷━━━━━┛"};
 
-const card_template_t CARD_TEMPLATE_MINION_NO_ABILITY =
-    {
+const card_template_t CARD_TEMPLATE_MINION_NO_ABILITY = {
         "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓",
         "┃    ~NNNNNNNNNNNNNNNNNNNNN~    ┃",
         "┠───────────────────────────────┨",
@@ -40,8 +38,7 @@ const card_template_t CARD_TEMPLATE_MINION_NO_ABILITY =
         "┠─ATK─┐                   ┌──HP─┨",
         "┃  ~A~│                   │~H~  ┃",
         "┗━━━━━┷━━━━━━━━━━━━━━━━━━━┷━━━━━┛"};
-const card_template_t TOP_CENTRE_GRAPHIC =
-    {
+const card_template_t TOP_CENTRE_GRAPHIC = {
         "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓",
         "┃    ~MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM      ┃",
         "┃    MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM      ┃",
@@ -56,8 +53,7 @@ const card_template_t TOP_CENTRE_GRAPHIC =
         "┃                                                                                                                                                                           ┃",
         "┃                                                                                                                                                                           ┃"};
 
-const card_template_t BOTTOM_CENTRE_GRAPHIC =
-    {
+const card_template_t BOTTOM_CENTRE_GRAPHIC ={
         "┃                                                                                                                                                                           ┃",
         "┃                                                                                                                                                                           ┃",
         "┃    ~MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM      ┃",
@@ -72,8 +68,7 @@ const card_template_t BOTTOM_CENTRE_GRAPHIC =
         "┃    MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM~     ┃",
         "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"};
 
-const card_template_t GAME_RULES =
-    {
+const card_template_t GAME_RULES ={
         "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓",
         "┃                             The game have 2 players play turn by turn.                                                                                                    ┃",
         "┃                             There are 2 heroes in the game: Butcher and Slark                                                                                             ┃",
@@ -95,6 +90,29 @@ const card_template_t GAME_RULES =
         "┃                                                                                                                                                                           ┃",
         "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"};
 
+const card_template_t HERO_BUTCHER_WINNER = {
+       "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━WINNER━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓",
+       "┃                                                                                                                                                                     ┃",
+       "┃                                                     ███████╗ ██    ██╗ ████████╗ ██████╗  ██╗   ██╗ ███████╗ ██████╗                                                ┃",
+       "┃                                                     ██   ██╝ ██    ██┃    ██ ╔━╝██╔════╝  ██║   ██┃ ██╔════╝ ██╔══██╗                                               ┃",
+       "┃                                                     ███═██━╗ ██    ██┃    ██╔╝  ██║       ██╚██╗██┃ █████╗   ██████╔╝                                               ┃",
+       "┃                                                     ██   ██┃ ██    ██┃    ██┃   ██║       ██   ║██┃ ██╔══╝   ██╔══██╗                                               ┃",
+       "┃                                                     ███████┃ ╚██████╔╝    ██┃   ╚██████╗  ██╗  ╚██┃ ███████╗ ██║  ██║                                               ┃",
+       "┃                                                     ╚━━━━━━╝  ╚━━━━━╝     ╚━╝    ╚═════╝  ╚━╝   ╚━╝ ╚══════╝ ╚═╝  ╚═╝                                               ┃",
+       "┃                                                                                                                                                                     ┃",
+       "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"};
+
+const card_template_t HERO_SLARK_WINNER = {
+       "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━WINNER━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓",
+       "┃                                                                                   ╔════╗                                                                            ┃",
+       "┃                                                               ███████╗  ██╗       ╚████╝   ██████╗  ██╗  ╔██╗                                                       ┃",
+       "┃                                                               ██╔════╝  ██╝      ██    ██  ██╔══██╗ ██╝╔██ ╚╝                                                       ┃",
+       "┃                                                               ███████╗  ██      ╔██═██═██╗ ██████╔╝ ████                                                            ┃",
+       "┃                                                               ╚════██║ ╔██      ┃██    ██┃ ██╔══██╗ ██╗╚██                                                          ┃",
+       "┃                                                               ███████║ ╚██████╗ ┃██    ██┃ ██║  ██║ ██┃  ╚██╗                                                       ┃",
+       "┃                                                               ╚══════╝  ╚━━━━━╝ ╚━╝    ╚━╝ ╚═╝  ╚═╝ ╚━╝   ╚━╝                                                       ┃",
+       "┃                                                                                                                                                                     ┃",
+       "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"};
 class GameUi
 {
 public:
@@ -102,8 +120,11 @@ public:
     void GameUi_displayEntireTable(const std::vector<GameData_t> &tableData);
     void GameUi_displayGameRules();
     void GameUi_displayMenuOption(int &option);
-    int GameUi_getChoiceWithCardList(const std::vector<std::shared_ptr<Minion>> &handEntities);
+    int  GameUi_getChoiceWithCardList(const std::vector<std::shared_ptr<Minion>> &handEntities);
     void GameUi_waitForNextTurn();
+    void GameUi_waitForConfirm();
+    void GameUi_prepareConsole();
+    void GameUi_displayResult(const std::vector<GameData_t> &tableData);
     ~GameUi(){};
 
 private:
