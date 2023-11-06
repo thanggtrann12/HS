@@ -1,6 +1,6 @@
 #include "GameUi/GameUi.h"
-#include "Entity/Minion.h"
-#include "Entity/Hero.h"
+#include "GameEntities/Minion.h"
+#include "GameEntities/Hero.h"
 #include "Helper/Helper.h"
 #include <iostream>
 #include <string>

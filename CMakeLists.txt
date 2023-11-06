@@ -8,17 +8,17 @@ project(
 add_definitions(-DLOG_FILE_PATH="${CMAKE_SOURCE_DIR}/generated/logfile.log")
 set(SOURCES
   main.cpp
-  ${CMAKE_SOURCE_DIR}/src/Entity/Entity.cpp
-  ${CMAKE_SOURCE_DIR}/src/Entity/Minion.cpp
-  ${CMAKE_SOURCE_DIR}/src/Entity/Hero.cpp
+  ${CMAKE_SOURCE_DIR}/src/GameEntities/Entity.cpp
+  ${CMAKE_SOURCE_DIR}/src/GameEntities/Minion.cpp
+  ${CMAKE_SOURCE_DIR}/src/GameEntities/Hero.cpp
   ${CMAKE_SOURCE_DIR}/src/GameEngine/GameEngine.cpp
   ${CMAKE_SOURCE_DIR}/src/MySocket/Socket.cpp
   ${CMAKE_SOURCE_DIR}/src/GameUi/GameUi.cpp
 )
 
 set(HEADERS
-  ${CMAKE_SOURCE_DIR}/inc/Entity/Entity.h
-  ${CMAKE_SOURCE_DIR}/inc/Entity/Minion.h
+  ${CMAKE_SOURCE_DIR}/inc/GameEntities/Entity.h
+  ${CMAKE_SOURCE_DIR}/inc/GameEntities/Minion.h
   ${CMAKE_SOURCE_DIR}/inc/GameEngine/GameEngine.h
   ${CMAKE_SOURCE_DIR}/inc/MySocket/Socket.h
   ${CMAKE_SOURCE_DIR}/inc/Helper/Helper.h

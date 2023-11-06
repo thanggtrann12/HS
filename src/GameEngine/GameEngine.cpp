@@ -1,5 +1,5 @@
 #include "GameEngine/GameEngine.h"
-#include "Entity/Entity.h"
+#include "GameEntities/Entity.h"
 #include <iostream>
 #include <iomanip>
 #include <arpa/inet.h>

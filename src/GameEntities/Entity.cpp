@@ -1,5 +1,5 @@
-#include "Entity/Entity.h"
-#include "Entity/Hero.h"
+#include "GameEntities/Entity.h"
+#include "GameEntities/Hero.h"
 #include <iostream>
 GameEntity::GameEntity(std::string n, int a, int h, std::string sk, EntityType tp)
     : name(n), attack(a), health(h), skill(sk), type(tp) { maxhealth = health; }

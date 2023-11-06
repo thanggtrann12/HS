@@ -5,6 +5,7 @@ generated/
 *.exe
 *.o
 test
+output/
 # Ignore logs and temporary files
 *.log
 .tmp/

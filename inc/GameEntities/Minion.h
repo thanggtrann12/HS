@@ -2,7 +2,7 @@
 #define MINION_H
 
 #include "Helper/Helper.h"
-#include "Entity/Entity.h"
+#include "GameEntities/Entity.h"
 #include <vector>
 #include <memory>
 

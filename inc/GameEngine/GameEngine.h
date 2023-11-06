@@ -1,9 +1,9 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include "Entity/Minion.h"
-#include "Entity/Hero.h"
-#include "Entity/Entity.h"
+#include "GameEntities/Minion.h"
+#include "GameEntities/Hero.h"
+#include "GameEntities/Entity.h"
 #include "MySocket/Socket.h"
 #include <ctime>
 #include <cstdlib>

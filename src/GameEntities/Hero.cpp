@@ -1,5 +1,5 @@
-#include "Entity/Entity.h"
-#include "Entity/Hero.h"
+#include "GameEntities/Entity.h"
+#include "GameEntities/Hero.h"
 #include <iostream>
 #include <algorithm>
 #include "Helper/Helper.h"

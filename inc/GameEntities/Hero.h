@@ -1,7 +1,7 @@
 #ifndef HERO_H
 #define HERO_H
 
-#include "Entity/Entity.h"
+#include "GameEntities/Entity.h"
 #include <vector>
 #include <memory>
 

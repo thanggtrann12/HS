@@ -1,5 +1,5 @@
-#include "Entity/Minion.h"
-#include "Entity/Hero.h"
+#include "GameEntities/Minion.h"
+#include "GameEntities/Hero.h"
 #include <iostream>
 #include <algorithm>
 #include "Helper/Helper.h"
