@@ -117,16 +117,22 @@ class GameUi
 {
 public:
     GameUi();
+    void GameUi_updateGameState(int playerIndex,int state, int &cardChoiced, const std::vector<GameData_t> &tableData);
     void GameUi_displayEntireTable(const std::vector<GameData_t> &tableData);
     void GameUi_displayGameRules();
     void GameUi_displayMenuOption(int &option);
-    int  GameUi_getChoiceWithCardList(const std::vector<std::shared_ptr<Minion>> &handEntities);
+    void GameUi_displayCardList(int &choice,const std::vector<std::shared_ptr<Minion>> &handEntities);
     void GameUi_waitForNextTurn();
     void GameUi_waitForConfirm();
     void GameUi_prepareConsole();
     void GameUi_displayResult(const std::vector<GameData_t> &tableData);
     ~GameUi(){};
-
+    enum {
+      INIT_STATE = 0,
+      CHOICE_STATE,
+      STATS_STATE,
+      RESULT_STATE,
+    };
 private:
     void GameUi_displayCard(std::vector<std::vector<std::string>> &hand);
     void GameUi_replaceTextFromLeftSide(card_template_t &text, char flag, std::string new_text);

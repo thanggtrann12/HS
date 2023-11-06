@@ -36,9 +36,9 @@ private:
     void GameEngine_checkPlayerTurnCount(MySocket &socket);
     void clearPlayerDataStats();
     void GameEngine_handingPlayerTurn(int playerIndex, int choice);
-
 protected:
-    GameUi *ui;
+    GameUi gameUi;
+    std::vector<GameUi*> observers;
     Hero playerHero;
     std::vector<std::shared_ptr<Minion>> cardsPool;
     std::vector<GameData_t> GameData;
@@ -47,6 +47,8 @@ protected:
     int option;
     int CLIENT_INDEX = 0;
     int SERVER_INDEX = 1;
+    void GameEngine_addUiObserver(GameUi *uiObs);
+    void GameEngine_notifyUiObserver(int playerIndex, int state, int &cardChoiced, const std::vector<GameData_t> &tableData);
 };
 
 #endif // GAME_H

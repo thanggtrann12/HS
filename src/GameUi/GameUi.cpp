@@ -31,6 +31,29 @@ std::pair<std::vector<T>, std::vector<T>> splitVector(const std::vector<T> &inpu
   return result;
 }
 
+void GameUi::GameUi_updateGameState(int playerIndex,int state, int &cardChoiced, const std::vector<GameData_t> &tableData)
+{
+  switch (state)
+  {
+  case INIT_STATE:
+    GameUi_displayMenuOption(cardChoiced);
+    break;
+  case CHOICE_STATE:
+    GameUi_displayCardList(cardChoiced, tableData[playerIndex].handEntities);
+    break;
+  case STATS_STATE:
+    int choice;
+    GameUi_prepareConsole();
+    GameUi_displayEntireTable(tableData);
+    GameUi_waitForConfirm();
+    break;
+  case RESULT_STATE:
+    GameUi_displayResult(tableData);
+    break;
+  }
+}
+
+
 void GameUi::GameUi_waitForConfirm()
 {
   std::cout << std::string(120, ' ') << "Press Enter to continue ....";
@@ -373,6 +396,12 @@ void GameUi::GameUi_displayMenuOption(int &option)
       break;
     case 10:
       option = currentIndex + 1;
+      if (option == 4)
+      {
+        GameUi_displayGameRules();
+        GameUi_waitForConfirm();
+        GameUi_displayMenuOption(option);
+      }
       int total = 100;
       int width = 50;
       int delay = 20;
@@ -404,7 +433,7 @@ void GameUi::GameUi_displayMenuOption(int &option)
   tcsetattr(STDIN_FILENO, TCSANOW, &original_termios);
 }
 
-int GameUi::GameUi_getChoiceWithCardList(const std::vector<std::shared_ptr<Minion>> &handEntities)
+void GameUi::GameUi_displayCardList(int &choice,const std::vector<std::shared_ptr<Minion>> &handEntities)
 {
   std::vector<std::string> menuOptions;
   for (auto &e : handEntities)
@@ -471,12 +500,13 @@ int GameUi::GameUi_getChoiceWithCardList(const std::vector<std::shared_ptr<Minio
       break;
     case 10:
       tcsetattr(STDIN_FILENO, TCSANOW, &original_termios);
-      return currentIndex;
+      choice = currentIndex;
+      return;
     }
   }
 
   tcsetattr(STDIN_FILENO, TCSANOW, &original_termios);
-  return -1;
+  return;
 }
 
 void GameUi::GameUi_displayResult(const std::vector<GameData_t> &tableData)

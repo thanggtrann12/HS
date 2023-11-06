@@ -11,15 +11,8 @@
 GameEngine::GameEngine()
 {
   srand(static_cast<unsigned int>(time(nullptr)));
-  ui->GameUi_displayMenuOption(option);
-  while (option == SHOW_GAME_RULES)
-  {
-    if (option == SHOW_GAME_RULES)
-    {
-      ui->GameUi_displayGameRules();
-    }
-  }
-
+  GameEngine_addUiObserver(&gameUi);
+  GameEngine_notifyUiObserver(0,GameUi::INIT_STATE, option, GameData);
   GameEngine_generateHeroPocket();
   GameEngine_generateCardPocket();
   GameEngine_distributeCardToPlayerHand();
@@ -107,7 +100,7 @@ void GameEngine::play()
   while (true)
   {
     GameEngine_checkPlayerTurnCount(socket);
-    ui->GameUi_displayResult(GameData);
+    GameEngine_notifyUiObserver(CLIENT_INDEX, GameUi::RESULT_STATE, option, GameData);
     switch (option)
     {
     case CLIENT_MODE:
@@ -125,13 +118,12 @@ void GameEngine::play()
 
 void GameEngine::GameEngine_onClientMode(MySocket &socket)
 {
-  int choiceCard = ui->GameUi_getChoiceWithCardList(GameData[CLIENT_INDEX].handEntities);
-  GameEngine_handingPlayerTurn(CLIENT_INDEX, choiceCard);
-  socket.sendPlayerChoice(choiceCard);
-  ui->GameUi_waitForNextTurn();
+  int cardChoiced;
+  GameEngine_notifyUiObserver(CLIENT_INDEX, GameUi::CHOICE_STATE, cardChoiced, GameData);
+  GameEngine_handingPlayerTurn(CLIENT_INDEX, cardChoiced);
+  socket.sendPlayerChoice(cardChoiced);
   int serverChoiceCard = socket.receivePlayerChoice();
   GameEngine_handingPlayerTurn(SERVER_INDEX, serverChoiceCard);
-  ui->GameUi_waitForConfirm();
 }
 
 void GameEngine::GameEngine_onServerMode(MySocket &socket)
@@ -139,16 +131,15 @@ void GameEngine::GameEngine_onServerMode(MySocket &socket)
 
   int clientChoiceCard = socket.receivePlayerChoice();
   GameEngine_handingPlayerTurn(CLIENT_INDEX, clientChoiceCard);
-  ui->GameUi_waitForConfirm();
-  int choiceCard = ui->GameUi_getChoiceWithCardList(GameData[SERVER_INDEX].handEntities);
-  GameEngine_handingPlayerTurn(SERVER_INDEX, choiceCard);
-  socket.sendPlayerChoice(choiceCard);
-  ui->GameUi_waitForNextTurn();
+  int cardChoiced;
+  GameEngine_notifyUiObserver(SERVER_INDEX, GameUi::CHOICE_STATE, cardChoiced, GameData);
+  GameEngine_handingPlayerTurn(SERVER_INDEX, cardChoiced);
+  socket.sendPlayerChoice(cardChoiced);
 }
 
 void GameEngine::GameEngine_checkPlayerTurnCount(MySocket &socket)
 {
-  for (int playerIndex = 0; playerIndex < GameData.size(); playerIndex++) // Change '=' to '<'
+  for (int playerIndex = 0; playerIndex < GameData.size(); playerIndex++)
   {
     if (GameData[playerIndex].turnCount == 2)
     {
@@ -173,9 +164,9 @@ void GameEngine::GameEngine_onOfflineMode()
   std::vector<std::string> cardList;
   while (true)
   {
-    int choiceCard = ui->GameUi_getChoiceWithCardList(GameData[CLIENT_INDEX].handEntities);
-    GameEngine_handingPlayerTurn(CLIENT_INDEX, choiceCard);
-    ui->GameUi_waitForConfirm();
+    int cardChoiced;
+    GameEngine_notifyUiObserver(CLIENT_INDEX, GameUi::CHOICE_STATE, cardChoiced, GameData);
+    GameEngine_handingPlayerTurn(CLIENT_INDEX, cardChoiced);
     std::swap(CLIENT_INDEX, SERVER_INDEX);
   }
 }
@@ -191,8 +182,7 @@ void GameEngine::GameEngine_handingPlayerTurn(int playerIndex, int choice)
   GameData[playerIndex].turnCount++;
   GameEngine_placeCardToBattleYard(playerIndex, choice);
   GameEngine_activeCardOnBattleYard(playerIndex);
-  ui->GameUi_prepareConsole();
-  ui->GameUi_displayEntireTable(GameData);
+  GameEngine_notifyUiObserver(playerIndex, GameUi::STATS_STATE, choice, GameData);
   clearPlayerDataStats();
 }
 
@@ -313,4 +303,16 @@ void GameEngine::GameEngine_activeCardOnBattleYard(int playerIndex)
   GameData[1 - playerIndex].stats.push_back(GameData[1 - playerIndex].hero->GetName() + " have been attacked by " + GameData[playerIndex].hero->GetName() + " with " + std::to_string(GameData[playerIndex].hero->GetAttack()) + " and minion attack " + std::to_string(totalMinionsDamage));
 
   GameData[1 - playerIndex].stats.push_back(GameData[1 - playerIndex].hero->GetName() + "'s health left [" + std::to_string((GameData[1 - playerIndex].hero->GetHealth())) + "]");
+}
+
+void GameEngine::GameEngine_addUiObserver(GameUi *uiObs)
+{
+  observers.push_back(uiObs);
+}
+
+void GameEngine::GameEngine_notifyUiObserver(int playerIndex,int state, int &cardChoiced, const std::vector<GameData_t> &tableData)
+{
+  for (GameUi* observer : observers) {
+            observer->GameUi_updateGameState(playerIndex, state, cardChoiced, tableData );
+  }
 }
