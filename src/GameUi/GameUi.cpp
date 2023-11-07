@@ -1,6 +1,4 @@
 #include "GameUi/GameUi.h"
-#include "GameEntities/Minion.h"
-#include "GameEntities/Hero.h"
 #include "Helper/Helper.h"
 #include <iostream>
 #include <string>
@@ -84,16 +82,16 @@ void GameUi::GameUi_displayEntireTable(const std::vector<GameData_t> &tableData)
             for (auto &entity : tableData[playerIndex].tableEntities)
 
             {
-                if (entity->GetEntitiesType() == EntityType::FIRELORD || entity->GetEntitiesType() == EntityType::THALNOS)
-                {
-                    card_template_t templ = GameUi_getTemplateWithText(CARD_TEMPLATE_MINION_NO_ABILITY, entity->GetName(), entity->GetAttack(), entity->GetHealth(), entity->GetSkill(), "", "Minion");
-                    GameData[playerIndex].emplace_back(templ);
-                }
-                else
-                {
-                    card_template_t templS = GameUi_getTemplateWithText(CARD_TEMPLATE_MINION_WITH_ABILITY, entity->GetName(), entity->GetAttack(), entity->GetHealth(), entity->GetSkill(), "", entity->EntityTypeToString(entity->GetEntitiesType()));
-                    GameData[playerIndex].emplace_back(templS);
-                }
+                // if (entity->GetEntitiesType() == EntityType::FIRELORD || entity->GetEntitiesType() == EntityType::THALNOS)
+                // {
+                //     card_template_t templ = GameUi_getTemplateWithText(CARD_TEMPLATE_MINION_NO_ABILITY, entity->GetName(), entity->GetAttack(), entity->GetHealth(), entity->GetSkill(), "", "Minion");
+                //     GameData[playerIndex].emplace_back(templ);
+                // }
+                // else
+                // {
+                //     card_template_t templS = GameUi_getTemplateWithText(CARD_TEMPLATE_MINION_WITH_ABILITY, entity->GetName(), entity->GetAttack(), entity->GetHealth(), entity->GetSkill(), "", entity->EntityTypeToString(entity->GetEntitiesType()));
+                //     GameData[playerIndex].emplace_back(templS);
+                // }
             }
         }
         std::pair<std::vector<std::vector<std::string>>, std::vector<std::vector<std::string>>> splitResult = splitVector(GameData[playerIndex]);
@@ -432,12 +430,12 @@ void GameUi::GameUi_displayMenuOption(int &option)
     tcsetattr(STDIN_FILENO, TCSANOW, &original_termios);
 }
 
-void GameUi::GameUi_displayCardList(int &choice, const std::vector<std::shared_ptr<Minion>> &handEntities)
+void GameUi::GameUi_displayCardList(int &choice, const std::vector<std::shared_ptr<Card>> &handEntities)
 {
     std::vector<std::string> menuOptions;
     for (auto &e : handEntities)
     {
-        menuOptions.push_back(e->GetDescription());
+        // menuOptions.push_back(e->GetDescription());
     }
     int numOptions = menuOptions.size();
     int currentIndex = 0;
@@ -520,13 +518,13 @@ void GameUi::GameUi_displayResult(const std::vector<GameData_t> &tableData)
     };
     for (int playerIndex = 0; playerIndex < tableData.size(); playerIndex++)
     {
-        if (!tableData[playerIndex].hero->IsAlive())
-        {
-            const auto &winnerMessages =
-                (tableData[1 - playerIndex].hero->GetName() == "Slark") ? HERO_SLARK_WINNER : HERO_BUTCHER_WINNER;
-            GameUi_prepareConsole();
-            printWinnerMessages(winnerMessages);
-            GameUi_waitForConfirm();
-        }
+        // if (!tableData[playerIndex].hero->IsAlive())
+        // {
+        //     const auto &winnerMessages =
+        //         (tableData[1 - playerIndex].hero->GetName() == "Slark") ? HERO_SLARK_WINNER : HERO_BUTCHER_WINNER;
+        //     GameUi_prepareConsole();
+        //     printWinnerMessages(winnerMessages);
+        //     GameUi_waitForConfirm();
+        // }
     }
 }

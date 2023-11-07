@@ -121,7 +121,7 @@ public:
     void GameUi_displayEntireTable(const std::vector<GameData_t> &tableData);
     void GameUi_displayGameRules();
     void GameUi_displayMenuOption(int &option);
-    void GameUi_displayCardList(int &choice,const std::vector<std::shared_ptr<Minion>> &handEntities);
+    void GameUi_displayCardList(int &choice,const std::vector<std::shared_ptr<Card>> &handEntities);
     void GameUi_waitForNextTurn();
     void GameUi_waitForConfirm();
     void GameUi_prepareConsole();

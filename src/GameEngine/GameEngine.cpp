@@ -1,5 +1,4 @@
 #include "GameEngine/GameEngine.h"
-#include "GameEntities/Entity.h"
 #include <iostream>
 #include <iomanip>
 #include <arpa/inet.h>
@@ -10,48 +9,34 @@
 #include "Helper/Helper.h"
 GameEngine::GameEngine()
 {
+  GameData.resize(2);
   srand(static_cast<unsigned int>(time(nullptr)));
   GameEngine_addUiObserver(&gameUi);
   GameEngine_notifyUiObserver(0,GameUi::INIT_STATE, option, GameData);
-  GameEngine_generateHeroPocket();
-  GameEngine_generateCardPocket();
-  GameEngine_distributeCardToPlayerHand();
+  GameEngine_generatePlayerHero();
+  GameEngine_generatePlayerCards();
 }
 
-/**
- * @brief Initializes the game's heroes.
- */
-void GameEngine::GameEngine_generateHeroPocket()
+void GameEngine::GameEngine_generatePlayerHero()
 {
-  playerHero.InitHeroes();
-  std::vector<std::shared_ptr<Hero>> retrievedHeroes = playerHero.GetHeroes();
-  GameData_t playerClient;
-  GameData_t playerServer;
-  int randomIndex = rand() % retrievedHeroes.size();
-  playerClient.hero = retrievedHeroes[randomIndex];
-  randomIndex = rand() % retrievedHeroes.size();
-  playerServer.hero = retrievedHeroes[randomIndex];
-  GameData.push_back(playerClient);
-  GameData.push_back(playerServer);
+  for(auto &player: GameData)
+  {
+    manager.CardManager_assignHeroToPlayer(player.hero);
+  }
+
 }
 
-/**
- * @brief Initializes the game's cards.
- */
-void GameEngine::GameEngine_generateCardPocket()
+void GameEngine::GameEngine_generatePlayerCards()
 {
-  std::shared_ptr<Minion> minion = std::make_shared<FlametongueTotem>();
-
-  cardsPool.push_back(std::make_shared<FlametongueTotem>());
-  cardsPool.push_back(std::make_shared<RagnarosTheFirelord>());
-  cardsPool.push_back(std::make_shared<BloodmageThalnos>());
-  cardsPool.push_back(std::make_shared<Brawl>());
-  cardsPool.push_back(std::make_shared<Techies>());
+  for(auto &player: GameData)
+  {
+    manager.CardManager_getCardFromPocket(player.handEntities);
+  }
 }
 
 void GameEngine::GameEngine_generateEntitiesForEachMode(MySocket &socket)
 {
-  EntityType entities[(option == CLIENT_MODE ? GameData[0].handEntities.size() : 2 * GameData[0].handEntities.size())];
+  Card::CardType entities[(option == CLIENT_MODE ? GameData[0].handEntities.size() : 2 * GameData[0].handEntities.size())];
   int entitiesCount = 0;
   switch (option)
   {
@@ -67,7 +52,7 @@ void GameEngine::GameEngine_generateEntitiesForEachMode(MySocket &socket)
     for (int playerIndex = 0; playerIndex < 2; playerIndex++)
       for (auto &e : GameData[playerIndex].handEntities)
       {
-        entities[entitiesCount] = e->GetEntitiesType();
+        entities[entitiesCount] = e->getCardType();
         entitiesCount++;
       }
     socket.sendInitCardPool(entities);
@@ -75,22 +60,6 @@ void GameEngine::GameEngine_generateEntitiesForEachMode(MySocket &socket)
   default:
     /* in ofline mode, data have been generated at begin, no need any actions*/
     break;
-  }
-}
-
-void GameEngine::GameEngine_distributeCardToPlayerHand()
-{
-  for (auto &player : GameData)
-  {
-    for (int i = 0; i < 10; ++i)
-    {
-      int randomIndex = rand() % cardsPool.size();
-      std::shared_ptr<Minion> minion = std::dynamic_pointer_cast<Minion>(cardsPool[randomIndex]);
-      if (minion)
-      {
-        player.handEntities.push_back(minion);
-      }
-    }
   }
 }
 
@@ -143,15 +112,11 @@ void GameEngine::GameEngine_checkPlayerTurnCount(MySocket &socket)
   {
     if (GameData[playerIndex].turnCount == 2)
     {
-      for (int i = 0; i < 2; i++)
-      {
-        int randomIndex = rand() % cardsPool.size();
-        std::shared_ptr<Minion> minion = std::dynamic_pointer_cast<Minion>(cardsPool[randomIndex]);
+        std::shared_ptr<Card> minion = std::dynamic_pointer_cast<Card>(manager.CardManager_drawRandomCard());
         if (minion)
         {
           GameData[playerIndex].handEntities.push_back(minion);
         }
-      }
       GameData[playerIndex].turnCount = 0;
     }
   }
@@ -181,7 +146,6 @@ void GameEngine::GameEngine_handingPlayerTurn(int playerIndex, int choice)
 {
   GameData[playerIndex].turnCount++;
   GameEngine_placeCardToBattleYard(playerIndex, choice);
-  GameEngine_activeCardOnBattleYard(playerIndex);
   GameEngine_notifyUiObserver(playerIndex, GameUi::STATS_STATE, choice, GameData);
   clearPlayerDataStats();
 }
@@ -190,7 +154,7 @@ void GameEngine::GameEngine_deleteCardFromBattleYard(int playerIndex, int entity
 {
   if (entityIndex < GameData[playerIndex].tableEntities.size())
   {
-    GameData[playerIndex].stats.push_back(GameData[playerIndex].hero->GetName() + " remove " + GameData[playerIndex].tableEntities[entityIndex]->GetDescription());
+    GameData[playerIndex].stats.push_back(GameData[playerIndex].hero->Hero_getName() + " remove " + GameData[playerIndex].tableEntities[entityIndex]->getName());
     GameData[playerIndex].tableEntities.erase(GameData[playerIndex].tableEntities.begin() + entityIndex);
   }
 }
@@ -200,109 +164,21 @@ void GameEngine::GameEngine_placeCardToBattleYard(int playerIndex, int entityInd
 
   if (entityIndex < GameData[playerIndex].handEntities.size())
   {
-    std::shared_ptr<GameEntity> originalEntity = GameData[playerIndex].handEntities[entityIndex];
+    std::shared_ptr<Card> originalEntity = GameData[playerIndex].handEntities[entityIndex];
 
     if (!originalEntity)
     {
       return;
     }
-    std::shared_ptr<Minion> newEntity;
-
-    if (originalEntity->GetEntitiesType() == EntityType::SHAMAN)
+    else
     {
-      auto shamanEntity = std::dynamic_pointer_cast<FlametongueTotem>(originalEntity);
-      if (shamanEntity)
-      {
-        newEntity = std::make_shared<FlametongueTotem>(*shamanEntity);
-      }
-    }
-    else if (originalEntity->GetEntitiesType() == EntityType::FIRELORD)
-    {
-      auto minionEntity = std::dynamic_pointer_cast<RagnarosTheFirelord>(originalEntity);
-      if (minionEntity)
-      {
-        newEntity = std::make_shared<RagnarosTheFirelord>(*minionEntity);
-      }
-    }
-    else if (originalEntity->GetEntitiesType() == EntityType::THALNOS)
-    {
-      auto bloodmageEntity = std::dynamic_pointer_cast<BloodmageThalnos>(originalEntity);
-      if (bloodmageEntity)
-      {
-        newEntity = std::make_shared<BloodmageThalnos>(*bloodmageEntity);
-      }
-    }
-
-    else if (originalEntity->GetEntitiesType() == EntityType::TECHIES)
-    {
-      auto techiesEntity = std::dynamic_pointer_cast<Techies>(originalEntity);
-      if (techiesEntity)
-      {
-        newEntity = std::make_shared<Techies>(*techiesEntity);
-      }
-    }
-    else if (originalEntity->GetEntitiesType() == EntityType::BRAWL)
-    {
-      auto brawlEntity = std::dynamic_pointer_cast<Brawl>(originalEntity);
-      if (brawlEntity)
-      {
-        newEntity = std::make_shared<Brawl>(*brawlEntity);
-      }
-    }
-
-    if (newEntity)
-    {
-      newEntity->SetIsUsed(false);
-      GameData[playerIndex].tableEntities.push_back(newEntity);
-      GameData[playerIndex].stats.push_back(GameData[playerIndex].hero->GetName() + " activate " + newEntity->GetDescription());
+      originalEntity->setUsed();
+      GameData[playerIndex].tableEntities.push_back(originalEntity);
+      GameData[playerIndex].stats.push_back(GameData[playerIndex].hero->Hero_getName() + " activate " + originalEntity->getName());
+      originalEntity->play(playerIndex, entityIndex, GameData);
       GameData[playerIndex].handEntities.erase(GameData[playerIndex].handEntities.begin() + entityIndex);
     }
   }
-}
-
-void GameEngine::GameEngine_activeCardOnBattleYard(int playerIndex)
-{
-  int totalMinionsDamage = 0;
-  if (!GameData[playerIndex].tableEntities.empty())
-  {
-    for (size_t entityIndex = 0; entityIndex < GameData[playerIndex].tableEntities.size(); ++entityIndex)
-    {
-      std::shared_ptr<Minion> minion = std::dynamic_pointer_cast<Minion>(GameData[playerIndex].tableEntities[entityIndex]);
-    }
-
-    for (size_t entityIndex = 0; entityIndex < GameData[playerIndex].tableEntities.size(); ++entityIndex)
-    {
-      std::shared_ptr<Minion> minion = std::dynamic_pointer_cast<Minion>(GameData[playerIndex].tableEntities[entityIndex]);
-      if (minion)
-      {
-        if (minion->GetEntitiesType() == EntityType::BRAWL)
-        {
-          minion->applyEffect(GameData, playerIndex);
-          GameEngine_deleteCardFromBattleYard(playerIndex, entityIndex);
-        }
-        else if (minion->GetEntitiesType() == EntityType::SHAMAN && !minion->IsUsed())
-        {
-          minion->applyEffect(GameData, playerIndex);
-          minion->SetIsUsed(true);
-        }
-        else if (minion->GetEntitiesType() != EntityType::SHAMAN)
-        {
-
-          minion->DameToAllEntities(GameData[1 - playerIndex], minion->GetAttack());
-          minion->applyEffect(GameData, playerIndex);
-          minion->SetIsUsed(true);
-          totalMinionsDamage += minion->GetAttack();
-        }
-      }
-    }
-  }
-  GameData[playerIndex].stats.push_back(GameData[playerIndex].hero->GetName() + " attack " + GameData[1 - playerIndex].hero->GetName() + " with " + std::to_string(GameData[playerIndex].hero->GetAttack()) + " and minion attack with: [" + std::to_string(totalMinionsDamage) + "] damage");
-  GameData[playerIndex].hero->AttackHero(GameData[1 - playerIndex].hero, GameData[playerIndex].hero->GetAttack());
-  GameData[playerIndex].stats.push_back(GameData[playerIndex].hero->GetName() + "'s health left [" + std::to_string((GameData[playerIndex].hero->GetHealth())) + "]");
-
-  GameData[1 - playerIndex].stats.push_back(GameData[1 - playerIndex].hero->GetName() + " have been attacked by " + GameData[playerIndex].hero->GetName() + " with " + std::to_string(GameData[playerIndex].hero->GetAttack()) + " and minion attack " + std::to_string(totalMinionsDamage));
-
-  GameData[1 - playerIndex].stats.push_back(GameData[1 - playerIndex].hero->GetName() + "'s health left [" + std::to_string((GameData[1 - playerIndex].hero->GetHealth())) + "]");
 }
 
 void GameEngine::GameEngine_addUiObserver(GameUi *uiObs)

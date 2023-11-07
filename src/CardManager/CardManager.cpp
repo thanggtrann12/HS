@@ -4,8 +4,12 @@
 #include <iostream>
 #include <string>
 #include <memory>
-
-void CardManager::CardManager_initCardManager()
+CardManager::CardManager()
+{
+  CardManager_initManager();
+  hero.initHero();
+}
+void CardManager::CardManager_initManager()
 {
     std::shared_ptr<CardFactory> factory;
     factory = std::make_unique<MinionCardFactory>();
@@ -22,7 +26,22 @@ void CardManager::CardManager_initCardManager()
     std::shared_ptr<Card> spellCard = factory->createCard(Card::CardType::BRAWL);
     cardPocket.emplace_back(spellCard);
 }
-std::vector<std::shared_ptr<Card>> &CardManager::CardManager_getCardFromPocket()
+void CardManager::CardManager_getCardFromPocket(std::vector<std::shared_ptr<Card>> &playerHand)
 {
-    return cardPocket;
+    for(int i=0; i<10;i++)
+    {
+      int cardRandom = rand() % cardPocket.size();
+      playerHand.push_back(cardPocket[cardRandom]);
+    }
+}
+
+void CardManager::CardManager_assignHeroToPlayer(std::shared_ptr<Hero> &playerHero)
+{
+    int cardRandom = rand() % 2;
+    playerHero = hero.GetHeroes()[cardRandom];
+}
+std::shared_ptr<Card> CardManager::CardManager_drawRandomCard()
+{
+    int cardRandom = rand() % cardPocket.size();
+    return cardPocket[cardRandom];
 }

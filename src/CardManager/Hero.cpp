@@ -1,18 +1,18 @@
-#include "CardManager/GameEntities/Hero.h"
+#include "CardManager/Hero.h"
 #include <iostream>
 #include <algorithm>
 #include "Helper/Helper.h"
-void Hero::InitHeroes()
+void Hero::initHero()
 {
     Hero butcher("Butcher", 6, 120);
-    heroes.push_back(std::make_shared<Hero>(butcher));
+    heroPocket.push_back(std::make_shared<Hero>(butcher));
     Hero slark("Slark", 10, 72);
-    heroes.push_back(std::make_shared<Hero>(slark));
+    heroPocket.push_back(std::make_shared<Hero>(slark));
 }
 
 std::vector<std::shared_ptr<Hero>> &Hero::GetHeroes()
 {
-    return heroes;
+    return heroPocket;
 }
 bool Hero::IsAlive()
 {

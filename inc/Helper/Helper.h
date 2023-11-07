@@ -21,16 +21,4 @@ struct GameData_t
     int turnCount = 0;
 };
 
-struct GameStats_t
-{
-    std::string basicHeroStats;
-    std::vector<std::string> stats;
-    std::vector<std::string> cardNames;
-    std::vector<std::string> cardTypes;
-    std::vector<std::string> cardSkills;
-    std::vector<std::string> health;
-    std::vector<std::string> attack;
-    std::vector<std::string> activate;
-};
-
 #endif // HELPER_H
