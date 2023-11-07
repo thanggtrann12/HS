@@ -1,35 +1,126 @@
 #include <iostream>
-#include <vector>
-#include <sstream>
-typedef std::vector<std::string> card_template_t;
-const card_template_t GAME_RULES =
-    {
-        "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓",
-        "┃                             The game have 2 players play turn by turn.                                                                                                    ┃",
-        "┃                             There are 2 heroes in the game: Butcher and Slark                                                                                             ┃",
-        "┃                                    - Butcher has 120 HP and 6 Attack.                                                                                                     ┃",
-        "┃                                    - Slark has 72 HP and 10 Attack.                                                                                                       ┃",
-        "┃                             There are 5 types of card                                                                                                                     ┃",
-        "┃                                    - Ragnaros the Firelord - A minion with 1HP and 3 Attack.                                                                              ┃",
-        "┃                                    - Bloodmage Thalnos - A minion with 1HP and 1 Attack.                                                                                  ┃",
-        "┃                                    - Flametongue Totem - A shaman with 3HP and 0 Attack, but provides all alliance minions with a +1 Attack                               ┃",
-        "┃                                    - Brawl - Destroy a random minion of the opposite player - Just use only 1 time.                                                       ┃",
-        "┃                                    - Techies - A minion with 2HP and 1 Attack. On dead it deals 3 damage to both hero.                                                    ┃",
-        "┃                                                                                                                                                                           ┃",
-        "┃                             Enter the game, each player is random a hero and 10 cards from the board (player is able to hold card of the same type).                      ┃",
-        "┃                             Each turn, a player can activate a card and place it into the battle. The card take effect immediately from that turn.                        ┃",
-        "┃                             When an unit has 0 HP, it's removed from the battle, player lose that card.                                                                   ┃",
-        "┃                             A hero only attack the other hero. Minion/shaman deals damage to all units.                                                                   ┃",
-        "┃                             Player is defeated when his hero has 0 HP.                                                                                                    ┃",
-        "┃                             When a turn finishes, player shall be able to see remaining HP and Attack of all units in the battle.                                         ┃",
-        "┃                                                                                                                                                                           ┃",
-        "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"};
+#include <string>
+#include <memory>
 
-int main()
-{
+// class Card
+// {
+// public:
+//     virtual ~Card() = default;
+//     virtual void play() = 0;
 
-    for (auto &e : GAME_RULES)
-    {
-        std::cout << std::string(50, ' ') << e << std::endl;
-    }
-}
+//     // Getters for basic stats
+//     const std::string &getName() const { return name; }
+//     int getHP() const { return hp; }
+//     int getAttack() const { return attack; }
+//     const std::string &getSkill() const { return skill; }
+
+// protected:
+//     Card(const std::string &name, int hp, int attack, const std::string &skill)
+//         : name(name), hp(hp), attack(attack), skill(skill) {}
+
+// private:
+//     std::string name;
+//     int hp;
+//     int attack;
+//     std::string skill;
+// };
+
+// class MinionCard : public Card
+// {
+// public:
+//     MinionCard(const std::string &name, int hp, int attack);
+//     void play() override;
+// };
+
+// class BuffCard : public Card
+// {
+// public:
+//     BuffCard(const std::string &name, int hp, int attack, const std::string &skill);
+//     void play() override;
+// };
+
+// class SpellCard : public Card
+// {
+// public:
+//     SpellCard(const std::string &name);
+//     void play() override;
+// };
+
+// MinionCard::MinionCard(const std::string &name, int hp, int attack)
+//     : Card(name, hp, attack, "No Skill") {}
+
+// void MinionCard::play()
+// {
+//     std::cout << "Playing Minion Card: " << getName() << " (HP: " << getHP() << ", Attack: " << getAttack() << ")." << std::endl;
+// }
+
+// BuffCard::BuffCard(const std::string &name, int hp, int attack, const std::string &skill)
+//     : Card(name, hp, attack, skill) {}
+
+// void BuffCard::play()
+// {
+//     std::cout << "Playing Buff Card: " << getName() << " (HP: " << getHP() << ", Attack: " << getAttack() << "). Skill: " << getSkill() << std::endl;
+// }
+
+// SpellCard::SpellCard(const std::string &name)
+//     : Card(name, 0, 0, "No Skill") {}
+
+// void SpellCard::play()
+// {
+//     std::cout << "Playing Spell Card: " << getName() << "." << std::endl;
+// }
+
+// class CardFactory
+// {
+// public:
+//     virtual std::unique_ptr<Card> createCard() = 0;
+// };
+
+// class MinionCardFactory : public CardFactory
+// {
+// public:
+//     std::unique_ptr<Card> createCard() override
+//     {
+//         return std::make_unique<MinionCard>("Generic Minion", 2, 2);
+//     }
+// };
+
+// class BuffCardFactory : public CardFactory
+// {
+// public:
+//     std::unique_ptr<Card> createCard() override
+//     {
+//         return std::make_unique<BuffCard>("Generic Buff", 1, 1, "Generic Skill");
+//     }
+// };
+
+// class SpellCardFactory : public CardFactory
+// {
+// public:
+//     std::unique_ptr<Card> createCard() override
+//     {
+//         return std::make_unique<SpellCard>("Generic Spell");
+//     }
+// };
+
+// // int main()
+// // {
+// //     std::unique_ptr<CardFactory> factory;
+
+// //     // Create a Minion card
+// //     factory = std::make_unique<MinionCardFactory>();
+// //     std::unique_ptr<Card> minionCard = factory->createCard();
+// //     minionCard->play();
+
+// //     // Create a Buff card
+// //     factory = std::make_unique<BuffCardFactory>();
+// //     std::unique_ptr<Card> buffCard = factory->createCard();
+// //     buffCard->play();
+
+// //     // Create a Spell card
+// //     factory = std::make_unique<SpellCardFactory>();
+// //     std::unique_ptr<Card> spellCard = factory->createCard();
+// //     spellCard->play();
+
+// //     return 0;
+// // }

@@ -8,21 +8,26 @@ project(
 add_definitions(-DLOG_FILE_PATH="${CMAKE_SOURCE_DIR}/generated/logfile.log")
 set(SOURCES
   main.cpp
-  ${CMAKE_SOURCE_DIR}/src/GameEntities/Entity.cpp
-  ${CMAKE_SOURCE_DIR}/src/GameEntities/Minion.cpp
-  ${CMAKE_SOURCE_DIR}/src/GameEntities/Hero.cpp
-  ${CMAKE_SOURCE_DIR}/src/GameEngine/GameEngine.cpp
-  ${CMAKE_SOURCE_DIR}/src/MySocket/Socket.cpp
-  ${CMAKE_SOURCE_DIR}/src/GameUi/GameUi.cpp
+#   ${CMAKE_SOURCE_DIR}/src/CardManager/GameEntities/Entity.cpp
+  ${CMAKE_SOURCE_DIR}/src/CardManager/CardFactory/Card.cpp
+  ${CMAKE_SOURCE_DIR}/src/CardManager/CardManager.cpp
+  ${CMAKE_SOURCE_DIR}/src/CardManager/GameEntities/Hero.cpp
+#   ${CMAKE_SOURCE_DIR}/src/GameEngine/GameEngine.cpp
+#   ${CMAKE_SOURCE_DIR}/src/MySocket/Socket.cpp
+#   ${CMAKE_SOURCE_DIR}/src/GameUi/GameUi.cpp
 )
 
 set(HEADERS
-  ${CMAKE_SOURCE_DIR}/inc/GameEntities/Entity.h
-  ${CMAKE_SOURCE_DIR}/inc/GameEntities/Minion.h
-  ${CMAKE_SOURCE_DIR}/inc/GameEngine/GameEngine.h
-  ${CMAKE_SOURCE_DIR}/inc/MySocket/Socket.h
+#   ${CMAKE_SOURCE_DIR}/inc/CardManager/GameEntities/Entity.h
+  ${CMAKE_SOURCE_DIR}/inc/CardManager/CardFactory/Card.h
+  ${CMAKE_SOURCE_DIR}/inc/CardManager/CardManager.h
+  ${CMAKE_SOURCE_DIR}/inc/CardManager/CardFactory/CardFactory.h
+#   ${CMAKE_SOURCE_DIR}/inc/CardManager/GameEntities/Minion.h
+  ${CMAKE_SOURCE_DIR}/inc/CardManager/GameEntities/Hero.h
+#   ${CMAKE_SOURCE_DIR}/inc/GameEngine/GameEngine.h
+#   ${CMAKE_SOURCE_DIR}/inc/MySocket/Socket.h
   ${CMAKE_SOURCE_DIR}/inc/Helper/Helper.h
-  ${CMAKE_SOURCE_DIR}/inc/GameUi/GameUi.h
+#   ${CMAKE_SOURCE_DIR}/inc/GameUi/GameUi.h
 )
 
 set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/build)
