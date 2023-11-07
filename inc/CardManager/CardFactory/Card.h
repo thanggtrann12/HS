@@ -30,6 +30,7 @@ public:
     void setUsed() { used = true; }
     void getBuff(int damage) { attack += damage; }
     const std::string &getSkill() const { return skill; }
+    virtual std::string getDesciption() = 0;
 
 protected:
     Card(const std::string &name, int hp, int attack, const std::string &skill, CardType type)
@@ -49,6 +50,7 @@ class MinionCard : public Card
 public:
     MinionCard(const std::string &name, int hp, int attack, Card::CardType type);
     void play(unsigned int playerIndex, unsigned int cardPlayed, std::vector<GameData_t> &gameData) override;
+    std::string getDesciption() override;
 };
 
 class BuffCard : public Card
@@ -56,13 +58,15 @@ class BuffCard : public Card
 public:
     BuffCard(const std::string &name, int hp, int attack, const std::string &skill, Card::CardType type);
     void play(unsigned int playerIndex, unsigned int cardPlayed, std::vector<GameData_t> &gameData) override;
+    std::string getDesciption() override;
 };
 
 class SpellCard : public Card
 {
 public:
-    SpellCard(const std::string &name, Card::CardType type);
+    SpellCard(const std::string &name, const std::string &skill, Card::CardType type);
     void play(unsigned int playerIndex, unsigned int cardPlayed, std::vector<GameData_t> &gameData) override;
+    std::string getDesciption() override;
 };
 
 #endif

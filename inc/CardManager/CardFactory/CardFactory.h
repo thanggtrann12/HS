@@ -45,7 +45,7 @@ class SpellCardFactory : public CardFactory
 public:
     std::shared_ptr<Card> createCard(Card::CardType type) override
     {
-        return std::make_shared<SpellCard>("Destroy a random minion of the opposite playe", type);
+        return std::make_shared<SpellCard>("Brawl", "Destroy a random minion of the opposite playey", type);
     }
 };
 #endif // CARD_FACTORY_H

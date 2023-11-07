@@ -2,6 +2,7 @@
 
 int main()
 {
-  GameEngine game;
+    GameEngine game;
+    game.play();
     return 0;
 }

@@ -9,186 +9,176 @@
 #include "Helper/Helper.h"
 GameEngine::GameEngine()
 {
-  GameData.resize(2);
-  srand(static_cast<unsigned int>(time(nullptr)));
-  GameEngine_addUiObserver(&gameUi);
-  GameEngine_notifyUiObserver(0,GameUi::INIT_STATE, option, GameData);
-  GameEngine_generatePlayerHero();
-  GameEngine_generatePlayerCards();
+    GameData.resize(2);
+    srand(static_cast<unsigned int>(time(nullptr)));
+    GameEngine_addUiObserver(&gameUi);
+    GameEngine_notifyUiObserver(0, GameUi::INIT_STATE, option, GameData);
+    GameEngine_generatePlayerHero();
+    GameEngine_generatePlayerCards();
 }
 
 void GameEngine::GameEngine_generatePlayerHero()
 {
-  for(auto &player: GameData)
-  {
-    manager.CardManager_assignHeroToPlayer(player.hero);
-  }
-
+    for (auto &player : GameData)
+    {
+        manager.CardManager_assignHeroToPlayer(player.hero);
+    }
 }
 
 void GameEngine::GameEngine_generatePlayerCards()
 {
-  for(auto &player: GameData)
-  {
-    manager.CardManager_getCardFromPocket(player.handEntities);
-  }
+    for (auto &player : GameData)
+    {
+        manager.CardManager_getCardFromPocket(player.handEntities);
+    }
 }
 
 void GameEngine::GameEngine_generateEntitiesForEachMode(MySocket &socket)
 {
-  Card::CardType entities[(option == CLIENT_MODE ? GameData[0].handEntities.size() : 2 * GameData[0].handEntities.size())];
-  int entitiesCount = 0;
-  switch (option)
-  {
-  case CLIENT_MODE:
-    if (socket.receiveInitCardPool(ClientData.handEntities, ServerData.handEntities))
+    Card::CardType entities[(option == CLIENT_MODE ? GameData[0].handEntities.size() : 2 * GameData[0].handEntities.size())];
+    int entitiesCount = 0;
+    switch (option)
     {
-      GameData[CLIENT_INDEX].handEntities = ClientData.handEntities;
-      GameData[SERVER_INDEX].handEntities = ServerData.handEntities;
-    }
+    case CLIENT_MODE:
+        if (socket.receiveInitCardPool(ClientData.handEntities, ServerData.handEntities))
+        {
+            GameData[CLIENT_INDEX].handEntities = ClientData.handEntities;
+            GameData[SERVER_INDEX].handEntities = ServerData.handEntities;
+        }
 
-    return;
-  case SERVER_MODE:
-    for (int playerIndex = 0; playerIndex < 2; playerIndex++)
-      for (auto &e : GameData[playerIndex].handEntities)
-      {
-        entities[entitiesCount] = e->getCardType();
-        entitiesCount++;
-      }
-    socket.sendInitCardPool(entities);
-    break;
-  default:
-    /* in ofline mode, data have been generated at begin, no need any actions*/
-    break;
-  }
+        return;
+    case SERVER_MODE:
+        for (int playerIndex = 0; playerIndex < 2; playerIndex++)
+            for (auto &e : GameData[playerIndex].handEntities)
+            {
+                entities[entitiesCount] = e->getCardType();
+                entitiesCount++;
+            }
+        socket.sendInitCardPool(entities);
+        break;
+    default:
+        /* in ofline mode, data have been generated at begin, no need any actions*/
+        break;
+    }
 }
 
 void GameEngine::play()
 {
-  MySocket socket(option);
-  while (true)
-  {
-    GameEngine_checkPlayerTurnCount(socket);
-    GameEngine_notifyUiObserver(CLIENT_INDEX, GameUi::RESULT_STATE, option, GameData);
-    switch (option)
+    MySocket socket(option);
+    while (true)
     {
-    case CLIENT_MODE:
-      GameEngine_onClientMode(socket);
-      break;
-    case SERVER_MODE:
-      GameEngine_onServerMode(socket);
-      break;
-    default:
-      GameEngine_onOfflineMode();
-      break;
+        GameEngine_checkPlayerTurnCount(socket);
+        GameEngine_notifyUiObserver(CLIENT_INDEX, GameUi::RESULT_STATE, option, GameData);
+        switch (option)
+        {
+        case CLIENT_MODE:
+            GameEngine_onClientMode(socket);
+            break;
+        case SERVER_MODE:
+            GameEngine_onServerMode(socket);
+            break;
+        default:
+            GameEngine_onOfflineMode();
+            break;
+        }
     }
-  }
 }
 
 void GameEngine::GameEngine_onClientMode(MySocket &socket)
 {
-  int cardChoiced;
-  GameEngine_notifyUiObserver(CLIENT_INDEX, GameUi::CHOICE_STATE, cardChoiced, GameData);
-  GameEngine_handingPlayerTurn(CLIENT_INDEX, cardChoiced);
-  socket.sendPlayerChoice(cardChoiced);
-  int serverChoiceCard = socket.receivePlayerChoice();
-  GameEngine_handingPlayerTurn(SERVER_INDEX, serverChoiceCard);
+    int cardChoiced;
+    GameEngine_notifyUiObserver(CLIENT_INDEX, GameUi::CHOICE_STATE, cardChoiced, GameData);
+    GameEngine_handingPlayerTurn(CLIENT_INDEX, cardChoiced);
+    socket.sendPlayerChoice(cardChoiced);
+    int serverChoiceCard = socket.receivePlayerChoice();
+    GameEngine_handingPlayerTurn(SERVER_INDEX, serverChoiceCard);
 }
 
 void GameEngine::GameEngine_onServerMode(MySocket &socket)
 {
 
-  int clientChoiceCard = socket.receivePlayerChoice();
-  GameEngine_handingPlayerTurn(CLIENT_INDEX, clientChoiceCard);
-  int cardChoiced;
-  GameEngine_notifyUiObserver(SERVER_INDEX, GameUi::CHOICE_STATE, cardChoiced, GameData);
-  GameEngine_handingPlayerTurn(SERVER_INDEX, cardChoiced);
-  socket.sendPlayerChoice(cardChoiced);
+    int clientChoiceCard = socket.receivePlayerChoice();
+    GameEngine_handingPlayerTurn(CLIENT_INDEX, clientChoiceCard);
+    int cardChoiced;
+    GameEngine_notifyUiObserver(SERVER_INDEX, GameUi::CHOICE_STATE, cardChoiced, GameData);
+    GameEngine_handingPlayerTurn(SERVER_INDEX, cardChoiced);
+    socket.sendPlayerChoice(cardChoiced);
 }
 
 void GameEngine::GameEngine_checkPlayerTurnCount(MySocket &socket)
 {
-  for (int playerIndex = 0; playerIndex < GameData.size(); playerIndex++)
-  {
-    if (GameData[playerIndex].turnCount == 2)
+    for (int playerIndex = 0; playerIndex < GameData.size(); playerIndex++)
     {
-        std::shared_ptr<Card> minion = std::dynamic_pointer_cast<Card>(manager.CardManager_drawRandomCard());
-        if (minion)
+        if (GameData[playerIndex].turnCount == 2)
         {
-          GameData[playerIndex].handEntities.push_back(minion);
+            std::shared_ptr<Card> minion = std::dynamic_pointer_cast<Card>(manager.CardManager_drawRandomCard());
+            if (minion)
+            {
+                GameData[playerIndex].handEntities.push_back(minion);
+            }
+            GameData[playerIndex].turnCount = 0;
         }
-      GameData[playerIndex].turnCount = 0;
     }
-  }
-  if (option < 3)
-    GameEngine_generateEntitiesForEachMode(socket);
+    if (option < 3)
+        GameEngine_generateEntitiesForEachMode(socket);
 }
 
 void GameEngine::GameEngine_onOfflineMode()
 {
-  std::vector<std::string> cardList;
-  while (true)
-  {
-    int cardChoiced;
-    GameEngine_notifyUiObserver(CLIENT_INDEX, GameUi::CHOICE_STATE, cardChoiced, GameData);
-    GameEngine_handingPlayerTurn(CLIENT_INDEX, cardChoiced);
-    std::swap(CLIENT_INDEX, SERVER_INDEX);
-  }
+    while (true)
+    {
+        int cardChoiced;
+        GameEngine_notifyUiObserver(CLIENT_INDEX, GameUi::CHOICE_STATE, cardChoiced, GameData);
+        GameEngine_handingPlayerTurn(CLIENT_INDEX, cardChoiced);
+        std::swap(CLIENT_INDEX, SERVER_INDEX);
+    }
 }
 
 void GameEngine::clearPlayerDataStats()
 {
-  GameData[CLIENT_INDEX].stats.clear();
-  GameData[SERVER_INDEX].stats.clear();
+    GameData[CLIENT_INDEX].stats.clear();
+    GameData[SERVER_INDEX].stats.clear();
 }
 
 void GameEngine::GameEngine_handingPlayerTurn(int playerIndex, int choice)
 {
-  GameData[playerIndex].turnCount++;
-  GameEngine_placeCardToBattleYard(playerIndex, choice);
-  GameEngine_notifyUiObserver(playerIndex, GameUi::STATS_STATE, choice, GameData);
-  clearPlayerDataStats();
+    GameData[playerIndex].turnCount++;
+    GameEngine_activeCard(playerIndex, choice);
+    GameEngine_notifyUiObserver(playerIndex, GameUi::STATS_STATE, choice, GameData);
+    clearPlayerDataStats();
 }
 
-void GameEngine::GameEngine_deleteCardFromBattleYard(int playerIndex, int entityIndex)
-{
-  if (entityIndex < GameData[playerIndex].tableEntities.size())
-  {
-    GameData[playerIndex].stats.push_back(GameData[playerIndex].hero->Hero_getName() + " remove " + GameData[playerIndex].tableEntities[entityIndex]->getName());
-    GameData[playerIndex].tableEntities.erase(GameData[playerIndex].tableEntities.begin() + entityIndex);
-  }
-}
-
-void GameEngine::GameEngine_placeCardToBattleYard(int playerIndex, int entityIndex)
+void GameEngine::GameEngine_activeCard(int playerIndex, int entityIndex)
 {
 
-  if (entityIndex < GameData[playerIndex].handEntities.size())
-  {
-    std::shared_ptr<Card> originalEntity = GameData[playerIndex].handEntities[entityIndex];
+    if (entityIndex < GameData[playerIndex].handEntities.size())
+    {
+        std::shared_ptr<Card> originalEntity = GameData[playerIndex].handEntities[entityIndex];
 
-    if (!originalEntity)
-    {
-      return;
+        if (!originalEntity)
+        {
+            return;
+        }
+        else
+        {
+            originalEntity->setUsed();
+            GameData[playerIndex].tableEntities.push_back(originalEntity);
+            GameData[playerIndex].stats.push_back(GameData[playerIndex].hero->getName() + " activate " + originalEntity->getName());
+            originalEntity->play(playerIndex, entityIndex, GameData);
+            GameData[playerIndex].handEntities.erase(GameData[playerIndex].handEntities.begin() + entityIndex);
+        }
     }
-    else
-    {
-      originalEntity->setUsed();
-      GameData[playerIndex].tableEntities.push_back(originalEntity);
-      GameData[playerIndex].stats.push_back(GameData[playerIndex].hero->Hero_getName() + " activate " + originalEntity->getName());
-      originalEntity->play(playerIndex, entityIndex, GameData);
-      GameData[playerIndex].handEntities.erase(GameData[playerIndex].handEntities.begin() + entityIndex);
-    }
-  }
 }
 
 void GameEngine::GameEngine_addUiObserver(GameUi *uiObs)
 {
-  observers.push_back(uiObs);
+    observers.push_back(uiObs);
 }
 
-void GameEngine::GameEngine_notifyUiObserver(int playerIndex,int state, int &cardChoiced, const std::vector<GameData_t> &tableData)
+void GameEngine::GameEngine_notifyUiObserver(int playerIndex, int state, int &cardChoiced, const std::vector<GameData_t> &tableData)
 {
-  for (GameUi* observer : observers) {
-            observer->GameUi_updateGameState(playerIndex, state, cardChoiced, tableData );
-  }
+    for (GameUi *observer : observers)
+    {
+        observer->GameUi_updateGameState(playerIndex, state, cardChoiced, tableData);
+    }
 }

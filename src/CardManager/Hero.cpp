@@ -10,7 +10,7 @@ void Hero::initHero()
     heroPocket.push_back(std::make_shared<Hero>(slark));
 }
 
-std::vector<std::shared_ptr<Hero>> &Hero::GetHeroes()
+std::vector<std::shared_ptr<Hero>> &Hero::getHero()
 {
     return heroPocket;
 }
@@ -19,12 +19,12 @@ bool Hero::IsAlive()
     return health > 0;
 }
 
-void Hero::Hero_attackDefenderHero(GameData_t &defender)
+void Hero::attackDefenderHero(GameData_t &defender)
 {
-    defender.hero->Hero_getDamage(attack);
+    defender.hero->getDamage(attack);
 }
 
-void Hero::Hero_getDamage(unsigned int damage)
+void Hero::getDamage(unsigned int damage)
 {
     health = (health > damage) ? health - damage : 0;
 }

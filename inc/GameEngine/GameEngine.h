@@ -25,7 +25,7 @@ private:
     void GameEngine_generateEntitiesForEachMode(MySocket &socket);
     void GameEngine_distributeCardToPlayerHand();
     void GameEngine_deleteCardFromBattleYard(int playerIndex, int entityIndex);
-    void GameEngine_placeCardToBattleYard(int playerIndex, int entityIndex);
+    void GameEngine_activeCard(int playerIndex, int entityIndex);
     void GameEngine_onClientMode(MySocket &socket);
     void GameEngine_onServerMode(MySocket &socket);
     void GameEngine_onOfflineMode();

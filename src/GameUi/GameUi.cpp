@@ -1,5 +1,7 @@
 #include "GameUi/GameUi.h"
 #include "Helper/Helper.h"
+#include "CardManager/CardFactory/Card.h"
+#include "CardManager/Hero.h"
 #include <iostream>
 #include <string>
 #include <limits>
@@ -37,6 +39,7 @@ void GameUi::GameUi_updateGameState(int playerIndex, int state, int &cardChoiced
         GameUi_displayMenuOption(cardChoiced);
         break;
     case CHOICE_STATE:
+        std::cout << "choice" << std::endl;
         GameUi_displayCardList(cardChoiced, tableData[playerIndex].handEntities);
         break;
     case STATS_STATE:
@@ -82,16 +85,16 @@ void GameUi::GameUi_displayEntireTable(const std::vector<GameData_t> &tableData)
             for (auto &entity : tableData[playerIndex].tableEntities)
 
             {
-                // if (entity->GetEntitiesType() == EntityType::FIRELORD || entity->GetEntitiesType() == EntityType::THALNOS)
-                // {
-                //     card_template_t templ = GameUi_getTemplateWithText(CARD_TEMPLATE_MINION_NO_ABILITY, entity->GetName(), entity->GetAttack(), entity->GetHealth(), entity->GetSkill(), "", "Minion");
-                //     GameData[playerIndex].emplace_back(templ);
-                // }
-                // else
-                // {
-                //     card_template_t templS = GameUi_getTemplateWithText(CARD_TEMPLATE_MINION_WITH_ABILITY, entity->GetName(), entity->GetAttack(), entity->GetHealth(), entity->GetSkill(), "", entity->EntityTypeToString(entity->GetEntitiesType()));
-                //     GameData[playerIndex].emplace_back(templS);
-                // }
+                if (entity->getCardType() == Card::CardType::FIRELORD || entity->getCardType() == Card::CardType::THALNOS)
+                {
+                    card_template_t templ = GameUi_getTemplateWithText(CARD_TEMPLATE_MINION_NO_ABILITY, entity->getName(), entity->getAttack(), entity->getHP(), entity->getSkill(), "", "Minion");
+                    GameData[playerIndex].emplace_back(templ);
+                }
+                else
+                {
+                    card_template_t templS = GameUi_getTemplateWithText(CARD_TEMPLATE_MINION_WITH_ABILITY, entity->getName(), entity->getAttack(), entity->getHP(), entity->getSkill(), "", "");
+                    GameData[playerIndex].emplace_back(templS);
+                }
             }
         }
         std::pair<std::vector<std::vector<std::string>>, std::vector<std::vector<std::string>>> splitResult = splitVector(GameData[playerIndex]);
@@ -119,14 +122,7 @@ void GameUi::GameUi_displayEntireTable(const std::vector<GameData_t> &tableData)
 
     GameUi_displayCard(firstGroup[0]);
     GameUi_displayCard(secondGroup[0]);
-    for (auto &msg : GameUi_getCenterTemplateWithMessage(TOP_CENTRE_GRAPHIC, statsOfPlayer1))
-    {
-        std::cout << std::string(50, ' ') << EXTERNAL_BORDER_CHAR_UP_DOWN << "  " << msg << "  " << EXTERNAL_BORDER_CHAR_UP_DOWN << std::endl;
-    }
-    for (auto &msg : GameUi_getCenterTemplateWithMessage(BOTTOM_CENTRE_GRAPHIC, statsOfPlayer2))
-    {
-        std::cout << std::string(50, ' ') << EXTERNAL_BORDER_CHAR_UP_DOWN << "  " << msg << "  " << EXTERNAL_BORDER_CHAR_UP_DOWN << std::endl;
-    }
+    GameUi_getCenterTemplateWithMessage(tableData);
     GameUi_displayCard(firstGroup[1]);
     GameUi_displayCard(secondGroup[1]);
 
@@ -272,18 +268,54 @@ card_template_t GameUi::GameUi_getTemplateWithText(card_template_t out, std::str
     return out;
 }
 
-card_template_t GameUi::GameUi_getCenterTemplateWithMessage(card_template_t out, std::vector<std::string> message)
+void GameUi::GameUi_getCenterTemplateWithMessage(const std::vector<GameData_t> &tableData)
 {
-    std::string msg;
-    for (auto e : message)
+    std::vector<std::string> player1Stats = tableData[0].stats;
+    std::vector<std::string> player2Stats = tableData[1].stats;
+    int numStatsPlayer1 = player1Stats.size();
+
+    int width = 179;
+    std::cout << std::string(50, ' ') << "┃  ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓  ┃" << std::endl;
+    int titlePadding = (width - tableData[0].hero->getName().length() - 4) / 2;
+    std::cout << std::string(50, ' ') << "┃  ┃";
+    std::cout << std::string(titlePadding, ' ') << "\033[35m" << std::left << std::setw(tableData[0].hero->getName().length()) << tableData[0].hero->getName() << "\033[0m";
+    std::cout << std::string(width - tableData[0].hero->getName().length() - titlePadding - 8, ' ') << "┃  ┃" << std::endl;
+    std::cout << std::string(50, ' ') << "┃  ┠━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┨  ┃" << std::endl;
+
+    if (numStatsPlayer1 > 0)
     {
-        msg += e;
+        for (int i = 0; i < numStatsPlayer1; ++i)
+        {
+            std::cout << std::string(50, ' ') << "┃  ┃    " << std::left << player1Stats[i] << std::string(width - player1Stats[i].length() - 12, ' ') << "┃  ┃" << std::endl;
+        }
     }
-    std::ostringstream oss;
-    GameUi_prepareForReplace(out);
-    GameUi_replaceTextFromLeftSide(out, 'M', msg);
-    oss.str("");
-    return out;
+    else
+    {
+        std::cout << std::string(50, ' ') << "┃  ┃ " << std::left << std::setw(width - 4) << "No table entities to display."
+                  << " ┃  ┃" << std::endl;
+    }
+
+    std::cout << std::string(50, ' ') << "┃  ┃                                                                                                                                                                           ┃  ┃" << std::endl;
+    int numStatsPlayer2 = player2Stats.size();
+    if (numStatsPlayer2 > 0)
+    {
+        for (int i = 0; i < numStatsPlayer2; ++i)
+        {
+            std::cout << std::string(50, ' ') << "┃  ┃    " << std::left << player2Stats[i] << std::string(width - player2Stats[i].length() - 12, ' ') << "┃  ┃" << std::endl;
+        }
+    }
+    else
+    {
+        std::cout << std::string(50, ' ') << "┃  ┃ " << std::left << std::setw(width - 10) << "No table entities to display."
+                  << " ┃  ┃" << std::endl;
+    }
+    titlePadding = (width - tableData[1].hero->getName().length() - 4) / 2;
+
+    std::cout << std::string(50, ' ') << "┃  ┠━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┨  ┃" << std::endl;
+    std::cout << std::string(50, ' ') << "┃  ┃";
+    std::cout << std::string(titlePadding, ' ') << "\033[35m" << std::left << std::setw(tableData[1].hero->getName().length()) << tableData[1].hero->getName() << "\033[0m";
+    std::cout << std::string(width - tableData[1].hero->getName().length() - titlePadding - 8, ' ') << "┃  ┃" << std::endl;
+    std::cout << std::string(50, ' ') << "┃  ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛  ┃" << std::endl;
 }
 
 void GameUi::GameUi_displayGameRules()
@@ -401,7 +433,7 @@ void GameUi::GameUi_displayMenuOption(int &option)
             }
             int total = 100;
             int width = 50;
-            int delay = 20;
+            int delay = 10;
 
             std::cout << "              Please waiting when loading resource!" << std::endl;
             for (int i = 0; i <= total; ++i)
@@ -435,7 +467,7 @@ void GameUi::GameUi_displayCardList(int &choice, const std::vector<std::shared_p
     std::vector<std::string> menuOptions;
     for (auto &e : handEntities)
     {
-        // menuOptions.push_back(e->GetDescription());
+        menuOptions.push_back(e->getDesciption());
     }
     int numOptions = menuOptions.size();
     int currentIndex = 0;
@@ -518,13 +550,13 @@ void GameUi::GameUi_displayResult(const std::vector<GameData_t> &tableData)
     };
     for (int playerIndex = 0; playerIndex < tableData.size(); playerIndex++)
     {
-        // if (!tableData[playerIndex].hero->IsAlive())
-        // {
-        //     const auto &winnerMessages =
-        //         (tableData[1 - playerIndex].hero->GetName() == "Slark") ? HERO_SLARK_WINNER : HERO_BUTCHER_WINNER;
-        //     GameUi_prepareConsole();
-        //     printWinnerMessages(winnerMessages);
-        //     GameUi_waitForConfirm();
-        // }
+        if (!tableData[playerIndex].hero->IsAlive())
+        {
+            const auto &winnerMessages =
+                (tableData[1 - playerIndex].hero->getName() == "Slark") ? HERO_SLARK_WINNER : HERO_BUTCHER_WINNER;
+            GameUi_prepareConsole();
+            printWinnerMessages(winnerMessages);
+            GameUi_waitForConfirm();
+        }
     }
 }
