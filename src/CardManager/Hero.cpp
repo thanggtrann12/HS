@@ -21,10 +21,10 @@ bool Hero::IsAlive()
 
 void Hero::attackDefenderHero(GameData_t &defender)
 {
-    defender.hero->getDamage(attack);
+    defender.hero->takeDamage(attack);
 }
 
-void Hero::getDamage(unsigned int damage)
+void Hero::takeDamage(unsigned int damage)
 {
     health = (health > damage) ? health - damage : 0;
 }

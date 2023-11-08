@@ -128,6 +128,9 @@ void GameEngine::GameEngine_onOfflineMode()
     while (true)
     {
         int cardChoiced;
+        MySocket socket(option);
+        GameEngine_checkPlayerTurnCount(socket);
+        GameEngine_notifyUiObserver(CLIENT_INDEX, GameUi::RESULT_STATE, cardChoiced, GameData);
         GameEngine_notifyUiObserver(CLIENT_INDEX, GameUi::CHOICE_STATE, cardChoiced, GameData);
         GameEngine_handingPlayerTurn(CLIENT_INDEX, cardChoiced);
         std::swap(CLIENT_INDEX, SERVER_INDEX);
@@ -143,6 +146,7 @@ void GameEngine::clearPlayerDataStats()
 void GameEngine::GameEngine_handingPlayerTurn(int playerIndex, int choice)
 {
     GameData[playerIndex].turnCount++;
+    GameData[playerIndex].hero->attackDefenderHero(GameData[1 - playerIndex]);
     GameEngine_activeCard(playerIndex, choice);
     GameEngine_notifyUiObserver(playerIndex, GameUi::STATS_STATE, choice, GameData);
     clearPlayerDataStats();
@@ -161,8 +165,7 @@ void GameEngine::GameEngine_activeCard(int playerIndex, int entityIndex)
         }
         else
         {
-            originalEntity->setUsed();
-            GameData[playerIndex].tableEntities.push_back(originalEntity);
+            manager.CardManager_pushCardToTable(GameData[playerIndex].tableEntities, originalEntity->getCardType());
             GameData[playerIndex].stats.push_back(GameData[playerIndex].hero->getName() + " activate " + originalEntity->getName());
             originalEntity->play(playerIndex, entityIndex, GameData);
             GameData[playerIndex].handEntities.erase(GameData[playerIndex].handEntities.begin() + entityIndex);

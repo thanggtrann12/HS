@@ -13,8 +13,10 @@ public:
     bool IsAlive();
     std::vector<std::shared_ptr<Hero>> &getHero();
     void attackDefenderHero(GameData_t &defender);
-    void getDamage(unsigned int damage);
+    void takeDamage(unsigned int damage);
     const std::string &getName() const { return name; }
+    int getHP() const { return health; }
+    int getAttack() const { return attack; }
 
 private:
     std::vector<std::shared_ptr<Hero>> heroPocket;

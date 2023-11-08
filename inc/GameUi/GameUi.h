@@ -16,10 +16,10 @@ const char DELIMITER = '\v';
 const card_template_t CARD_TEMPLATE_MINION_WITH_ABILITY = {
     "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓",
     "┃    ~NNNNNNNNNNNNNNNNNNNNN~    ┃",
-    "┠───────────────┬───────────────┨",
-    "┃ ~TTTTTTT~     │ ~SSSSSSSSS~   ┃",
-    "┠───────────────┴───────────────┨",
-    "┃   ~KKKKKKKKKKKKKKKKKKKKK      ┃",
+    "┠───────────────────────────────┨",
+    "┃           ~SSSSSSSSS~         ┃",
+    "┠───────────────────────────────┨",
+    "┃   ~KKKKKKKKKKKKKKKKKKKKKK     ┃",
     "┃   KKKKKKKKKKKKKKKKKKKKKKKKK   ┃",
     "┃              KKK~             ┃",
     "┠─ATK─┐                   ┌──HP─┨",
@@ -30,11 +30,11 @@ const card_template_t CARD_TEMPLATE_MINION_NO_ABILITY = {
     "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓",
     "┃    ~NNNNNNNNNNNNNNNNNNNNN~    ┃",
     "┠───────────────────────────────┨",
-    "┃        ~TTTTTT~               ┃",
+    "┃             Minion            ┃",
     "┠───────────────────────────────┨",
     "┃   ~KKKKKKKKKKKKKKKKKKKKKK     ┃",
     "┃   KKKKKKKKKKKKKKKKKKKKKKKKK   ┃",
-    "┃              KKK~             ┃",
+    "┃              KKKKK~           ┃",
     "┠─ATK─┐                   ┌──HP─┨",
     "┃  ~A~│                   │~H~  ┃",
     "┗━━━━━┷━━━━━━━━━━━━━━━━━━━┷━━━━━┛"};
@@ -103,7 +103,7 @@ private:
     void GameUi_displayEntireTable(const std::vector<GameData_t> &tableData);
     void GameUi_displayGameRules();
     void GameUi_displayMenuOption(int &option);
-    void GameUi_displayCardList(int &choice, const std::vector<std::shared_ptr<Card>> &handEntities);
+    void GameUi_displayCardList(int &choice, const std::string &name, const std::vector<std::shared_ptr<Card>> &handEntities);
     void GameUi_waitForNextTurn();
     void GameUi_waitForConfirm();
     void GameUi_prepareConsole();
@@ -113,7 +113,7 @@ private:
     void GameUi_replaceTextFromRightSide(card_template_t &text, char flag, std::string new_text);
     void GameUi_prepareForReplace(card_template_t &text);
     void GameUi_getCenterTemplateWithMessage(const std::vector<GameData_t> &tableData);
-    card_template_t GameUi_getTemplateWithText(card_template_t out, std::string name, int attack, int health, std::string skill, std::string status, std::string type);
+    card_template_t GameUi_getTemplateWithText(card_template_t out, std::string name, int attack, int health, std::string skill, std::string status);
 };
 
 #endif // GAME_UI_H

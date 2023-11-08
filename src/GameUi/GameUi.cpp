@@ -40,7 +40,7 @@ void GameUi::GameUi_updateGameState(int playerIndex, int state, int &cardChoiced
         break;
     case CHOICE_STATE:
         std::cout << "choice" << std::endl;
-        GameUi_displayCardList(cardChoiced, tableData[playerIndex].handEntities);
+        GameUi_displayCardList(cardChoiced, tableData[playerIndex].hero->getName(), tableData[playerIndex].handEntities);
         break;
     case STATS_STATE:
         int choice;
@@ -87,12 +87,12 @@ void GameUi::GameUi_displayEntireTable(const std::vector<GameData_t> &tableData)
             {
                 if (entity->getCardType() == Card::CardType::FIRELORD || entity->getCardType() == Card::CardType::THALNOS)
                 {
-                    card_template_t templ = GameUi_getTemplateWithText(CARD_TEMPLATE_MINION_NO_ABILITY, entity->getName(), entity->getAttack(), entity->getHP(), entity->getSkill(), "", "Minion");
+                    card_template_t templ = GameUi_getTemplateWithText(CARD_TEMPLATE_MINION_NO_ABILITY, entity->getName(), entity->getAttack(), entity->getHP(), entity->getSkill(), "");
                     GameData[playerIndex].emplace_back(templ);
                 }
                 else
                 {
-                    card_template_t templS = GameUi_getTemplateWithText(CARD_TEMPLATE_MINION_WITH_ABILITY, entity->getName(), entity->getAttack(), entity->getHP(), entity->getSkill(), "", "");
+                    card_template_t templS = GameUi_getTemplateWithText(CARD_TEMPLATE_MINION_WITH_ABILITY, entity->getName(), entity->getAttack(), entity->getHP(), entity->getSkill(), (entity->isUsed() ? "ACTIVE" : "INACTIVE"));
                     GameData[playerIndex].emplace_back(templS);
                 }
             }
@@ -250,12 +250,11 @@ void GameUi::GameUi_prepareForReplace(card_template_t &text)
     }
 }
 
-card_template_t GameUi::GameUi_getTemplateWithText(card_template_t out, std::string name, int attack, int health, std::string skill, std::string status, std::string type)
+card_template_t GameUi::GameUi_getTemplateWithText(card_template_t out, std::string name, int attack, int health, std::string skill, std::string status)
 {
     std::ostringstream oss;
     GameUi_prepareForReplace(out);
     GameUi_replaceTextFromLeftSide(out, 'N', name);
-    GameUi_replaceTextFromRightSide(out, 'T', type);
     GameUi_replaceTextFromRightSide(out, 'S', status);
     oss.str("");
     oss << attack;
@@ -272,14 +271,15 @@ void GameUi::GameUi_getCenterTemplateWithMessage(const std::vector<GameData_t> &
 {
     std::vector<std::string> player1Stats = tableData[0].stats;
     std::vector<std::string> player2Stats = tableData[1].stats;
+    std::string title = tableData[0].hero->getName() + " HP[" + std::to_string(tableData[0].hero->getHP()) + "] ATK[" + std::to_string(tableData[0].hero->getAttack()) + "]";
     int numStatsPlayer1 = player1Stats.size();
 
     int width = 179;
     std::cout << std::string(50, ' ') << "┃  ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓  ┃" << std::endl;
-    int titlePadding = (width - tableData[0].hero->getName().length() - 4) / 2;
+    int titlePadding = (width - title.length() - 4) / 2;
     std::cout << std::string(50, ' ') << "┃  ┃";
-    std::cout << std::string(titlePadding, ' ') << "\033[35m" << std::left << std::setw(tableData[0].hero->getName().length()) << tableData[0].hero->getName() << "\033[0m";
-    std::cout << std::string(width - tableData[0].hero->getName().length() - titlePadding - 8, ' ') << "┃  ┃" << std::endl;
+    std::cout << std::string(titlePadding, ' ') << "\033[35m" << std::left << std::setw(title.length()) << title << "\033[0m";
+    std::cout << std::string(width - title.length() - titlePadding - 8, ' ') << "┃  ┃" << std::endl;
     std::cout << std::string(50, ' ') << "┃  ┠━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┨  ┃" << std::endl;
 
     if (numStatsPlayer1 > 0)
@@ -288,11 +288,6 @@ void GameUi::GameUi_getCenterTemplateWithMessage(const std::vector<GameData_t> &
         {
             std::cout << std::string(50, ' ') << "┃  ┃    " << std::left << player1Stats[i] << std::string(width - player1Stats[i].length() - 12, ' ') << "┃  ┃" << std::endl;
         }
-    }
-    else
-    {
-        std::cout << std::string(50, ' ') << "┃  ┃ " << std::left << std::setw(width - 4) << "No table entities to display."
-                  << " ┃  ┃" << std::endl;
     }
 
     std::cout << std::string(50, ' ') << "┃  ┃                                                                                                                                                                           ┃  ┃" << std::endl;
@@ -304,17 +299,14 @@ void GameUi::GameUi_getCenterTemplateWithMessage(const std::vector<GameData_t> &
             std::cout << std::string(50, ' ') << "┃  ┃    " << std::left << player2Stats[i] << std::string(width - player2Stats[i].length() - 12, ' ') << "┃  ┃" << std::endl;
         }
     }
-    else
-    {
-        std::cout << std::string(50, ' ') << "┃  ┃ " << std::left << std::setw(width - 10) << "No table entities to display."
-                  << " ┃  ┃" << std::endl;
-    }
-    titlePadding = (width - tableData[1].hero->getName().length() - 4) / 2;
+    title.clear();
+    title = tableData[1].hero->getName() + " HP[" + std::to_string(tableData[1].hero->getHP()) + "] ATK[" + std::to_string(tableData[1].hero->getAttack()) + "]";
+    titlePadding = (width - title.length() - 4) / 2;
 
     std::cout << std::string(50, ' ') << "┃  ┠━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┨  ┃" << std::endl;
     std::cout << std::string(50, ' ') << "┃  ┃";
-    std::cout << std::string(titlePadding, ' ') << "\033[35m" << std::left << std::setw(tableData[1].hero->getName().length()) << tableData[1].hero->getName() << "\033[0m";
-    std::cout << std::string(width - tableData[1].hero->getName().length() - titlePadding - 8, ' ') << "┃  ┃" << std::endl;
+    std::cout << std::string(titlePadding, ' ') << "\033[35m" << std::left << std::setw(title.length()) << title << "\033[0m";
+    std::cout << std::string(width - title.length() - titlePadding - 8, ' ') << "┃  ┃" << std::endl;
     std::cout << std::string(50, ' ') << "┃  ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛  ┃" << std::endl;
 }
 
@@ -341,13 +333,13 @@ void GameUi::GameUi_displayMenuOption(int &option)
     while (1)
     {
 
-        std::cout << "\033[H\033[J";
+        std::cout << "\033[H\033[J \n\n\n\n\n\n\n\n";
 
-        std::cout << "=====================================================================" << std::endl;
-        std::cout << "#" << std::setw(68) << "#" << std::endl;
-        std::cout << "#" << std::setw(68) << "#" << std::endl;
-        std::cout << "#              WELCOME TO MY COPY HEARTH STONE GAME                 #" << std::endl;
-        std::cout << "#                     Choose option to play                         #" << std::endl;
+        std::cout << std::string(100, ' ') << "=====================================================================" << std::endl;
+        std::cout << std::string(100, ' ') << "#" << std::setw(68) << "#" << std::endl;
+        std::cout << std::string(100, ' ') << "#" << std::setw(68) << "#" << std::endl;
+        std::cout << std::string(100, ' ') << "#              WELCOME TO MY COPY HEARTH STONE GAME                 #" << std::endl;
+        std::cout << std::string(100, ' ') << "#                     Choose option to play                         #" << std::endl;
 
         for (int i = 1; i <= numOptions; ++i)
         {
@@ -355,54 +347,46 @@ void GameUi::GameUi_displayMenuOption(int &option)
             {
                 if (i == 1)
                 {
-                    std::cout << "# \033[33m                   >   " << i << ". Host a game    <                    \033[0m    #" << std::endl;
+                    std::cout << std::string(100, ' ') << "# \033[33m                   >   " << i << ". Host a game    <                    \033[0m    #" << std::endl;
                 }
                 else if (i == 2)
                 {
-                    std::cout << "# \033[33m                   >   " << i << ". Join a game    <                    \033[0m    #" << std::endl;
+                    std::cout << std::string(100, ' ') << "# \033[33m                   >   " << i << ". Join a game    <                    \033[0m    #" << std::endl;
                 }
                 else if (i == 3)
                 {
-                    std::cout << "# \033[33m                   >   " << i << ". Play offline    <                   \033[0m    #" << std::endl;
+                    std::cout << std::string(100, ' ') << "# \033[33m                   >   " << i << ". Play offline    <                   \033[0m    #" << std::endl;
                 }
                 else if (i == 4)
                 {
-                    std::cout << "# \033[33m                   >   " << i << ". Read Game Rules <                   \033[0m    #" << std::endl;
-                }
-                else
-                {
-                    std::cout << "#                        " << i << ". Option " << i << "                           #" << std::endl;
+                    std::cout << std::string(100, ' ') << "# \033[33m                   >   " << i << ". Read Game Rules <                   \033[0m    #" << std::endl;
                 }
             }
             else
             {
                 if (i == 1)
                 {
-                    std::cout << "#                        " << i << ". Host a game                             #" << std::endl;
+                    std::cout << std::string(100, ' ') << "#                        " << i << ". Host a game                             #" << std::endl;
                 }
                 else if (i == 2)
                 {
-                    std::cout << "#                        " << i << ". Join a game                             #" << std::endl;
+                    std::cout << std::string(100, ' ') << "#                        " << i << ". Join a game                             #" << std::endl;
                 }
                 else if (i == 3)
                 {
-                    std::cout << "#                        " << i << ". Play offline                            #" << std::endl;
+                    std::cout << std::string(100, ' ') << "#                        " << i << ". Play offline                            #" << std::endl;
                 }
                 else if (i == 4)
                 {
-                    std::cout << "#                       " << i << ". Read Game Rules                          #" << std::endl;
-                }
-                else
-                {
-                    std::cout << "#                        " << i << ". Option " << i << "                           #" << std::endl;
+                    std::cout << std::string(100, ' ') << "#                       " << i << ". Read Game Rules                          #" << std::endl;
                 }
             }
         }
-        std::cout << "#" << std::setw(68) << "#" << std::endl;
-        std::cout << "#          Uses ↑ and ↓ to select and Enter to confirm              #" << std::endl;
-        std::cout << "#" << std::setw(68) << "#" << std::endl;
-        std::cout << "#" << std::setw(68) << "#" << std::endl;
-        std::cout << "=====================================================================" << std::endl;
+        std::cout << std::string(100, ' ') << "#" << std::setw(68) << "#" << std::endl;
+        std::cout << std::string(100, ' ') << "#          Uses ↑ and ↓ to select and Enter to confirm              #" << std::endl;
+        std::cout << std::string(100, ' ') << "#" << std::setw(68) << "#" << std::endl;
+        std::cout << std::string(100, ' ') << "#" << std::setw(68) << "#" << std::endl;
+        std::cout << std::string(100, ' ') << "=====================================================================" << std::endl;
 
         key = getchar();
 
@@ -431,30 +415,6 @@ void GameUi::GameUi_displayMenuOption(int &option)
                 GameUi_waitForConfirm();
                 GameUi_displayMenuOption(option);
             }
-            int total = 100;
-            int width = 50;
-            int delay = 10;
-
-            std::cout << "              Please waiting when loading resource!" << std::endl;
-            for (int i = 0; i <= total; ++i)
-            {
-                float percentage = static_cast<float>(i) / total * 100;
-                int numHashes = static_cast<int>(percentage / 2);
-                int numSpaces = width - numHashes;
-                std::cout << "\rLoading: [";
-                for (int j = 0; j < numHashes; ++j)
-                {
-                    std::cout << "#";
-                }
-                for (int j = 0; j < numSpaces; ++j)
-                {
-                    std::cout << " ";
-                }
-                std::cout << "] " << percentage << "%";
-                std::cout.flush();
-                std::this_thread::sleep_for(std::chrono::milliseconds(delay));
-            }
-            std::cout << "\n\t\t\tDone." << std::endl;
             tcsetattr(STDIN_FILENO, TCSANOW, &original_termios);
             return;
         }
@@ -462,7 +422,7 @@ void GameUi::GameUi_displayMenuOption(int &option)
     tcsetattr(STDIN_FILENO, TCSANOW, &original_termios);
 }
 
-void GameUi::GameUi_displayCardList(int &choice, const std::vector<std::shared_ptr<Card>> &handEntities)
+void GameUi::GameUi_displayCardList(int &choice, const std::string &name, const std::vector<std::shared_ptr<Card>> &handEntities)
 {
     std::vector<std::string> menuOptions;
     for (auto &e : handEntities)
@@ -484,29 +444,66 @@ void GameUi::GameUi_displayCardList(int &choice, const std::vector<std::shared_p
         std::cout << "\033[H\033[J";
         int width = 100;
         int height = menuOptions.size() + 4;
+        std::vector<std::vector<std::string>> card;
+        card_template_t temp;
+        if (handEntities[currentIndex]->getCardType() == Card::CardType::FIRELORD || handEntities[currentIndex]->getCardType() == Card::CardType::THALNOS || handEntities[currentIndex]->getCardType() == Card::CardType::TECHIES)
+        {
+            temp = GameUi_getTemplateWithText(CARD_TEMPLATE_MINION_NO_ABILITY, handEntities[currentIndex]->getName(), handEntities[currentIndex]->getAttack(), handEntities[currentIndex]->getHP(), handEntities[currentIndex]->getSkill(), "");
+        }
+        else
+        {
+            temp = GameUi_getTemplateWithText(CARD_TEMPLATE_MINION_WITH_ABILITY, handEntities[currentIndex]->getName(), handEntities[currentIndex]->getAttack(), handEntities[currentIndex]->getHP(), handEntities[currentIndex]->getSkill(), (handEntities[currentIndex]->isUsed() ? "ACTIVE" : "INACTIVE"));
+        }
+        card.emplace_back(temp);
+        size_t maxRows = 0;
+
+        for (const std::vector<std::string> &row : card)
+        {
+            if (row.size() > maxRows)
+            {
+                maxRows = row.size();
+            }
+        }
+        for (size_t i = 0; i < maxRows; i++)
+        {
+            for (const std::vector<std::string> &row : card)
+            {
+                if (i < row.size())
+                {
+                    std::cout << std::string(110, ' ') << row[i] << "  ";
+                }
+            }
+            std::cout << std::endl;
+        }
+
+        std::string line = "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓";
+
+        int padding = (line.length() - name.length()) / 2;
+        line.replace(padding, name.length(), name);
+        std::cout << std::string(80, ' ') << line << std::endl;
         if (numOptions > 0)
         {
             for (int i = 0; i < numOptions; ++i)
             {
                 if (i == currentIndex)
                 {
-                    std::cout << "| \033[32m-> ";
+                    std::cout << std::string(80, ' ') << EXTERNAL_BORDER_CHAR_UP_DOWN << " \033[32m-> ";
                 }
                 else
                 {
-                    std::cout << "|    ";
+                    std::cout << std::string(80, ' ') << EXTERNAL_BORDER_CHAR_UP_DOWN << "    ";
                 }
                 int padding = 5;
-                std::cout << std::string(padding, ' ') << std::left << menuOptions[i] << std::string(width - menuOptions[i].length() - padding - 6, ' ') << "\033[0m|" << std::endl;
+                std::cout << std::string(padding, ' ') << std::left << menuOptions[i] << std::string(width - menuOptions[i].length() - padding - 6, ' ') << "\033[0m" << EXTERNAL_BORDER_CHAR_UP_DOWN << std::endl;
             }
         }
         else
         {
-            std::cout << "| " << std::left << std::setw(width - 4) << "You are ran out of cards, only hero attack!"
-                      << " |" << std::endl;
+            std::cout << std::string(80, ' ') << EXTERNAL_BORDER_CHAR_UP_DOWN << " " << std::left << std::setw(width - 4) << "You are ran out of cards, only hero attack!"
+                      << " " << EXTERNAL_BORDER_CHAR_UP_DOWN << std::endl;
         }
 
-        std::cout << '+' << std::string(width - 2, '-') << '+' << std::endl;
+        std::cout << std::string(80, ' ') << "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛" << std::endl;
 
         key = getchar();
 

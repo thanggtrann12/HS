@@ -11,8 +11,9 @@ void MinionCard::play(unsigned int playerIndex, unsigned int cardPlayed, std::ve
 {
     auto &attacker = gameData[playerIndex];
     auto &defender = gameData[1 - playerIndex];
-    attacker.hero->attackDefenderHero(defender);
     unsigned int damage = attacker.handEntities[cardPlayed]->getAttack();
+    defender.hero->takeDamage(damage);
+    attacker.stats.push_back(attacker.handEntities[cardPlayed]->getName() + " attack " + defender.hero->getName() + "with " + std::to_string(damage) + " damage");
     if (!defender.tableEntities.empty())
         for (auto it = defender.tableEntities.begin(); it != defender.tableEntities.end();)
         {
@@ -23,9 +24,9 @@ void MinionCard::play(unsigned int playerIndex, unsigned int cardPlayed, std::ve
                 if (card->getCardType() == Card::CardType::TECHIES)
                 {
                     attacker.stats.push_back(attacker.hero->getName() + " Get 3 damage on Techies elimination");
-                    attacker.hero->getDamage(3);
+                    attacker.hero->takeDamage(3);
                     defender.stats.push_back(defender.hero->getName() + " Get 3 damage on Techies elimination");
-                    defender.hero->getDamage(3);
+                    defender.hero->takeDamage(3);
                 }
                 else
                 {
@@ -37,6 +38,7 @@ void MinionCard::play(unsigned int playerIndex, unsigned int cardPlayed, std::ve
             else
             {
                 ++it;
+                attacker.stats.push_back(attacker.handEntities[cardPlayed]->getName() + " attack " + card->getName() + "with " + std::to_string(damage) + " damage");
             }
         }
     else
@@ -62,7 +64,6 @@ void BuffCard::play(unsigned int playerIndex, unsigned int cardPlayed, std::vect
 {
     auto &attacker = gameData[playerIndex];
     auto &defender = gameData[1 - playerIndex];
-    attacker.handEntities[cardPlayed];
     if (!attacker.tableEntities.empty())
     {
         attacker.stats.push_back("Card buffed: ");
@@ -101,14 +102,26 @@ void SpellCard::play(unsigned int playerIndex, unsigned int cardPlayed, std::vec
         if (cardRemoved->getCardType() == Card::CardType::TECHIES)
         {
             attacker.stats.push_back(attacker.hero->getName() + "Get 3 damage on Techies elimination");
-            attacker.hero->getDamage(3);
+            attacker.hero->takeDamage(3);
             defender.stats.push_back(defender.hero->getName() + "Get 3 damage on Techies elimination");
-            defender.hero->getDamage(3);
+            defender.hero->takeDamage(3);
         }
         defender.tableEntities.erase(defender.tableEntities.begin() + randomIndex);
     }
     else
     {
         attacker.stats.push_back(attacker.hero->getName() + "had no card on table");
+    }
+    for (auto it = attacker.tableEntities.begin(); it != attacker.tableEntities.end();)
+    {
+        auto &card = *it;
+        if (card->getCardType() == Card::CardType::BRAWL)
+        {
+            it = attacker.tableEntities.erase(it);
+        }
+        else
+        {
+            ++it;
+        }
     }
 }

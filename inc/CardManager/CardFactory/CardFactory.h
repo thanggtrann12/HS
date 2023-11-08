@@ -36,7 +36,7 @@ class BuffCardFactory : public CardFactory
 public:
     std::shared_ptr<Card> createCard(Card::CardType type) override
     {
-        return std::make_shared<BuffCard>("Flametongue Totem", 1, 1, "Provides all alliance minions with a +1 Attack bonus", type);
+        return std::make_shared<BuffCard>("Flametongue Totem", 1, 1, "Provides  all alliance minions with a +1 Attack bonus", type);
     }
 };
 
