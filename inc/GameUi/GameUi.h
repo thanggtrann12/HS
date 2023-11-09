@@ -87,33 +87,33 @@ const card_template_t HERO_SLARK_WINNER = {
 class GameUi
 {
 public:
-    GameUi();
-    void GameUi_updateGameState(int playerIndex, int state, int &cardChoiced, const std::vector<GameData_t> &tableData);
+  GameUi();
+  void GameUi_updateGameState(int playerIndex, int state, int &cardChoiced, const std::vector<GameData_t> &tableData);
 
-    ~GameUi(){};
-    enum
-    {
-        INIT_STATE = 0,
-        CHOICE_STATE,
-        STATS_STATE,
-        RESULT_STATE,
-    };
+  ~GameUi(){};
+  enum
+  {
+    INIT_STATE = 0,
+    CHOICE_STATE,
+    STATS_STATE,
+    RESULT_STATE,
+  };
 
 private:
-    void GameUi_displayEntireTable(const std::vector<GameData_t> &tableData);
-    void GameUi_displayGameRules();
-    void GameUi_displayMenuOption(int &option);
-    void GameUi_displayCardList(int &choice, const std::string &name, const std::vector<std::shared_ptr<Card>> &handEntities);
-    void GameUi_waitForNextTurn();
-    void GameUi_waitForConfirm();
-    void GameUi_prepareConsole();
-    void GameUi_displayResult(const std::vector<GameData_t> &tableData);
-    void GameUi_displayCard(std::vector<std::vector<std::string>> &hand);
-    void GameUi_replaceTextFromLeftSide(card_template_t &text, char flag, std::string new_text);
-    void GameUi_replaceTextFromRightSide(card_template_t &text, char flag, std::string new_text);
-    void GameUi_prepareForReplace(card_template_t &text);
-    void GameUi_getCenterTemplateWithMessage(const std::vector<GameData_t> &tableData);
-    card_template_t GameUi_getTemplateWithText(card_template_t out, std::string name, int attack, int health, std::string skill, std::string status);
+  void GameUi_displayEntireTable(const std::vector<GameData_t> &tableData);
+  void GameUi_displayGameRules();
+  void GameUi_displayMenuOption(int &option);
+  void GameUi_displayCardList(int &choice, const std::string &name, const std::vector<std::shared_ptr<Card>> &handEntities);
+  void GameUi_waitForNextTurn();
+  void GameUi_waitForConfirm();
+  void GameUi_prepareConsole();
+  void GameUi_displayResult(const std::vector<GameData_t> &tableData);
+  void GameUi_displayCard(std::vector<std::vector<std::string>> &hand);
+  void GameUi_replaceTextFromLeftSide(card_template_t &text, char flag, std::string new_text);
+  void GameUi_replaceTextFromRightSide(card_template_t &text, char flag, std::string new_text);
+  void GameUi_prepareForReplace(card_template_t &text);
+  void GameUi_getCenterTemplateWithMessage(const std::vector<GameData_t> &tableData);
+  card_template_t GameUi_getTemplateWithText(const std::string &color, card_template_t out, std::string name, int attack, int health, std::string skill, std::string status);
 };
 
 #endif // GAME_UI_H
