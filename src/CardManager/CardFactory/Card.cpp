@@ -130,16 +130,5 @@ void SpellCard::play(unsigned int playerIndex, const std::vector<std::shared_ptr
   {
     defender.stats.push_back(attacker.hero->getName() + " had no card on table");
   }
-  for (auto it = attacker.tableEntities.begin(); it != attacker.tableEntities.end();)
-  {
-    auto &card = *it;
-    if (card->getCardType() == Card::CardType::BRAWL)
-    {
-      it = attacker.tableEntities.erase(it);
-    }
-    else
-    {
-      ++it;
-    }
-  }
+  attacker.tableEntities.erase(cardPlayed);
 }
