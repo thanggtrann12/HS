@@ -9,7 +9,7 @@ class Card
 {
 public:
     virtual ~Card() = default;
-    virtual void play(unsigned int playerIndex,const std::vector<std::shared_ptr<Card>>::iterator &cardPlayed, std::vector<GameData_t> &gameData) = 0;
+    virtual void play(player_t player, const std::vector<std::shared_ptr<Card>>::iterator &cardPlayed, std::vector<GameData_t> &gameData) = 0;
     enum class CardType
     {
         FIRELORD,
@@ -49,7 +49,7 @@ class MinionCard : public Card
 {
 public:
     MinionCard(const std::string &name, int hp, int attack, Card::CardType type);
-    void play(unsigned int playerIndex,const std::vector<std::shared_ptr<Card>>::iterator &cardPlayed, std::vector<GameData_t> &gameData) override;
+    void play(player_t player, const std::vector<std::shared_ptr<Card>>::iterator &cardPlayed, std::vector<GameData_t> &gameData) override;
     std::string getDesciption() override;
 };
 
@@ -57,7 +57,7 @@ class BuffCard : public Card
 {
 public:
     BuffCard(const std::string &name, int hp, int attack, const std::string &skill, Card::CardType type);
-    void play(unsigned int playerIndex,const std::vector<std::shared_ptr<Card>>::iterator &cardPlayed, std::vector<GameData_t> &gameData) override;
+    void play(player_t player, const std::vector<std::shared_ptr<Card>>::iterator &cardPlayed, std::vector<GameData_t> &gameData) override;
     std::string getDesciption() override;
 };
 
@@ -65,7 +65,7 @@ class SpellCard : public Card
 {
 public:
     SpellCard(const std::string &name, const std::string &skill, Card::CardType type);
-    void play(unsigned int playerIndex,const std::vector<std::shared_ptr<Card>>::iterator &cardPlayed, std::vector<GameData_t> &gameData) override;
+    void play(player_t player, const std::vector<std::shared_ptr<Card>>::iterator &cardPlayed, std::vector<GameData_t> &gameData) override;
     std::string getDesciption() override;
 };
 

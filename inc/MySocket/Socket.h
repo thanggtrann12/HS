@@ -14,33 +14,33 @@
 class MySocket
 {
 public:
-  MySocket(int mode) : mode_(mode), clientSocket_(-1)
-  {
-    if (mode_ == 1)
+    MySocket(int mode) : mode_(mode), clientSocket_(-1)
     {
-      initializeServer();
+        if (mode_ == 1)
+        {
+            initializeServer();
+        }
+        else if (mode_ == 2)
+        {
+            initializeClient();
+        }
     }
-    else if (mode_ == 2)
-    {
-      initializeClient();
-    }
-  }
 
-  ~MySocket();
-  void sendInitCardPool(const Card::CardType *entities);
-  bool receiveInitCardPool(std::vector<std::shared_ptr<Card>> &client, std::vector<std::shared_ptr<Card>> &server);
-  void sendPlayerChoice(int choice);
-  int receivePlayerChoice();
+    ~MySocket();
+    void sendInitCardPool(const Card::CardType *entities);
+    Card::CardType *receiveInitCardPool();
+    void sendPlayerChoice(int choice);
+    int receivePlayerChoice();
 
 private:
-  int mode_;
-  int serverSocket_;
-  int clientSocket_;
-  sockaddr_in serverAddress_;
-  sockaddr_in clientAddress_;
+    int mode_;
+    int serverSocket_;
+    int clientSocket_;
+    sockaddr_in serverAddress_;
+    sockaddr_in clientAddress_;
 
-  void initializeServer();
+    void initializeServer();
 
-  void initializeClient();
+    void initializeClient();
 };
 #endif

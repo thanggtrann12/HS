@@ -24,14 +24,14 @@ private:
     void GameEngine_generatePlayerCards();
     void GameEngine_generateEntitiesForEachMode(MySocket &socket);
     void GameEngine_distributeCardToPlayerHand();
-    void GameEngine_deleteCardFromBattleYard(int playerIndex, int entityIndex);
-    void GameEngine_activeCard(int playerIndex, int entityIndex);
+    void GameEngine_deleteCardFromBattleYard(player_t player, int entityIndex);
+    void GameEngine_activeCard(player_t player, int entityIndex);
     void GameEngine_onClientMode(MySocket &socket);
     void GameEngine_onServerMode(MySocket &socket);
     void GameEngine_onOfflineMode();
     void GameEngine_checkPlayerTurnCount(MySocket &socket);
     void clearPlayerDataStats();
-    void GameEngine_handingPlayerTurn(int playerIndex, int choice);
+    void GameEngine_handingPlayerTurn(player_t player, int choice);
 
 protected:
     GameUi gameUi;
@@ -41,10 +41,8 @@ protected:
     GameData_t ServerData;
     GameData_t ClientData;
     int option;
-    int CLIENT_INDEX = 0;
-    int SERVER_INDEX = 1;
     void GameEngine_addUiObserver(GameUi *uiObs);
-    void GameEngine_notifyUiObserver(int playerIndex, int state, int &cardChoiced, const std::vector<GameData_t> &tableData);
+    void GameEngine_notifyUiObserver(player_t player, int state, int &cardChoiced, const std::vector<GameData_t> &tableData);
 };
 
 #endif // GAME_H

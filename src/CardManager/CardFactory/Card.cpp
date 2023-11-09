@@ -7,10 +7,10 @@
 #include "Helper/Helper.h"
 MinionCard::MinionCard(const std::string &name, int hp, int attack, Card::CardType type)
     : Card(name, hp, attack, "No Skill", type) {}
-void MinionCard::play(unsigned int playerIndex,const std::vector<std::shared_ptr<Card>>::iterator &cardPlayed, std::vector<GameData_t> &gameData)
+void MinionCard::play(player_t player,const std::vector<std::shared_ptr<Card>>::iterator &cardPlayed, std::vector<GameData_t> &gameData)
 {
-  auto &attacker = gameData[playerIndex];
-  auto &defender = gameData[1 - playerIndex];
+  auto &attacker = gameData[player];
+  auto &defender = gameData[1 - player];
   (*cardPlayed)->getBuff(attacker.shamanCout);
   unsigned int damage = (*cardPlayed)->getAttack();
   defender.hero->takeDamage(damage);
@@ -64,10 +64,10 @@ std::string BuffCard::getDesciption()
 {
   return getName() + " " + getSkill() + " " + (isUsed() ? "ACTIVE" : "INACTIVE");
 }
-void BuffCard::play(unsigned int playerIndex,const std::vector<std::shared_ptr<Card>>::iterator &cardPlayed, std::vector<GameData_t> &gameData)
+void BuffCard::play(player_t player,const std::vector<std::shared_ptr<Card>>::iterator &cardPlayed, std::vector<GameData_t> &gameData)
 {
-  auto &attacker = gameData[playerIndex];
-  auto &defender = gameData[1 - playerIndex];
+  auto &attacker = gameData[player];
+  auto &defender = gameData[1 - player];
   for (auto &minion : attacker.tableEntities)
     {
       if (minion->getCardType() != Card::CardType::SHAMAN)
@@ -109,10 +109,10 @@ std::string SpellCard::getDesciption()
 SpellCard::SpellCard(const std::string &name, const std::string &skill, Card::CardType type)
     : Card(name, 0, 0, skill, type) {}
 
-void SpellCard::play(unsigned int playerIndex, const std::vector<std::shared_ptr<Card>>::iterator &cardPlayed, std::vector<GameData_t> &gameData)
+void SpellCard::play(player_t player, const std::vector<std::shared_ptr<Card>>::iterator &cardPlayed, std::vector<GameData_t> &gameData)
 {
-  auto &attacker = gameData[playerIndex];
-  auto &defender = gameData[1 - playerIndex];
+  auto &attacker = gameData[player];
+  auto &defender = gameData[1 - player];
   if (!defender.tableEntities.empty())
   {
     int randomIndex = rand() % defender.tableEntities.size();

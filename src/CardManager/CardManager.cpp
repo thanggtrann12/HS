@@ -35,10 +35,10 @@ void CardManager::CardManager_getCardFromPocket(std::vector<std::shared_ptr<Card
     }
 }
 
-void CardManager::CardManager_assignHeroToPlayer(std::shared_ptr<Hero> &playerHero)
+std::shared_ptr<Hero> CardManager::CardManager_assignHeroToPlayer(unsigned int heroNum)
 {
-    int cardRandom = rand() % 2;
-    playerHero = std::make_shared<Hero>(*hero.getHero()[cardRandom]);
+
+    return std::make_shared<Hero>(*hero.getHero()[heroNum]);
 }
 
 std::shared_ptr<Card> CardManager::CardManager_drawRandomCard()

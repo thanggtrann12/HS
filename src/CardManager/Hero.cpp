@@ -6,7 +6,7 @@ void Hero::initHero()
 {
     Hero butcher("Butcher", 6, 120);
     heroPocket.push_back(std::make_shared<Hero>(butcher));
-    Hero slark("Slark", 10, 72);
+    Hero slark("Slark ", 10, 72);
     heroPocket.push_back(std::make_shared<Hero>(slark));
 }
 

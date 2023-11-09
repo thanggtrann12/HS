@@ -8,7 +8,7 @@ public:
     CardManager();
     void CardManager_initManager();
     void CardManager_getCardFromPocket(std::vector<std::shared_ptr<Card>> &playerHand);
-    void CardManager_assignHeroToPlayer(std::shared_ptr<Hero> &playerHero);
+    std::shared_ptr<Hero> CardManager_assignHeroToPlayer(unsigned int heroNum);
     void CardManager_pushCardToTable(std::vector<std::shared_ptr<Card>> &playerTable, Card::CardType type);
     std::shared_ptr<Card> CardManager_drawRandomCard();
     ~CardManager(){};
