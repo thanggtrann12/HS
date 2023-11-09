@@ -252,8 +252,8 @@ card_template_t GameUi::GameUi_getTemplateWithText(const std::string &color, car
 {
   std::ostringstream oss;
   GameUi_prepareForReplace(out);
-  out.insert(out.begin(), color);
-  out.insert(out.end(), "\033[0m");
+  out[0] = color+ out[0];
+  out[out.size()-1] = out[out.size()-1] + "\033[0m";
   GameUi_replaceTextFromLeftSide(out, 'N', name);
   GameUi_replaceTextFromRightSide(out, 'S', status);
   oss.str("");

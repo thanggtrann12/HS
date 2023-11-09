@@ -165,10 +165,10 @@ void GameEngine::GameEngine_activeCard(int playerIndex, int entityIndex)
         }
         else
         {
+            GameData[playerIndex].stats.push_back(GameData[playerIndex].hero->getName() + " activate " + originalEntity->getName());
             originalEntity->setUsed();
             manager.CardManager_pushCardToTable(GameData[playerIndex].tableEntities, originalEntity->getCardType());
             originalEntity->play(playerIndex, GameData[playerIndex].tableEntities.end()-1, GameData);
-            GameData[playerIndex].stats.push_back(GameData[playerIndex].hero->getName() + " activate " + originalEntity->getName());
             GameData[playerIndex].handEntities.erase(GameData[playerIndex].handEntities.begin() + entityIndex);
         }
     }

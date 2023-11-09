@@ -65,7 +65,6 @@ void CardManager::CardManager_pushCardToTable(std::vector<std::shared_ptr<Card>>
         playerTable.emplace_back(factory->createCard(Card::CardType::TECHIES));
         break;
     case Card::CardType::SHAMAN:
-
         factory = std::make_shared<BuffCardFactory>();
         playerTable.emplace_back(factory->createCard(Card::CardType::SHAMAN));
         break;
