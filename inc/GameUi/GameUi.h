@@ -17,7 +17,7 @@ const card_template_t CARD_TEMPLATE_MINION_WITH_ABILITY = {
     "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓",
     "┃    ~NNNNNNNNNNNNNNNNNNNNN~    ┃",
     "┠───────────────────────────────┨",
-    "┃           ~SSSSSSSSS~         ┃",
+    "┃         ~SSSSSSSSS~           ┃",
     "┠───────────────────────────────┨",
     "┃   ~KKKKKKKKKKKKKKKKKKKKKK     ┃",
     "┃   KKKKKKKKKKKKKKKKKKKKKKKKK   ┃",

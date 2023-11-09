@@ -90,7 +90,7 @@ void GameUi::GameUi_displayEntireTable(const std::vector<GameData_t> &tableData)
         }
         else
         {
-          card_template_t templS = GameUi_getTemplateWithText("\033[33m", CARD_TEMPLATE_MINION_WITH_ABILITY, entity->getName(), entity->getAttack(), entity->getHP(), entity->getSkill(), (entity->isUsed() ? "ACTIVE" : "INACTIVE"));
+          card_template_t templS = GameUi_getTemplateWithText("\033[33m", CARD_TEMPLATE_MINION_WITH_ABILITY, entity->getName(), entity->getAttack(), entity->getHP(), entity->getSkill(), "ACTIVE");
           GameData[playerIndex].emplace_back(templS);
         }
       }

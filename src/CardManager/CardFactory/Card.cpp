@@ -7,13 +7,14 @@
 #include "Helper/Helper.h"
 MinionCard::MinionCard(const std::string &name, int hp, int attack, Card::CardType type)
     : Card(name, hp, attack, "No Skill", type) {}
-void MinionCard::play(unsigned int playerIndex, unsigned int cardPlayed, std::vector<GameData_t> &gameData)
+void MinionCard::play(unsigned int playerIndex,const std::vector<std::shared_ptr<Card>>::iterator &cardPlayed, std::vector<GameData_t> &gameData)
 {
   auto &attacker = gameData[playerIndex];
   auto &defender = gameData[1 - playerIndex];
-  unsigned int damage = attacker.handEntities[cardPlayed]->getAttack();
+  (*cardPlayed)->getBuff(attacker.shamanCout);
+  unsigned int damage = (*cardPlayed)->getAttack();
   defender.hero->takeDamage(damage);
-  attacker.stats.push_back(attacker.handEntities[cardPlayed]->getName() + " attack " + defender.hero->getName() + "with " + std::to_string(damage) + " damage");
+  attacker.stats.push_back((*cardPlayed)->getName() + " attack " + defender.hero->getName() + " with " + std::to_string(damage) + " damage");
   if (!defender.tableEntities.empty())
     for (auto it = defender.tableEntities.begin(); it != defender.tableEntities.end();)
     {
@@ -32,13 +33,16 @@ void MinionCard::play(unsigned int playerIndex, unsigned int cardPlayed, std::ve
         {
           defender.stats.push_back(defender.hero->getName() + " card has been eliminated: " + card->getName());
         }
-
+        if (card->getCardType() == Card::CardType::SHAMAN)
+        {
+          defender.shamanCout --;
+        }
         it = defender.tableEntities.erase(it);
       }
       else
       {
         ++it;
-        attacker.stats.push_back(attacker.handEntities[cardPlayed]->getName() + " attack " + card->getName() + "with " + std::to_string(damage) + " damage");
+        attacker.stats.push_back((*cardPlayed)->getName() + " attack " + card->getName() + " with " + std::to_string(damage) + " damage");
       }
     }
   else
@@ -60,21 +64,34 @@ std::string BuffCard::getDesciption()
 {
   return getName() + " " + getSkill() + " " + (isUsed() ? "ACTIVE" : "INACTIVE");
 }
-void BuffCard::play(unsigned int playerIndex, unsigned int cardPlayed, std::vector<GameData_t> &gameData)
+void BuffCard::play(unsigned int playerIndex,const std::vector<std::shared_ptr<Card>>::iterator &cardPlayed, std::vector<GameData_t> &gameData)
 {
   auto &attacker = gameData[playerIndex];
   auto &defender = gameData[1 - playerIndex];
+  for (auto &minion : attacker.tableEntities)
+    {
+      if (minion->getCardType() != Card::CardType::SHAMAN)
+      {
+        minion->getBuff(-attacker.shamanCout);
+      }
+    }
+  attacker.shamanCout = 0;
   if (!attacker.tableEntities.empty())
   {
 
     for (auto &minion : attacker.tableEntities)
     {
-      if (minion->getCardType() != Card::CardType::SHAMAN && !minion->isUsed())
+      if (minion->getCardType() == Card::CardType::SHAMAN)
       {
-        attacker.stats.push_back("Card buffed: ");
-        minion->getBuff(1);
-        attacker.stats.push_back("  -" + minion->getName() + std::to_string(minion->getAttack()));
-        minion->setUsed();
+        attacker.shamanCout ++;
+        attacker.stats.push_back(attacker.hero->getName() + " total damage buffed: "+ std::to_string(attacker.shamanCout));
+      }
+    }
+    for (auto &minion : attacker.tableEntities)
+    {
+      if (minion->getCardType() != Card::CardType::SHAMAN)
+      {
+        minion->getBuff(attacker.shamanCout);
       }
     }
   }
@@ -92,7 +109,7 @@ std::string SpellCard::getDesciption()
 SpellCard::SpellCard(const std::string &name, const std::string &skill, Card::CardType type)
     : Card(name, 0, 0, skill, type) {}
 
-void SpellCard::play(unsigned int playerIndex, unsigned int cardPlayed, std::vector<GameData_t> &gameData)
+void SpellCard::play(unsigned int playerIndex, const std::vector<std::shared_ptr<Card>>::iterator &cardPlayed, std::vector<GameData_t> &gameData)
 {
   auto &attacker = gameData[playerIndex];
   auto &defender = gameData[1 - playerIndex];

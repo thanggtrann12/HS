@@ -19,6 +19,7 @@ struct GameData_t
     std::vector<std::shared_ptr<Card>> handEntities;
     std::vector<std::string> stats;
     int turnCount = 0;
+    int shamanCout =0;
 };
 
 #endif // HELPER_H

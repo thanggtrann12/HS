@@ -36,8 +36,8 @@ private:
 protected:
     GameUi gameUi;
     std::vector<GameUi *> observers;
-    std::vector<GameData_t> GameData;
     CardManager manager;
+    std::vector<GameData_t> GameData;
     GameData_t ServerData;
     GameData_t ClientData;
     int option;
