@@ -465,7 +465,7 @@ void GameUi::GameUi_displayHandCard(int &choice, const std::string &name, const 
                 }
                 else
                 {
-                    temp = GameUi_getTemplateWithText("\033[36m", CARD_TEMPLATE_MINION_WITH_ABILITY, handCard[currentIndex]->getName(), handCard[currentIndex]->getAttack(), handCard[currentIndex]->getHP(), handCard[currentIndex]->getSkill(), "INACTIVE");
+                    temp = GameUi_getTemplateWithText("\033[33m", CARD_TEMPLATE_MINION_WITH_ABILITY, handCard[currentIndex]->getName(), handCard[currentIndex]->getAttack(), handCard[currentIndex]->getHP(), handCard[currentIndex]->getSkill(), "INACTIVE");
                 }
                 card.emplace_back(temp);
             }
@@ -487,9 +487,20 @@ void GameUi::GameUi_displayHandCard(int &choice, const std::string &name, const 
         secondGroup = splitResult.second;
         splitResult.first.clear();
         splitResult.second.clear();
+        std::cout << std::string(50, ' ') << EXTERNAL_BORDER_CHAR_TOP_LEFT;
+        for (unsigned int i = 0; i < 177; i++)
+        {
+            std::cout << EXTERNAL_BORDER_CHAR_LEFT_RIGHT;
+        }
+        std::cout << EXTERNAL_BORDER_CHAR_TOP_RIGHT << std::endl;
         GameUi_displayCard(firstGroup);
         GameUi_displayCard(secondGroup);
-
+        std::cout << std::string(50, ' ') << EXTERNAL_BORDER_CHAR_BOTTOM_LEFT;
+        for (unsigned int i = 0; i < 177; i++)
+        {
+            std::cout << EXTERNAL_BORDER_CHAR_LEFT_RIGHT;
+        }
+        std::cout << EXTERNAL_BORDER_CHAR_BOTTOM_RIGHT << std::endl;
         key = getchar();
 
         switch (key)
