@@ -23,8 +23,6 @@ private:
     void GameEngine_generatePlayerHero();
     void GameEngine_generatePlayerCards();
     void GameEngine_generateEntitiesForEachMode(MySocket &socket);
-    void GameEngine_distributeCardToPlayerHand();
-    void GameEngine_deleteCardFromBattleYard(player_t player, int entityIndex);
     void GameEngine_activeCard(player_t player, int entityIndex);
     void GameEngine_onClientMode(MySocket &socket);
     void GameEngine_onServerMode(MySocket &socket);

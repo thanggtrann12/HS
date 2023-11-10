@@ -354,19 +354,19 @@ void GameUi::GameUi_displayModesOption(int &option)
             {
                 if (i == 1)
                 {
-                    std::cout << std::string(100, ' ') << "# \033[33m                   >   " << i << ". Host a game    <                    \033[0m    #" << std::endl;
+                    std::cout << std::string(100, ' ') << "# \033[33m                   →   " << i << ". Host a game    ←                    \033[0m    #" << std::endl;
                 }
                 else if (i == 2)
                 {
-                    std::cout << std::string(100, ' ') << "# \033[33m                   >   " << i << ". Join a game    <                    \033[0m    #" << std::endl;
+                    std::cout << std::string(100, ' ') << "# \033[33m                   →   " << i << ". Join a game    ←                    \033[0m    #" << std::endl;
                 }
                 else if (i == 3)
                 {
-                    std::cout << std::string(100, ' ') << "# \033[33m                   >   " << i << ". Play offline    <                   \033[0m    #" << std::endl;
+                    std::cout << std::string(100, ' ') << "# \033[33m                   →   " << i << ". Play offline    ←                   \033[0m    #" << std::endl;
                 }
                 else if (i == 4)
                 {
-                    std::cout << std::string(100, ' ') << "# \033[33m                   >   " << i << ". Read Game Rules <                   \033[0m    #" << std::endl;
+                    std::cout << std::string(100, ' ') << "# \033[33m                   →   " << i << ". Read Game Rules ←                   \033[0m    #" << std::endl;
                 }
             }
             else
@@ -448,13 +448,14 @@ void GameUi::GameUi_displayHandCard(int &choice, const std::string &name, const 
 
     while (1)
     {
-        std::cout << "\033[H\033[J";
+        std::cout << "\033[H\033[J \n\n\n\n";
         int width = 100;
         int height = menuOptions.size() + 4;
         std::vector<std::vector<std::string>> card;
         std::vector<std::vector<std::string>> firstGroup;
         std::vector<std::vector<std::string>> secondGroup;
         card_template_t temp;
+        std::cout<<std::string(width+30, ' ')<<name<<"'s turn"<<std::endl;
         for (int cardIndex = 0; cardIndex < handCard.size(); cardIndex++)
         {
             if (currentIndex == cardIndex)
@@ -495,6 +496,7 @@ void GameUi::GameUi_displayHandCard(int &choice, const std::string &name, const 
         std::cout << EXTERNAL_BORDER_CHAR_TOP_RIGHT << std::endl;
         GameUi_displayCard(firstGroup);
         GameUi_displayCard(secondGroup);
+        std::cout << std::string(width+30, ' ') << "#          Uses → and ← to select and Enter to confirm              #" << std::endl;
         std::cout << std::string(50, ' ') << EXTERNAL_BORDER_CHAR_BOTTOM_LEFT;
         for (unsigned int i = 0; i < 177; i++)
         {
