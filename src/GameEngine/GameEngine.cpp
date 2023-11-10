@@ -128,6 +128,7 @@ void GameEngine::GameEngine_checkPlayerTurnCount(MySocket &socket)
             if (minion)
             {
                 GameData[player].handCard.push_back(minion);
+                GameData[player].stats.push_back("Player "+ std::to_string(player)+ " draw [" +minion->getDesciption() +"]");
             }
             GameData[player].turnCount = 0;
             GameEngine_generateEntitiesForEachMode(socket);

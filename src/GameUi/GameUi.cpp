@@ -496,13 +496,13 @@ void GameUi::GameUi_displayHandCard(int &choice, const std::string &name, const 
         std::cout << EXTERNAL_BORDER_CHAR_TOP_RIGHT << std::endl;
         GameUi_displayCard(firstGroup);
         GameUi_displayCard(secondGroup);
-        std::cout << std::string(width+30, ' ') << "#          Uses → and ← to select and Enter to confirm              #" << std::endl;
         std::cout << std::string(50, ' ') << EXTERNAL_BORDER_CHAR_BOTTOM_LEFT;
         for (unsigned int i = 0; i < 177; i++)
         {
             std::cout << EXTERNAL_BORDER_CHAR_LEFT_RIGHT;
         }
         std::cout << EXTERNAL_BORDER_CHAR_BOTTOM_RIGHT << std::endl;
+        std::cout << std::string(width+20, ' ') << "Uses → and ← to select and Enter to confirm" << std::endl;
         key = getchar();
 
         switch (key)

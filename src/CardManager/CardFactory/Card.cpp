@@ -124,6 +124,7 @@ void SpellCard::play(player_t player, const std::vector<std::shared_ptr<Card>>::
       defender.stats.push_back(defender.hero->getName() + "Get 3 damage on Techies elimination");
       defender.hero->takeDamage(3);
     }
+    defender.stats.push_back("Card "+ cardRemoved->getDesciption()+ " have been removed from table by Brawl");
     defender.tableEntities.erase(defender.tableEntities.begin() + randomIndex);
   }
   else
