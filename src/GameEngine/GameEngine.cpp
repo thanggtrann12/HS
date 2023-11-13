@@ -34,39 +34,61 @@ void GameEngine::GameEngine_generatePlayerCards()
 
 void GameEngine::GameEngine_generateEntitiesForEachMode(MySocket &socket)
 {
-    Card::CardType entities[20];
-    Card::CardType *recvArr;
-    int entitiesCount = 0;
     switch (option)
     {
     case CLIENT_MODE:
-        for (int player = 0; player < 2; player++)
-            GameData[player].handCard.clear();
-        recvArr = socket.receiveInitCardPool();
+    {
+        GameData[PLAYER_1].handCard.clear();
+        GameData[PLAYER_2].handCard.clear();
 
-        for (int player = 0; player < 2; player++)
+        Card::CardType *client = nullptr;
+        Card::CardType *host = nullptr;
+        int clientSize = 0, hostSize = 0;
+
+        socket.recvInitCardPool(host, hostSize, client, clientSize);
+
+        if (host && client)
         {
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < hostSize; i++)
             {
-                manager.CardManager_pushCardToTable(GameData[player].handCard, recvArr[i + 10 * player]);
+                manager.CardManager_pushCardToTable(GameData[PLAYER_2].handCard, host[i]);
             }
+
+            for (int i = 0; i < clientSize; i++)
+            {
+                manager.CardManager_pushCardToTable(GameData[PLAYER_1].handCard, client[i]);
+            }
+
+            delete[] host;
+            delete[] client;
         }
-        delete[] recvArr;
-        break;
+    }
+    break;
+
     case SERVER_MODE:
-        for (int player = 0; player < 2; player++)
+    {
+        int clientCount = 0;
+        Card::CardType *client = new Card::CardType[GameData[PLAYER_1].handCard.size()];
+        for (auto &e : GameData[PLAYER_1].handCard)
         {
-            for (auto &e : GameData[player].handCard)
-            {
-                entities[entitiesCount] = e->getCardType();
-                entitiesCount++;
-            }
+            client[clientCount] = e->getCardType();
+            clientCount++;
         }
-        socket.sendInitCardPool(entities);
-        break;
-    default:
-        /* in ofline mode, data have been generated at begin, no need any actions*/
-        break;
+
+        int hostCount = 0;
+        Card::CardType *host = new Card::CardType[GameData[PLAYER_2].handCard.size()];
+        for (auto &e : GameData[PLAYER_2].handCard)
+        {
+            host[hostCount] = e->getCardType();
+            hostCount++;
+        }
+
+        socket.sendInitCardPool(host, hostCount, client, clientCount);
+
+        delete[] host;
+        delete[] client;
+    }
+    break;
     }
 }
 
@@ -128,10 +150,10 @@ void GameEngine::GameEngine_checkPlayerTurnCount(MySocket &socket)
             if (minion)
             {
                 GameData[player].handCard.push_back(minion);
-                GameData[player].stats.push_back("Player "+ std::to_string(player)+ " draw [" +minion->getDesciption() +"]");
+                GameData[player].stats.push_back("Player " + std::to_string(player) + " draw [" + minion->getDesciption() + "]");
             }
             GameData[player].turnCount = 0;
-            GameEngine_generateEntitiesForEachMode(socket);
+            // GameEngine_generateEntitiesForEachMode(socket);
         }
     }
 }

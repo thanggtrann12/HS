@@ -16,18 +16,50 @@ MySocket::~MySocket()
     }
 }
 
-void MySocket::sendInitCardPool(const Card::CardType *entities)
+void MySocket::sendInitCardPool(const Card::CardType *host, size_t hostSize, const Card::CardType *client, size_t clientSize)
 {
-    size_t arraySize = 20;
-    ssize_t sentBytes = send(clientSocket_, entities, arraySize * sizeof(Card::CardType), 0);
+
+    size_t combined_length = hostSize + clientSize + 2;
+    Card::CardType *combined_array = new Card::CardType[combined_length];
+    size_t total_size_bytes = sizeof(Card::CardType) * (hostSize + clientSize + 2);
+    combined_array[0] = static_cast<Card::CardType>(hostSize);
+    combined_array[1] = static_cast<Card::CardType>(clientSize);
+    for (size_t i = 0; i < hostSize; ++i)
+    {
+        combined_array[i + 2] = host[i];
+    }
+    for (size_t i = 0; i < clientSize; ++i)
+    {
+        combined_array[i + hostSize + 2] = client[i];
+    }
+    send(clientSocket_, combined_array, total_size_bytes, 0);
 }
 
-Card::CardType *MySocket::receiveInitCardPool()
+void MySocket::recvInitCardPool(Card::CardType *&host, int &hostSize, Card::CardType *&client, int &clientSize)
 {
-    Card::CardType *entities = new Card::CardType[20];
-    size_t arraySize = 20;
-    ssize_t receivedBytes = recv(clientSocket_, entities, arraySize * sizeof(Card::CardType), 0);
-    return entities;
+    char buffer[4056];
+    ssize_t total_size_bytes = recv(clientSocket_, buffer, sizeof(buffer), 0);
+
+    // Assuming Card::CardType is an enum
+    Card::CardType *combined_array = reinterpret_cast<Card::CardType *>(buffer);
+
+    // Extract the lengths of the original arrays
+    hostSize = static_cast<size_t>(combined_array[0]);
+    clientSize = static_cast<size_t>(combined_array[1]);
+
+    // Allocate memory for host and client arrays
+    host = new Card::CardType[hostSize];
+    client = new Card::CardType[clientSize];
+
+    for (int i = 0; i < hostSize; ++i)
+    {
+        host[i] = combined_array[i + 2];
+    }
+
+    for (int i = 0; i < clientSize; ++i)
+    {
+        client[i] = combined_array[i + hostSize + 2];
+    }
 }
 
 void MySocket::sendPlayerChoice(int choice)
