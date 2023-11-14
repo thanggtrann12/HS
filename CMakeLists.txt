@@ -6,7 +6,6 @@ project(
   VERSION 1.0
   LANGUAGES CXX)
 
-# add_definitions(-DLOG_FILE_PATH="${CMAKE_SOURCE_DIR}/generated/logfile.log")
 set(GTEST_DIR ${CMAKE_SOURCE_DIR}/lib/googletest/googletest)
 set(GMOCK_DIR ${CMAKE_SOURCE_DIR}/lib/googletest/googlemock)
 
