@@ -1,12 +1,6 @@
-#include <iostream>
-#include <array>
-using namespace std;
-int main()
-{
-    // Given Array
-    int arr[] = {11, 22, 33, 44};
+#include <gtest/gtest.h>
 
-    cout << "The Length of the Array is : " << end(arr) - begin(arr); // length
-
-    return 0;
+int main(int argc, char** argv) {
+    ::testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
 }

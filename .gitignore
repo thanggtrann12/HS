@@ -6,6 +6,7 @@ generated/
 *.o
 test
 output/
+lib/
 # Ignore logs and temporary files
 *.log
 .tmp/
