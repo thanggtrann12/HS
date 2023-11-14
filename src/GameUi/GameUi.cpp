@@ -12,7 +12,6 @@
 #include <thread>
 GameUi::GameUi()
 {
-    std::cout << "Init game ui" << std::endl;
 }
 
 template <typename T>
@@ -455,7 +454,7 @@ void GameUi::GameUi_displayHandCard(int &choice, const std::string &name, const 
         std::vector<std::vector<std::string>> firstGroup;
         std::vector<std::vector<std::string>> secondGroup;
         card_template_t temp;
-        std::cout<<std::string(width+30, ' ')<<name<<"'s turn"<<std::endl;
+        std::cout << std::string(width + 30, ' ') << name << "'s turn" << std::endl;
         for (int cardIndex = 0; cardIndex < handCard.size(); cardIndex++)
         {
             if (currentIndex == cardIndex)
@@ -502,7 +501,7 @@ void GameUi::GameUi_displayHandCard(int &choice, const std::string &name, const 
             std::cout << EXTERNAL_BORDER_CHAR_LEFT_RIGHT;
         }
         std::cout << EXTERNAL_BORDER_CHAR_BOTTOM_RIGHT << std::endl;
-        std::cout << std::string(width+20, ' ') << "Uses → and ← to select and Enter to confirm" << std::endl;
+        std::cout << std::string(width + 20, ' ') << "Uses → and ← to select and Enter to confirm" << std::endl;
         key = getchar();
 
         switch (key)

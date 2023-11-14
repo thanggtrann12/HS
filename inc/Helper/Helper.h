@@ -26,6 +26,6 @@ typedef enum
 {
     PLAYER_1 = 0,
     PLAYER_2 = 1,
-    MASTER
+    MAX_PLAYER
 } player_t;
 #endif // HELPER_H

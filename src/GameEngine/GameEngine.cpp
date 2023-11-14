@@ -13,14 +13,14 @@ GameEngine::GameEngine()
     GameData.resize(2);
     srand(static_cast<unsigned int>(time(nullptr)));
     GameEngine_addUiObserver(&gameUi);
-    GameEngine_notifyUiObserver(MASTER, GameUi::INIT, option, GameData);
+    GameEngine_notifyUiObserver(MAX_PLAYER, GameUi::INIT, option, GameData);
     GameEngine_generatePlayerHero();
     GameEngine_generatePlayerCards();
 }
 
 void GameEngine::GameEngine_generatePlayerHero()
 {
-    for (int playerIndex = 0; playerIndex < MASTER; playerIndex++)
+    for (int playerIndex = 0; playerIndex < MAX_PLAYER; playerIndex++)
         GameData[playerIndex].hero = manager.CardManager_assignHeroToPlayer(playerIndex);
 }
 
