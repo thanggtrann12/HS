@@ -1,2 +1,0 @@
-C:/Users/rhn9hc/.babun/cygwin/bin/ar.exe qc lib/gtest.lib "CMakeFiles/gtest.dir/src/gtest-all.cc.obj"
-C:/Users/rhn9hc/.babun/cygwin/bin/ranlib.exe lib/gtest.lib

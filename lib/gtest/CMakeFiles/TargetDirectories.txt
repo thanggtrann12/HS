@@ -1,4 +1,0 @@
-U:/C++_Tranining/HS/lib/gtest/CMakeFiles/gtest.dir
-U:/C++_Tranining/HS/lib/gtest/CMakeFiles/gtest_main.dir
-U:/C++_Tranining/HS/lib/gtest/CMakeFiles/edit_cache.dir
-U:/C++_Tranining/HS/lib/gtest/CMakeFiles/rebuild_cache.dir
