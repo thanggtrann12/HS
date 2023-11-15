@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #include "mock/mock.h"
-class MockGameUiTest : public ::testing::Test
+class GameUiTest : public ::testing::Test
 {
 protected:
     void SetUp() override
@@ -14,7 +14,7 @@ protected:
         // Your common teardown code here if needed
     }
 };
-TEST(MockGameUiTest, UpdateGameStateTest_INIT)
+TEST(GameUiTest, UpdateGameStateTest_INIT)
 {
     MockGameUi mockUi;
     int cardChoiced = 42;
@@ -28,7 +28,7 @@ TEST(MockGameUiTest, UpdateGameStateTest_INIT)
     EXPECT_CALL(mockUi, GameUi_displayModesOption(cardChoiced));
     mockUi.GameUi_displayModesOption(cardChoiced);
 }
-TEST(MockGameUiTest, UpdateGameStateTest_CHOICE)
+TEST(GameUiTest, UpdateGameStateTest_CHOICE)
 {
     MockGameUi mockUi;
     int cardChoiced = 42;
@@ -39,7 +39,7 @@ TEST(MockGameUiTest, UpdateGameStateTest_CHOICE)
     EXPECT_CALL(mockUi, GameUi_displayHandCard(cardChoiced, _, tableData[PLAYER_1].handCard));
     mockUi.GameUi_displayHandCard(cardChoiced, " ", tableData[PLAYER_1].handCard);
 }
-TEST(MockGameUiTest, UpdateGameStateTest_STATS)
+TEST(GameUiTest, UpdateGameStateTest_STATS)
 {
     MockGameUi mockUi;
     int cardChoiced = 42;
@@ -53,7 +53,7 @@ TEST(MockGameUiTest, UpdateGameStateTest_STATS)
     EXPECT_CALL(mockUi, GameUi_displayEntireTable(_)).Times(1);
     mockUi.GameUi_displayEntireTable(tableData);
 }
-TEST(MockGameUiTest, UpdateGameStateTest_WAIT_CONFIRM)
+TEST(GameUiTest, UpdateGameStateTest_WAIT_CONFIRM)
 {
     MockGameUi mockUi;
     int cardChoiced = 42;
@@ -65,7 +65,7 @@ TEST(MockGameUiTest, UpdateGameStateTest_WAIT_CONFIRM)
     EXPECT_CALL(mockUi, GameUi_waitForConfirm()).Times(1);
     mockUi.GameUi_waitForConfirm();
 }
-TEST(MockGameUiTest, UpdateGameStateTest_WAIT_NEXT_TURN)
+TEST(GameUiTest, UpdateGameStateTest_WAIT_NEXT_TURN)
 {
     MockGameUi mockUi;
     int cardChoiced = 42;
@@ -76,7 +76,7 @@ TEST(MockGameUiTest, UpdateGameStateTest_WAIT_NEXT_TURN)
     EXPECT_CALL(mockUi, GameUi_waitForNextTurn()).Times(1);
     mockUi.GameUi_waitForNextTurn();
 }
-TEST(MockGameUiTest, UpdateGameStateTest_RESULT)
+TEST(GameUiTest, UpdateGameStateTest_RESULT)
 {
     MockGameUi mockUi;
     int cardChoiced = 42;

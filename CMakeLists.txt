@@ -18,7 +18,7 @@
     ${CMAKE_SOURCE_DIR}/src/CardManager/CardManager.cpp
     ${CMAKE_SOURCE_DIR}/src/GameEngine/GameEngine.cpp
     ${CMAKE_SOURCE_DIR}/src/CardManager/Hero.cpp
-    ${CMAKE_SOURCE_DIR}/src/MySocket/Socket.cpp
+    ${CMAKE_SOURCE_DIR}/src/MySocket/MySocket.cpp
     ${CMAKE_SOURCE_DIR}/src/GameUi/GameUi.cpp
     )
 
@@ -28,7 +28,7 @@
     ${CMAKE_SOURCE_DIR}/inc/CardManager/Hero.h
     ${CMAKE_SOURCE_DIR}/inc/CardManager/CardFactory/CardFactory.h
     ${CMAKE_SOURCE_DIR}/inc/GameEngine/GameEngine.h
-    ${CMAKE_SOURCE_DIR}/inc/MySocket/Socket.h
+    ${CMAKE_SOURCE_DIR}/inc/MySocket/MySocket.h
     ${CMAKE_SOURCE_DIR}/inc/Helper/Helper.h
     ${CMAKE_SOURCE_DIR}/inc/GameUi/GameUi.h
     )
@@ -51,6 +51,6 @@
     target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/inc)
 
 # Unit test executable
-add_executable(unittest_${PROJECT_NAME} ${TEST_SOURCES} )
+add_executable(unittest_${PROJECT_NAME} ${TEST_SOURCES} ${CMAKE_SOURCE_DIR}/UT/mock)
 target_include_directories(unittest_${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/inc ${GTEST_DIR}/include ${GMOCK_DIR}/include)
 target_link_libraries(unittest_${PROJECT_NAME} gtest gtest_main gmock)

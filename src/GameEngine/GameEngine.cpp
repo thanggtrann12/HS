@@ -175,7 +175,7 @@ void GameEngine::GameEngine_onOfflineMode()
     }
 }
 
-void GameEngine::clearPlayerDataStats()
+void GameEngine::GameEngine_clearPlayerDataStats()
 {
     GameData[PLAYER_1].stats.clear();
     GameData[PLAYER_2].stats.clear();
@@ -187,7 +187,7 @@ void GameEngine::GameEngine_handingPlayerTurn(player_t player, int choice)
     GameData[player].hero->attackDefenderHero(GameData[1 - player]);
     GameEngine_activeCard(player, choice);
     GameEngine_notifyUiObserver(player, GameUi::STATS, choice, GameData);
-    clearPlayerDataStats();
+    GameEngine_clearPlayerDataStats();
 }
 
 void GameEngine::GameEngine_activeCard(player_t player, int entityIndex)

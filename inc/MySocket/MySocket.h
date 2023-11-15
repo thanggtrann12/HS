@@ -1,5 +1,5 @@
-#ifndef SOCKET_H
-#define SOCKET_H
+#ifndef MY_SOCKET_H
+#define MY_SOCKET_H
 
 #include <iostream>
 #include <string>

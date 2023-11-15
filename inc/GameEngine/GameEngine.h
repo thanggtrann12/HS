@@ -1,6 +1,6 @@
 #ifndef GAME_H
 #define GAME_H
-#include "MySocket/Socket.h"
+#include "MySocket/MySocket.h"
 #include <ctime>
 #include <cstdlib>
 #include "Helper/Helper.h"
@@ -28,7 +28,7 @@ private:
     void GameEngine_onServerMode(MySocket &socket);
     void GameEngine_onOfflineMode();
     void GameEngine_checkPlayerTurnCount(MySocket &socket);
-    void clearPlayerDataStats();
+    void GameEngine_clearPlayerDataStats();
     void GameEngine_handingPlayerTurn(player_t player, int choice);
 
 protected:
