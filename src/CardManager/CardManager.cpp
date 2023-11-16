@@ -6,10 +6,10 @@
 #include <memory>
 CardManager::CardManager()
 {
-    CardManager_initManager();
+    initManager();
     hero.initHero();
 }
-void CardManager::CardManager_initManager()
+void CardManager::initManager()
 {
     std::shared_ptr<CardFactory> factory;
     factory = std::make_shared<MinionCardFactory>();
@@ -26,7 +26,7 @@ void CardManager::CardManager_initManager()
     std::shared_ptr<Card> spellCard = factory->createCard(Card::CardType::BRAWL);
     cardPocket.emplace_back(spellCard);
 }
-void CardManager::CardManager_getCardFromPocket(std::vector<std::shared_ptr<Card>> &playerHand)
+void CardManager::getCardFromPocket(std::vector<std::shared_ptr<Card>> &playerHand)
 {
     for (int i = 0; i < 10; i++)
     {
@@ -35,19 +35,19 @@ void CardManager::CardManager_getCardFromPocket(std::vector<std::shared_ptr<Card
     }
 }
 
-std::shared_ptr<Hero> CardManager::CardManager_assignHeroToPlayer(unsigned int heroNum)
+std::shared_ptr<Hero> CardManager::assignHeroToPlayer(unsigned int heroNum)
 {
 
     return std::make_shared<Hero>(*hero.getHero()[heroNum]);
 }
 
-std::shared_ptr<Card> CardManager::CardManager_drawRandomCard()
+std::shared_ptr<Card> CardManager::drawRandomCard()
 {
     int cardRandom = rand() % cardPocket.size();
     return cardPocket[cardRandom];
 }
 
-void CardManager::CardManager_pushCardToTable(std::vector<std::shared_ptr<Card>> &playerTable, Card::CardType type)
+void CardManager::pushCardToTable(std::vector<std::shared_ptr<Card>> &playerTable, Card::CardType type)
 {
     std::shared_ptr<CardFactory> factory;
     switch (type)

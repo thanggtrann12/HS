@@ -6,11 +6,11 @@ class CardManager
 {
 public:
     CardManager();
-    void CardManager_initManager();
-    void CardManager_getCardFromPocket(std::vector<std::shared_ptr<Card>> &playerHand);
-    std::shared_ptr<Hero> CardManager_assignHeroToPlayer(unsigned int heroNum);
-    void CardManager_pushCardToTable(std::vector<std::shared_ptr<Card>> &playerTable, Card::CardType type);
-    std::shared_ptr<Card> CardManager_drawRandomCard();
+    void initManager();
+    void getCardFromPocket(std::vector<std::shared_ptr<Card>> &playerHand);
+    std::shared_ptr<Hero> assignHeroToPlayer(unsigned int heroNum);
+    void pushCardToTable(std::vector<std::shared_ptr<Card>> &playerTable, Card::CardType type);
+    std::shared_ptr<Card> drawRandomCard();
     ~CardManager(){};
 
 private:

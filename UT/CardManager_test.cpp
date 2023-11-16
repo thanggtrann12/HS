@@ -14,34 +14,34 @@ protected:
     }
 };
 
-TEST_F(CardManagerTest, CardManager_getCardFromPocketTest) {
+TEST_F(CardManagerTest, getCardFromPocketTest) {
     std::vector<std::shared_ptr<Card>> playerHand;
-    cardManager.CardManager_getCardFromPocket(playerHand);
+    cardManager.getCardFromPocket(playerHand);
 
     // Assuming getCardFromPocket adds 10 cards to playerHand
     ASSERT_EQ(playerHand.size(), 10);
 }
 
-TEST_F(CardManagerTest, CardManager_assignHeroToPlayerTest) {
+TEST_F(CardManagerTest, assignHeroToPlayerTest) {
     unsigned int heroNum = 0;
-    auto assignedHero = cardManager.CardManager_assignHeroToPlayer(heroNum);
+    auto assignedHero = cardManager.assignHeroToPlayer(heroNum);
 
     // Assuming assignHeroToPlayer returns a valid shared_ptr<Hero>
     ASSERT_NE(assignedHero, nullptr);
 }
 
-TEST_F(CardManagerTest, CardManager_drawRandomCardTest) {
-    auto drawnCard = cardManager.CardManager_drawRandomCard();
+TEST_F(CardManagerTest, drawRandomCardTest) {
+    auto drawnCard = cardManager.drawRandomCard();
 
     // Assuming drawRandomCard returns a valid shared_ptr<Card>
     ASSERT_NE(drawnCard, nullptr);
 }
 
-TEST_F(CardManagerTest, CardManager_pushCardToTableTest) {
+TEST_F(CardManagerTest, pushCardToTableTest) {
     std::vector<std::shared_ptr<Card>> playerTable;
 
     // Assuming pushCardToTable adds a card to playerTable
-    cardManager.CardManager_pushCardToTable(playerTable, Card::CardType::FIRELORD);
+    cardManager.pushCardToTable(playerTable, Card::CardType::FIRELORD);
 
     ASSERT_EQ(playerTable.size(), 1);
     ASSERT_EQ(playerTable[0]->getCardType(), Card::CardType::FIRELORD);

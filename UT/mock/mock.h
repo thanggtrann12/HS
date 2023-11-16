@@ -15,11 +15,11 @@
 // Mock class for MockCardManager
 class MockCardManager : public CardManager {
 public:
-    MOCK_METHOD(void, CardManager_initManager, ());
-    MOCK_METHOD(void, CardManager_getCardFromPocket, (std::vector<std::shared_ptr<Card>> &playerHand));
-    MOCK_METHOD(std::shared_ptr<Hero>, CardManager_assignHeroToPlayer, (unsigned int heroNum));
-    MOCK_METHOD(void, CardManager_pushCardToTable, (std::vector<std::shared_ptr<Card>> &playerTable, Card::CardType type));
-    MOCK_METHOD(std::shared_ptr<Card>, CardManager_drawRandomCard, ());
+    MOCK_METHOD(void, initManager, ());
+    MOCK_METHOD(void, getCardFromPocket, (std::vector<std::shared_ptr<Card>> &playerHand));
+    MOCK_METHOD(std::shared_ptr<Hero>, assignHeroToPlayer, (unsigned int heroNum));
+    MOCK_METHOD(void, pushCardToTable, (std::vector<std::shared_ptr<Card>> &playerTable, Card::CardType type));
+    MOCK_METHOD(std::shared_ptr<Card>, drawRandomCard, ());
 };
 
 #include "CardManager/Hero.h"
@@ -39,18 +39,18 @@ public:
 class MockGameEngine : public GameEngine {
 public:
     MOCK_METHOD(void, play, ());
-    MOCK_METHOD(void, GameEngine_generatePlayerHero, ());
-    MOCK_METHOD(void, GameEngine_generatePlayerCards, ());
-    MOCK_METHOD(void, GameEngine_generateEntitiesForEachMode, (MySocket &socket));
-    MOCK_METHOD(void, GameEngine_activeCard, (player_t player, int entityIndex));
-    MOCK_METHOD(void, GameEngine_onClientMode, (MySocket &socket));
-    MOCK_METHOD(void, GameEngine_onServerMode, (MySocket &socket));
-    MOCK_METHOD(void, GameEngine_onOfflineMode, ());
-    MOCK_METHOD(void, GameEngine_checkPlayerTurnCount, (MySocket &socket));
-    MOCK_METHOD(void, GameEngine_clearPlayerDataStats, ());
-    MOCK_METHOD(void, GameEngine_handingPlayerTurn, (player_t player, int choice));
-    MOCK_METHOD(void, GameEngine_addUiObserver, (GameUi *uiObs));
-    MOCK_METHOD(void, GameEngine_notifyUiObserver, (player_t player, int state, int &cardChoiced, const std::vector<GameData_t> &tableData));
+    MOCK_METHOD(void, generatePlayerHero, ());
+    MOCK_METHOD(void, generatePlayerCards, ());
+    MOCK_METHOD(void, generateEntitiesForEachMode, (MySocket &socket));
+    MOCK_METHOD(void, activeCard, (player_t player, int entityIndex));
+    MOCK_METHOD(void, onClientMode, (MySocket &socket));
+    MOCK_METHOD(void, onServerMode, (MySocket &socket));
+    MOCK_METHOD(void, onOfflineMode, ());
+    MOCK_METHOD(void, checkPlayerTurnCount, (MySocket &socket));
+    MOCK_METHOD(void, clearPlayerDataStats, ());
+    MOCK_METHOD(void, handingPlayerTurn, (player_t player, int choice));
+    MOCK_METHOD(void, addUiObserver, (GameUi *uiObs));
+    MOCK_METHOD(void, notifyUiObserver, (player_t player, int state, int &cardChoiced, const std::vector<GameData_t> &tableData));
 };
 
 #include "MySocket/MySocket.h"

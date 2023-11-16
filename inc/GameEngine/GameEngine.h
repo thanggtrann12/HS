@@ -20,16 +20,16 @@ public:
     ~GameEngine(){};
 
 private:
-    void GameEngine_generatePlayerHero();
-    void GameEngine_generatePlayerCards();
-    void GameEngine_generateEntitiesForEachMode(MySocket &socket);
-    void GameEngine_activeCard(player_t player, int entityIndex);
-    void GameEngine_onClientMode(MySocket &socket);
-    void GameEngine_onServerMode(MySocket &socket);
-    void GameEngine_onOfflineMode();
-    void GameEngine_checkPlayerTurnCount(MySocket &socket);
-    void GameEngine_clearPlayerDataStats();
-    void GameEngine_handingPlayerTurn(player_t player, int choice);
+    void generatePlayerHero();
+    void generatePlayerCards();
+    void generateEntitiesForEachMode(MySocket &socket);
+    void activeCard(player_t player, int entityIndex);
+    void onClientMode(MySocket &socket);
+    void onServerMode(MySocket &socket);
+    void onOfflineMode();
+    void checkPlayerTurnCount(MySocket &socket);
+    void clearPlayerDataStats();
+    void handingPlayerTurn(player_t player, int choice);
 
 protected:
     GameUi gameUi;
@@ -39,8 +39,8 @@ protected:
     GameData_t ServerData;
     GameData_t ClientData;
     int option;
-    void GameEngine_addUiObserver(GameUi *uiObs);
-    void GameEngine_notifyUiObserver(player_t player, int state, int &cardChoiced, const std::vector<GameData_t> &tableData);
+    void addUiObserver(GameUi *uiObs);
+    void notifyUiObserver(player_t player, int state, int &cardChoiced, const std::vector<GameData_t> &tableData);
 };
 
 #endif // GAME_H

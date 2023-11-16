@@ -30,33 +30,33 @@ std::pair<std::vector<T>, std::vector<T>> splitVector(const std::vector<T> &inpu
     return result;
 }
 
-void GameUi::GameUi_updateGameState(player_t player, int state, int &cardChoiced, const std::vector<GameData_t> &tableData)
+void GameUi::updateGameState(player_t player, int state, int &cardChoiced, const std::vector<GameData_t> &tableData)
 {
     switch (state)
     {
     case INIT:
-        GameUi_displayModesOption(cardChoiced);
+        displayModesOption(cardChoiced);
         break;
     case CHOICE:
-        GameUi_displayHandCard(cardChoiced, tableData[player].hero->getName(), tableData[player].handCard);
+        displayHandCard(cardChoiced, tableData[player].hero->getName(), tableData[player].handCard);
         break;
     case STATS:
-        GameUi_prepareConsole();
-        GameUi_displayEntireTable(tableData);
+        prepareConsole();
+        displayEntireTable(tableData);
         break;
     case WAIT_CONFIRM:
-        GameUi_waitForConfirm();
+        waitForConfirm();
         break;
     case WAIT_NEXT_TURN:
-        GameUi_waitForNextTurn();
+        waitForNextTurn();
         break;
     case RESULT:
-        GameUi_displayResult(tableData);
+        displayResult(tableData);
         break;
     }
 }
 
-void GameUi::GameUi_waitForConfirm()
+void GameUi::waitForConfirm()
 {
     std::cout << std::string(120, ' ') << "Press Enter to continue ....";
     int key = getchar();
@@ -64,17 +64,17 @@ void GameUi::GameUi_waitForConfirm()
         return;
 }
 
-void GameUi::GameUi_waitForNextTurn()
+void GameUi::waitForNextTurn()
 {
     std::cout << std::string(120, ' ') << "Please wait for other turn..." << std::endl;
 }
 
-void GameUi::GameUi_prepareConsole()
+void GameUi::prepareConsole()
 {
     system("clear");
 }
 
-void GameUi::GameUi_displayEntireTable(const std::vector<GameData_t> &tableData)
+void GameUi::displayEntireTable(const std::vector<GameData_t> &tableData)
 {
     std::vector<std::vector<std::vector<std::string>>> GameData(2);
     std::vector<std::vector<std::vector<std::string>>> playerMsg(2);
@@ -89,12 +89,12 @@ void GameUi::GameUi_displayEntireTable(const std::vector<GameData_t> &tableData)
             {
                 if (entity->getCardType() == Card::CardType::FIRELORD || entity->getCardType() == Card::CardType::THALNOS)
                 {
-                    card_template_t templ = GameUi_getTemplateWithText("\033[36m", CARD_TEMPLATE_MINION_NO_ABILITY, entity->getName(), entity->getAttack(), entity->getHP(), entity->getSkill(), "");
+                    card_template_t templ = getTemplateWithText("\033[36m", CARD_TEMPLATE_MINION_NO_ABILITY, entity->getName(), entity->getAttack(), entity->getHP(), entity->getSkill(), "");
                     GameData[player].emplace_back(templ);
                 }
                 else
                 {
-                    card_template_t templS = GameUi_getTemplateWithText("\033[33m", CARD_TEMPLATE_MINION_WITH_ABILITY, entity->getName(), entity->getAttack(), entity->getHP(), entity->getSkill(), "ACTIVE");
+                    card_template_t templS = getTemplateWithText("\033[33m", CARD_TEMPLATE_MINION_WITH_ABILITY, entity->getName(), entity->getAttack(), entity->getHP(), entity->getSkill(), "ACTIVE");
                     GameData[player].emplace_back(templS);
                 }
             }
@@ -122,11 +122,11 @@ void GameUi::GameUi_displayEntireTable(const std::vector<GameData_t> &tableData)
     }
     std::cout << EXTERNAL_BORDER_CHAR_TOP_RIGHT << std::endl;
 
-    GameUi_displayCard(firstGroup[0]);
-    GameUi_displayCard(secondGroup[0]);
-    GameUi_getCenterTemplateWithMessage(tableData);
-    GameUi_displayCard(firstGroup[1]);
-    GameUi_displayCard(secondGroup[1]);
+    displayCard(firstGroup[0]);
+    displayCard(secondGroup[0]);
+    getCenterTemplateWithMessage(tableData);
+    displayCard(firstGroup[1]);
+    displayCard(secondGroup[1]);
 
     std::cout << std::string(50, ' ') << EXTERNAL_BORDER_CHAR_BOTTOM_LEFT;
     for (unsigned int i = 0; i < 177; i++)
@@ -136,7 +136,7 @@ void GameUi::GameUi_displayEntireTable(const std::vector<GameData_t> &tableData)
     std::cout << EXTERNAL_BORDER_CHAR_BOTTOM_RIGHT << std::endl;
 }
 
-void GameUi::GameUi_displayCard(std::vector<std::vector<std::string>> &hand)
+void GameUi::displayCard(std::vector<std::vector<std::string>> &hand)
 {
     size_t maxRows = 0;
     if (!hand.empty())
@@ -164,7 +164,7 @@ void GameUi::GameUi_displayCard(std::vector<std::vector<std::string>> &hand)
     }
 }
 
-void GameUi::GameUi_replaceTextFromLeftSide(card_template_t &text, char flag, std::string new_text)
+void GameUi::replaceTextFromLeftSide(card_template_t &text, char flag, std::string new_text)
 {
     std::string::iterator sit = new_text.begin();
     bool start_replace = false;
@@ -202,7 +202,7 @@ void GameUi::GameUi_replaceTextFromLeftSide(card_template_t &text, char flag, st
     }
 }
 
-void GameUi::GameUi_replaceTextFromRightSide(card_template_t &text, char flag, std::string new_text)
+void GameUi::replaceTextFromRightSide(card_template_t &text, char flag, std::string new_text)
 {
     std::string::reverse_iterator sit = new_text.rbegin();
     bool start_replace = false;
@@ -240,7 +240,7 @@ void GameUi::GameUi_replaceTextFromRightSide(card_template_t &text, char flag, s
     }
 }
 
-void GameUi::GameUi_prepareForReplace(card_template_t &text)
+void GameUi::prepareForReplace(card_template_t &text)
 {
     for (card_template_t::iterator it = text.begin(); it != text.end(); ++it)
     {
@@ -252,28 +252,28 @@ void GameUi::GameUi_prepareForReplace(card_template_t &text)
     }
 }
 
-card_template_t GameUi::GameUi_getTemplateWithText(const std::string &color, card_template_t out, std::string name, int attack, int health, std::string skill, std::string status)
+card_template_t GameUi::getTemplateWithText(const std::string &color, card_template_t out, std::string name, int attack, int health, std::string skill, std::string status)
 {
     std::ostringstream oss;
-    GameUi_prepareForReplace(out);
+    prepareForReplace(out);
     for (int i = 0; i < out.size(); i++)
     {
         out[i] = color + out[i] + "\033[0m";
     }
-    GameUi_replaceTextFromLeftSide(out, 'N', name);
-    GameUi_replaceTextFromRightSide(out, 'S', status);
+    replaceTextFromLeftSide(out, 'N', name);
+    replaceTextFromRightSide(out, 'S', status);
     oss.str("");
     oss << attack;
-    GameUi_replaceTextFromLeftSide(out, 'A', oss.str());
+    replaceTextFromLeftSide(out, 'A', oss.str());
     oss.str("");
     oss << health;
-    GameUi_replaceTextFromRightSide(out, 'H', oss.str());
-    GameUi_replaceTextFromLeftSide(out, 'K', skill);
+    replaceTextFromRightSide(out, 'H', oss.str());
+    replaceTextFromLeftSide(out, 'K', skill);
     oss.str("");
     return out;
 }
 
-void GameUi::GameUi_getCenterTemplateWithMessage(const std::vector<GameData_t> &tableData)
+void GameUi::getCenterTemplateWithMessage(const std::vector<GameData_t> &tableData)
 {
     std::vector<std::string> player1Stats = tableData[0].stats;
     std::vector<std::string> player2Stats = tableData[1].stats;
@@ -316,7 +316,7 @@ void GameUi::GameUi_getCenterTemplateWithMessage(const std::vector<GameData_t> &
     std::cout << std::string(50, ' ') << "┃  ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛  ┃" << std::endl;
 }
 
-void GameUi::GameUi_displayGameRules()
+void GameUi::displayGameRules()
 {
     for (auto &e : GAME_RULES)
     {
@@ -324,7 +324,7 @@ void GameUi::GameUi_displayGameRules()
     }
 }
 
-void GameUi::GameUi_displayModesOption(int &option)
+void GameUi::displayModesOption(int &option)
 {
     const int numOptions = 4;
     int currentIndex = 0;
@@ -417,9 +417,9 @@ void GameUi::GameUi_displayModesOption(int &option)
             option = currentIndex + 1;
             if (option == 4)
             {
-                GameUi_displayGameRules();
-                GameUi_waitForConfirm();
-                GameUi_displayModesOption(option);
+                displayGameRules();
+                waitForConfirm();
+                displayModesOption(option);
             }
             tcsetattr(STDIN_FILENO, TCSANOW, &original_termios);
             return;
@@ -428,7 +428,7 @@ void GameUi::GameUi_displayModesOption(int &option)
     tcsetattr(STDIN_FILENO, TCSANOW, &original_termios);
 }
 
-void GameUi::GameUi_displayHandCard(int &choice, const std::string &name, const std::vector<std::shared_ptr<Card>> &handCard)
+void GameUi::displayHandCard(int &choice, const std::string &name, const std::vector<std::shared_ptr<Card>> &handCard)
 {
     std::vector<std::string> menuOptions;
     for (auto &e : handCard)
@@ -461,11 +461,11 @@ void GameUi::GameUi_displayHandCard(int &choice, const std::string &name, const 
             {
                 if (handCard[currentIndex]->getCardType() == Card::CardType::FIRELORD || handCard[currentIndex]->getCardType() == Card::CardType::THALNOS || handCard[currentIndex]->getCardType() == Card::CardType::TECHIES)
                 {
-                    temp = GameUi_getTemplateWithText("\033[36m", CARD_TEMPLATE_MINION_NO_ABILITY, handCard[currentIndex]->getName(), handCard[currentIndex]->getAttack(), handCard[currentIndex]->getHP(), handCard[currentIndex]->getSkill(), "");
+                    temp = getTemplateWithText("\033[36m", CARD_TEMPLATE_MINION_NO_ABILITY, handCard[currentIndex]->getName(), handCard[currentIndex]->getAttack(), handCard[currentIndex]->getHP(), handCard[currentIndex]->getSkill(), "");
                 }
                 else
                 {
-                    temp = GameUi_getTemplateWithText("\033[33m", CARD_TEMPLATE_MINION_WITH_ABILITY, handCard[currentIndex]->getName(), handCard[currentIndex]->getAttack(), handCard[currentIndex]->getHP(), handCard[currentIndex]->getSkill(), "INACTIVE");
+                    temp = getTemplateWithText("\033[33m", CARD_TEMPLATE_MINION_WITH_ABILITY, handCard[currentIndex]->getName(), handCard[currentIndex]->getAttack(), handCard[currentIndex]->getHP(), handCard[currentIndex]->getSkill(), "INACTIVE");
                 }
                 card.emplace_back(temp);
             }
@@ -473,11 +473,11 @@ void GameUi::GameUi_displayHandCard(int &choice, const std::string &name, const 
             {
                 if (handCard[cardIndex]->getCardType() == Card::CardType::FIRELORD || handCard[cardIndex]->getCardType() == Card::CardType::THALNOS || handCard[cardIndex]->getCardType() == Card::CardType::TECHIES)
                 {
-                    temp = GameUi_getTemplateWithText("\033[0m", CARD_TEMPLATE_MINION_NO_ABILITY, handCard[cardIndex]->getName(), handCard[cardIndex]->getAttack(), handCard[cardIndex]->getHP(), handCard[cardIndex]->getSkill(), "");
+                    temp = getTemplateWithText("\033[0m", CARD_TEMPLATE_MINION_NO_ABILITY, handCard[cardIndex]->getName(), handCard[cardIndex]->getAttack(), handCard[cardIndex]->getHP(), handCard[cardIndex]->getSkill(), "");
                 }
                 else
                 {
-                    temp = GameUi_getTemplateWithText("\033[0m", CARD_TEMPLATE_MINION_WITH_ABILITY, handCard[cardIndex]->getName(), handCard[cardIndex]->getAttack(), handCard[cardIndex]->getHP(), handCard[cardIndex]->getSkill(), "INACTIVE");
+                    temp = getTemplateWithText("\033[0m", CARD_TEMPLATE_MINION_WITH_ABILITY, handCard[cardIndex]->getName(), handCard[cardIndex]->getAttack(), handCard[cardIndex]->getHP(), handCard[cardIndex]->getSkill(), "INACTIVE");
                 }
                 card.emplace_back(temp);
             }
@@ -493,8 +493,8 @@ void GameUi::GameUi_displayHandCard(int &choice, const std::string &name, const 
             std::cout << EXTERNAL_BORDER_CHAR_LEFT_RIGHT;
         }
         std::cout << EXTERNAL_BORDER_CHAR_TOP_RIGHT << std::endl;
-        GameUi_displayCard(firstGroup);
-        GameUi_displayCard(secondGroup);
+        displayCard(firstGroup);
+        displayCard(secondGroup);
         std::cout << std::string(50, ' ') << EXTERNAL_BORDER_CHAR_BOTTOM_LEFT;
         for (unsigned int i = 0; i < 177; i++)
         {
@@ -532,7 +532,7 @@ void GameUi::GameUi_displayHandCard(int &choice, const std::string &name, const 
     return;
 }
 
-void GameUi::GameUi_displayResult(const std::vector<GameData_t> &tableData)
+void GameUi::displayResult(const std::vector<GameData_t> &tableData)
 {
 
     auto printWinnerMessages = [](const std::vector<std::string> &winnerMessages)
@@ -548,10 +548,10 @@ void GameUi::GameUi_displayResult(const std::vector<GameData_t> &tableData)
         {
             const auto &winnerMessages =
                 (tableData[1 - player].hero->getName() == "Slark") ? HERO_SLARK_WINNER : HERO_BUTCHER_WINNER;
-            GameUi_prepareConsole();
+            prepareConsole();
             printWinnerMessages(winnerMessages);
             std::cout << std::string(120, ' ') << "Congrat player " << player + 1 << " is WINNER" << std::endl;
-            GameUi_waitForConfirm();
+            waitForConfirm();
             system("exit");
         }
     }
