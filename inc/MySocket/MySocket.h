@@ -8,7 +8,7 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #include "Helper/Helper.h"
-#include "CardManager/CardFactory/Card.h"
+#include "CardFactory/Card.h"
 #define PORT 8081
 
 class MySocket
@@ -27,8 +27,8 @@ public:
     }
 
     ~MySocket();
-    void sendInitCardPool(const Card::CardType *host, size_t hostSize, const Card::CardType *client, size_t clientSize);
-    void recvInitCardPool(Card::CardType *&host, int &hostSize, Card::CardType *&client, int &clientSize);
+    void sendInitCardPool(const CardType *host, size_t hostSize, const CardType *client, size_t clientSize);
+    void recvInitCardPool(CardType *&host, int &hostSize, CardType *&client, int &clientSize);
     void sendPlayerChoice(int choice);
     int receivePlayerChoice();
 

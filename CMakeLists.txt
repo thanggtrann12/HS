@@ -14,7 +14,7 @@
     add_subdirectory(${GMOCK_DIR})
 
     set(SOURCES
-    ${CMAKE_SOURCE_DIR}/src/CardManager/CardFactory/Card.cpp
+    ${CMAKE_SOURCE_DIR}/src/CardFactory/Card.cpp
     ${CMAKE_SOURCE_DIR}/src/CardManager/CardManager.cpp
     ${CMAKE_SOURCE_DIR}/src/GameEngine/GameEngine.cpp
     ${CMAKE_SOURCE_DIR}/src/CardManager/Hero.cpp
@@ -23,10 +23,11 @@
     )
 
     set(HEADERS
-    ${CMAKE_SOURCE_DIR}/inc/CardManager/CardFactory/Card.h
+    ${CMAKE_SOURCE_DIR}/inc/CardFactory/Card.h 
+    ${CMAKE_SOURCE_DIR}/inc/CardFactory/CardData.h 
     ${CMAKE_SOURCE_DIR}/inc/CardManager/CardManager.h
     ${CMAKE_SOURCE_DIR}/inc/CardManager/Hero.h
-    ${CMAKE_SOURCE_DIR}/inc/CardManager/CardFactory/CardFactory.h
+    ${CMAKE_SOURCE_DIR}/inc/CardFactory/CardFactory.h
     ${CMAKE_SOURCE_DIR}/inc/GameEngine/GameEngine.h
     ${CMAKE_SOURCE_DIR}/inc/MySocket/MySocket.h
     ${CMAKE_SOURCE_DIR}/inc/Helper/Helper.h

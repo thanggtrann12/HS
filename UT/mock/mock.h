@@ -4,7 +4,7 @@
 #include <gmock/gmock.h>
 #include "GameUi/GameUi.h"
 #include "Helper/Helper.h"
-#include "CardManager/CardFactory/Card.h"
+#include "CardFactory/Card.h"
 #include "CardManager/Hero.h"
 #include "MySocket/MySocket.h"
 #include "GameEngine/GameEngine.h"
@@ -18,7 +18,7 @@ public:
     MOCK_METHOD(void, initManager, ());
     MOCK_METHOD(void, getCardFromPocket, (std::vector<std::shared_ptr<Card>> &playerHand));
     MOCK_METHOD(std::shared_ptr<Hero>, assignHeroToPlayer, (unsigned int heroNum));
-    MOCK_METHOD(void, pushCardToTable, (std::vector<std::shared_ptr<Card>> &playerTable, Card::CardType type));
+    MOCK_METHOD(void, pushCardToTable, (std::vector<std::shared_ptr<Card>> &playerTable, CardType type));
     MOCK_METHOD(std::shared_ptr<Card>, drawRandomCard, ());
 };
 
@@ -58,8 +58,8 @@ public:
 // Mock class for MockMySocket
 class MockMySocket : public MySocket {
 public:
-    MOCK_METHOD(void, sendInitCardPool, (const Card::CardType *host, size_t hostSize, const Card::CardType *client, size_t clientSize));
-    MOCK_METHOD(void, recvInitCardPool, (Card::CardType *&host, int &hostSize, Card::CardType *&client, int &clientSize));
+    MOCK_METHOD(void, sendInitCardPool, (const CardType *host, size_t hostSize, const CardType *client, size_t clientSize));
+    MOCK_METHOD(void, recvInitCardPool, (CardType *&host, int &hostSize, CardType *&client, int &clientSize));
     MOCK_METHOD(void, sendPlayerChoice, (int choice));
     MOCK_METHOD(int, receivePlayerChoice, ());
     MOCK_METHOD(void, initializeServer, ());

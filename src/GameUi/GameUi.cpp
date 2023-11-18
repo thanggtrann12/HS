@@ -1,6 +1,6 @@
 #include "GameUi/GameUi.h"
 #include "Helper/Helper.h"
-#include "CardManager/CardFactory/Card.h"
+#include "CardFactory/Card.h"
 #include "CardManager/Hero.h"
 #include <iostream>
 #include <string>
@@ -87,7 +87,7 @@ void GameUi::displayEntireTable(const std::vector<GameData_t> &tableData)
             for (auto &entity : tableData[player].tableEntities)
 
             {
-                if (entity->getCardType() == Card::CardType::FIRELORD || entity->getCardType() == Card::CardType::THALNOS)
+                if (entity->getCardType() == CardType::FIRELORD || entity->getCardType() == CardType::THALNOS)
                 {
                     card_template_t templ = getTemplateWithText("\033[36m", CARD_TEMPLATE_MINION_NO_ABILITY, entity->getName(), entity->getAttack(), entity->getHP(), entity->getSkill(), "");
                     GameData[player].emplace_back(templ);
@@ -459,7 +459,7 @@ void GameUi::displayHandCard(int &choice, const std::string &name, const std::ve
         {
             if (currentIndex == cardIndex)
             {
-                if (handCard[currentIndex]->getCardType() == Card::CardType::FIRELORD || handCard[currentIndex]->getCardType() == Card::CardType::THALNOS || handCard[currentIndex]->getCardType() == Card::CardType::TECHIES)
+                if (handCard[currentIndex]->getCardType() == CardType::FIRELORD || handCard[currentIndex]->getCardType() == CardType::THALNOS || handCard[currentIndex]->getCardType() == CardType::TECHIES)
                 {
                     temp = getTemplateWithText("\033[36m", CARD_TEMPLATE_MINION_NO_ABILITY, handCard[currentIndex]->getName(), handCard[currentIndex]->getAttack(), handCard[currentIndex]->getHP(), handCard[currentIndex]->getSkill(), "");
                 }
@@ -471,7 +471,7 @@ void GameUi::displayHandCard(int &choice, const std::string &name, const std::ve
             }
             else
             {
-                if (handCard[cardIndex]->getCardType() == Card::CardType::FIRELORD || handCard[cardIndex]->getCardType() == Card::CardType::THALNOS || handCard[cardIndex]->getCardType() == Card::CardType::TECHIES)
+                if (handCard[cardIndex]->getCardType() == CardType::FIRELORD || handCard[cardIndex]->getCardType() == CardType::THALNOS || handCard[cardIndex]->getCardType() == CardType::TECHIES)
                 {
                     temp = getTemplateWithText("\033[0m", CARD_TEMPLATE_MINION_NO_ABILITY, handCard[cardIndex]->getName(), handCard[cardIndex]->getAttack(), handCard[cardIndex]->getHP(), handCard[cardIndex]->getSkill(), "");
                 }

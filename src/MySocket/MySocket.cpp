@@ -16,14 +16,14 @@ MySocket::~MySocket()
     }
 }
 
-void MySocket::sendInitCardPool(const Card::CardType *host, size_t hostSize, const Card::CardType *client, size_t clientSize)
+void MySocket::sendInitCardPool(const CardType *host, size_t hostSize, const CardType *client, size_t clientSize)
 {
 
     size_t combined_length = hostSize + clientSize + 2;
-    Card::CardType *combined_array = new Card::CardType[combined_length];
-    size_t total_size_bytes = sizeof(Card::CardType) * (hostSize + clientSize + 2);
-    combined_array[0] = static_cast<Card::CardType>(hostSize);
-    combined_array[1] = static_cast<Card::CardType>(clientSize);
+    CardType *combined_array = new CardType[combined_length];
+    size_t total_size_bytes = sizeof(CardType) * (hostSize + clientSize + 2);
+    combined_array[0] = static_cast<CardType>(hostSize);
+    combined_array[1] = static_cast<CardType>(clientSize);
     for (size_t i = 0; i < hostSize; ++i)
     {
         combined_array[i + 2] = host[i];
@@ -35,21 +35,21 @@ void MySocket::sendInitCardPool(const Card::CardType *host, size_t hostSize, con
     send(clientSocket_, combined_array, total_size_bytes, 0);
 }
 
-void MySocket::recvInitCardPool(Card::CardType *&host, int &hostSize, Card::CardType *&client, int &clientSize)
+void MySocket::recvInitCardPool(CardType *&host, int &hostSize, CardType *&client, int &clientSize)
 {
     char buffer[4056];
     ssize_t total_size_bytes = recv(clientSocket_, buffer, sizeof(buffer), 0);
 
-    // Assuming Card::CardType is an enum
-    Card::CardType *combined_array = reinterpret_cast<Card::CardType *>(buffer);
+    // Assuming CardType is an enum
+    CardType *combined_array = reinterpret_cast<CardType *>(buffer);
 
     // Extract the lengths of the original arrays
     hostSize = static_cast<size_t>(combined_array[0]);
     clientSize = static_cast<size_t>(combined_array[1]);
 
     // Allocate memory for host and client arrays
-    host = new Card::CardType[hostSize];
-    client = new Card::CardType[clientSize];
+    host = new CardType[hostSize];
+    client = new CardType[clientSize];
 
     for (int i = 0; i < hostSize; ++i)
     {

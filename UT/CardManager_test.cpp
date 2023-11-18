@@ -41,8 +41,8 @@ TEST_F(CardManagerTest, pushCardToTableTest) {
     std::vector<std::shared_ptr<Card>> playerTable;
 
     // Assuming pushCardToTable adds a card to playerTable
-    cardManager.pushCardToTable(playerTable, Card::CardType::FIRELORD);
+    cardManager.pushCardToTable(playerTable, CardType::FIRELORD);
 
     ASSERT_EQ(playerTable.size(), 1);
-    ASSERT_EQ(playerTable[0]->getCardType(), Card::CardType::FIRELORD);
+    ASSERT_EQ(playerTable[0]->getCardType(), CardType::FIRELORD);
 }

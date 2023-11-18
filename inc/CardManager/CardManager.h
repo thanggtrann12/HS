@@ -1,6 +1,6 @@
 #ifndef CARD_MANAGER_H
 #define CARD_MANAGER_H
-#include "CardManager/CardFactory/Card.h"
+#include "CardFactory/Card.h"
 #include "CardManager/Hero.h"
 class CardManager
 {
@@ -9,7 +9,7 @@ public:
     void initManager();
     void getCardFromPocket(std::vector<std::shared_ptr<Card>> &playerHand);
     std::shared_ptr<Hero> assignHeroToPlayer(unsigned int heroNum);
-    void pushCardToTable(std::vector<std::shared_ptr<Card>> &playerTable, Card::CardType type);
+    void pushCardToTable(std::vector<std::shared_ptr<Card>> &playerTable, CardType type);
     std::shared_ptr<Card> drawRandomCard();
     ~CardManager(){};
 

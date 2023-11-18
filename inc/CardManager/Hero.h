@@ -4,11 +4,12 @@
 #include <vector>
 #include <memory>
 #include "Helper/Helper.h"
+#include "CardFactory/CardData.h"
 class Hero
 {
 public:
     Hero() : name("Hero"), health(0), attack(0) {}
-    Hero(std::string name, int atk, int hp) : name(name), health(hp), attack(atk) {}
+    Hero(CardType type) : name(cardDatas[type].name), health(cardDatas[type].health), attack(cardDatas[type].attack) {}
     void initHero();
     bool IsAlive();
     std::vector<std::shared_ptr<Hero>> &getHero();

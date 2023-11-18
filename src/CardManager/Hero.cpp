@@ -4,9 +4,9 @@
 #include "Helper/Helper.h"
 void Hero::initHero()
 {
-    Hero butcher("Butcher", 6, 120);
+    Hero butcher(CardType::BUTCHER);
     heroPocket.push_back(std::make_shared<Hero>(butcher));
-    Hero slark("Slark ", 10, 72);
+    Hero slark(CardType::SLARK);
     heroPocket.push_back(std::make_shared<Hero>(slark));
 }
 

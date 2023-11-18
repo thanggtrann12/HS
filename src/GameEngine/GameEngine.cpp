@@ -41,8 +41,8 @@ void GameEngine::generateEntitiesForEachMode(MySocket &socket)
         GameData[PLAYER_1].handCard.clear();
         GameData[PLAYER_2].handCard.clear();
 
-        Card::CardType *client = nullptr;
-        Card::CardType *host = nullptr;
+        CardType *client = nullptr;
+        CardType *host = nullptr;
         int clientSize = 0, hostSize = 0;
 
         socket.recvInitCardPool(host, hostSize, client, clientSize);
@@ -68,7 +68,7 @@ void GameEngine::generateEntitiesForEachMode(MySocket &socket)
     case SERVER_MODE:
     {
         int clientCount = 0;
-        Card::CardType *client = new Card::CardType[GameData[PLAYER_1].handCard.size()];
+        CardType *client = new CardType[GameData[PLAYER_1].handCard.size()];
         for (auto &e : GameData[PLAYER_1].handCard)
         {
             client[clientCount] = e->getCardType();
@@ -76,7 +76,7 @@ void GameEngine::generateEntitiesForEachMode(MySocket &socket)
         }
 
         int hostCount = 0;
-        Card::CardType *host = new Card::CardType[GameData[PLAYER_2].handCard.size()];
+        CardType *host = new CardType[GameData[PLAYER_2].handCard.size()];
         for (auto &e : GameData[PLAYER_2].handCard)
         {
             host[hostCount] = e->getCardType();
@@ -204,7 +204,6 @@ void GameEngine::activeCard(player_t player, int entityIndex)
         else
         {
             GameData[player].stats.push_back(GameData[player].hero->getName() + " activate " + originalEntity->getName());
-            originalEntity->setUsed();
             manager.pushCardToTable(GameData[player].tableEntities, originalEntity->getCardType());
             originalEntity->play(player, GameData[player].tableEntities.end() - 1, GameData);
             GameData[player].handCard.erase(GameData[player].handCard.begin() + entityIndex);

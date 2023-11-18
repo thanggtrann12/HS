@@ -1,6 +1,6 @@
 #include "CardManager/CardManager.h"
-#include "CardManager/CardFactory/CardFactory.h"
-
+#include "CardFactory/Card.h"
+#include "CardFactory/CardFactory.h"
 #include <iostream>
 #include <string>
 #include <memory>
@@ -13,17 +13,17 @@ void CardManager::initManager()
 {
     std::shared_ptr<CardFactory> factory;
     factory = std::make_shared<MinionCardFactory>();
-    std::shared_ptr<Card> firelordCard = factory->createCard(Card::CardType::FIRELORD);
+    std::shared_ptr<Card> firelordCard = factory->createCard(CardType::FIRELORD);
     cardPocket.emplace_back(firelordCard);
-    std::shared_ptr<Card> thalnosCard = factory->createCard(Card::CardType::THALNOS);
+    std::shared_ptr<Card> thalnosCard = factory->createCard(CardType::THALNOS);
     cardPocket.emplace_back(thalnosCard);
-    std::shared_ptr<Card> techiesCard = factory->createCard(Card::CardType::TECHIES);
+    std::shared_ptr<Card> techiesCard = factory->createCard(CardType::TECHIES);
     cardPocket.emplace_back(techiesCard);
     factory = std::make_shared<BuffCardFactory>();
-    std::shared_ptr<Card> buffCard = factory->createCard(Card::CardType::SHAMAN);
+    std::shared_ptr<Card> buffCard = factory->createCard(CardType::SHAMAN);
     cardPocket.emplace_back(buffCard);
     factory = std::make_shared<SpellCardFactory>();
-    std::shared_ptr<Card> spellCard = factory->createCard(Card::CardType::BRAWL);
+    std::shared_ptr<Card> spellCard = factory->createCard(CardType::BRAWL);
     cardPocket.emplace_back(spellCard);
 }
 void CardManager::getCardFromPocket(std::vector<std::shared_ptr<Card>> &playerHand)
@@ -47,30 +47,30 @@ std::shared_ptr<Card> CardManager::drawRandomCard()
     return cardPocket[cardRandom];
 }
 
-void CardManager::pushCardToTable(std::vector<std::shared_ptr<Card>> &playerTable, Card::CardType type)
+void CardManager::pushCardToTable(std::vector<std::shared_ptr<Card>> &playerTable, CardType type)
 {
     std::shared_ptr<CardFactory> factory;
     switch (type)
     {
-    case Card::CardType::FIRELORD:
+    case CardType::FIRELORD:
         factory = std::make_shared<MinionCardFactory>();
-        playerTable.emplace_back(factory->createCard(Card::CardType::FIRELORD));
+        playerTable.emplace_back(factory->createCard(CardType::FIRELORD));
         break;
-    case Card::CardType::THALNOS:
+    case CardType::THALNOS:
         factory = std::make_shared<MinionCardFactory>();
-        playerTable.emplace_back(factory->createCard(Card::CardType::THALNOS));
+        playerTable.emplace_back(factory->createCard(CardType::THALNOS));
         break;
-    case Card::CardType::TECHIES:
+    case CardType::TECHIES:
         factory = std::make_shared<MinionCardFactory>();
-        playerTable.emplace_back(factory->createCard(Card::CardType::TECHIES));
+        playerTable.emplace_back(factory->createCard(CardType::TECHIES));
         break;
-    case Card::CardType::SHAMAN:
+    case CardType::SHAMAN:
         factory = std::make_shared<BuffCardFactory>();
-        playerTable.emplace_back(factory->createCard(Card::CardType::SHAMAN));
+        playerTable.emplace_back(factory->createCard(CardType::SHAMAN));
         break;
-    case Card::CardType::BRAWL:
+    case CardType::BRAWL:
         factory = std::make_shared<SpellCardFactory>();
-        playerTable.emplace_back(factory->createCard(Card::CardType::BRAWL));
+        playerTable.emplace_back(factory->createCard(CardType::BRAWL));
         break;
     }
 }
