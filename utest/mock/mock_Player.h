@@ -1,8 +1,8 @@
 #ifndef MOCK_PLAYER_H
 #define MOCK_PLAYER_H
 
- #include "gtest/gtest.h"
- #include "gmock/gmock.h"
+#include "gtest/gtest.h"
+#include "gmock/gmock.h"
 #include "Player/Player.h"
 
 // Mock class for Mock_Player

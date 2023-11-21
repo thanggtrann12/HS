@@ -14,7 +14,7 @@ class MockFileGenerator:
         
         # Include guard
         header_guard = f"{self.mock_class_name}_H"
-        mock_file_content += f"#ifndef {header_guard.upper()}\n#define {header_guard.upper()}\n\n #include \"gtest/gtest.h\"\n #include \"gmock/gmock.h\"\n"
+        mock_file_content += f"#ifndef {header_guard.upper()}\n#define {header_guard.upper()}\n\n#include \"gtest/gtest.h\"\n#include \"gmock/gmock.h\"\n"
 
         # Begin mock class declaration
         relative_path = os.path.relpath(self.header_file_path, self.base_path).replace("\\", "/")
@@ -76,7 +76,7 @@ class MockFileGenerator:
             with open(file_path, 'w', encoding='utf-8') as file:
                 file.writelines(lines)
 
-base_path = "C:/Users/rhn9hc/Desktop/HS_v2"
+base_path = os.path.abspath(os.getcwd())
 file_paths = [
     base_path+"/inc/Player/Player.h",
     base_path+"/inc/UI/Ui.h",
@@ -89,7 +89,15 @@ file_paths = [
     base_path+"/inc/assets/HeroData.h",
     base_path+"/inc/assets/CardData.h"
 ]
-
+for filename in os.listdir(base_path+"/utest/mock"):
+    file_path = os.path.join(base_path+"/utest/mock", filename)
+    try:
+        if os.path.isfile(file_path) or os.path.islink(file_path):
+            os.unlink(file_path)
+        elif os.path.isdir(file_path):
+            shutil.rmtree(file_path)
+    except Exception as e:
+        print('Failed to delete %s. Reason: %s' % (file_path, e))
 mock_folder_path = base_path+ "/utest/mock/"
 os.makedirs(mock_folder_path, exist_ok=True)
 # folder_path = os.path.join(os.getcwd(), "utes\mock\\")
