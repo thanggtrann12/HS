@@ -42,6 +42,8 @@ test.cpp
 ${SOURCES}
 ${CMAKE_SOURCE_DIR}/utest/Ui.utest.cpp
 ${CMAKE_SOURCE_DIR}/utest/Player.utest.cpp
+${CMAKE_SOURCE_DIR}/utest/Hero.utest.cpp
+${CMAKE_SOURCE_DIR}/utest/MySocket.utest.cpp
 )
 
 
