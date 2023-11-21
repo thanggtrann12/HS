@@ -1,20 +1,18 @@
 #ifndef CARD_MANAGER_H
 #define CARD_MANAGER_H
-#include "CardFactory/Card.h"
-#include "CardManager/Hero.h"
+#include <vector>
+#include <iostream>
+#include <memory>
+#include "Card/Card.h"
 class CardManager
 {
 public:
     CardManager();
-    void initManager();
-    void getCardFromPocket(std::vector<std::shared_ptr<Card>> &playerHand);
-    std::shared_ptr<Hero> assignHeroToPlayer(unsigned int heroNum);
-    void pushCardToTable(std::vector<std::shared_ptr<Card>> &playerTable, CardType type);
-    std::shared_ptr<Card> drawRandomCard();
+    std::shared_ptr<Card> getCardFromPocket();
+    void generateCardFromCardType(std::vector<std::shared_ptr<Card>> &playerTable, CardType type);
     ~CardManager(){};
 
 private:
-    Hero hero;
     std::vector<std::shared_ptr<Card>> cardPocket;
 };
 

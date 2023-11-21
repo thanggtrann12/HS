@@ -8,6 +8,7 @@
 #include <cstring>
 #include <iostream>
 #include <iomanip>
+
 MySocket::~MySocket()
 {
     if (clientSocket_ != -1)
@@ -16,49 +17,67 @@ MySocket::~MySocket()
     }
 }
 
-void MySocket::sendInitCardPool(const CardType *host, size_t hostSize, const CardType *client, size_t clientSize)
+void MySocket::sendInitCardPool(std::vector<std::shared_ptr<Card>> &hostPlayer, std::vector<std::shared_ptr<Card>> &clientPlayer)
 {
-
-    size_t combined_length = hostSize + clientSize + 2;
+    size_t hostHandSize = hostPlayer.size();
+    size_t clientHandSize = clientPlayer.size();
+    size_t combined_length = hostHandSize + clientHandSize + 1;
     CardType *combined_array = new CardType[combined_length];
-    size_t total_size_bytes = sizeof(CardType) * (hostSize + clientSize + 2);
-    combined_array[0] = static_cast<CardType>(hostSize);
-    combined_array[1] = static_cast<CardType>(clientSize);
-    for (size_t i = 0; i < hostSize; ++i)
+
+    // Set the size of the host player's hand
+    combined_array[0] = static_cast<CardType>(hostHandSize);
+
+    // Fill in host player's card types
+    for (size_t i = 0; i < hostHandSize; ++i)
     {
-        combined_array[i + 2] = host[i];
+        combined_array[i + 1] = hostPlayer[i]->getCardType();
+        // std::cout << static_cast<int>(hostPlayer[i]->getCardType()) << std::endl;
     }
-    for (size_t i = 0; i < clientSize; ++i)
+
+    // Fill in client player's card types
+    for (size_t i = 0; i < clientHandSize; ++i)
     {
-        combined_array[i + hostSize + 2] = client[i];
+        combined_array[i + hostHandSize + 1] = clientPlayer[i]->getCardType();
+        // std::cout << static_cast<int>(clientPlayer[i]->getCardType()) << std::endl;
     }
-    send(clientSocket_, combined_array, total_size_bytes, 0);
+
+    // Send the entire array
+    send(clientSocket_, combined_array, combined_length * sizeof(CardType), 0);
+
+    // Don't forget to free the dynamically allocated array
+    delete[] combined_array;
 }
 
-void MySocket::recvInitCardPool(CardType *&host, int &hostSize, CardType *&client, int &clientSize)
+void MySocket::recvInitCardPool(Player &hostPlayer, Player &clientPlayer)
 {
+    auto &hostPlayerHand = hostPlayer.getHand();
+    auto &clientPlayerHand = clientPlayer.getHand();
+    hostPlayerHand.clear();
+    clientPlayerHand.clear();
+
     char buffer[4056];
     ssize_t total_size_bytes = recv(clientSocket_, buffer, sizeof(buffer), 0);
 
-    // Assuming CardType is an enum
-    CardType *combined_array = reinterpret_cast<CardType *>(buffer);
+    // Cast the received buffer to the CardType array
+    CardType *receiveArr = reinterpret_cast<CardType *>(buffer);
+    size_t arrayLength = total_size_bytes / sizeof(CardType);
+    size_t hostHandSize = static_cast<size_t>(receiveArr[0]);
 
-    // Extract the lengths of the original arrays
-    hostSize = static_cast<size_t>(combined_array[0]);
-    clientSize = static_cast<size_t>(combined_array[1]);
+    // std::cout << "hostHandSize: " << hostHandSize << std::endl;
+    // std::cout << "arrayLength: " << arrayLength << std::endl;
 
-    // Allocate memory for host and client arrays
-    host = new CardType[hostSize];
-    client = new CardType[clientSize];
-
-    for (int i = 0; i < hostSize; ++i)
+    // Update host player cards
+    for (size_t i = 1; i <= hostHandSize; i++)
     {
-        host[i] = combined_array[i + 2];
+        hostPlayer.updateCard(receiveArr[i]);
+        // std::cout << static_cast<int>(receiveArr[i]) << std::endl;
     }
 
-    for (int i = 0; i < clientSize; ++i)
+    // Update client player cards
+    for (size_t i = hostHandSize + 1; i < arrayLength; i++)
     {
-        client[i] = combined_array[i + hostSize + 2];
+        clientPlayer.updateCard(receiveArr[i]);
+        // std::cout << static_cast<int>(receiveArr[i]) << std::endl;
     }
 }
 
@@ -111,7 +130,6 @@ void MySocket::initializeServer()
         std::cerr << "Error accepting client connection." << std::endl;
         exit(EXIT_FAILURE);
     }
-    std::cout << "Client connected" << std::endl;
 }
 
 void MySocket::initializeClient()

@@ -1,53 +1,36 @@
 #include "CardManager/CardManager.h"
-#include "CardFactory/Card.h"
-#include "CardFactory/CardFactory.h"
+#include "assets/CardData.h"
+#include "Card/CardFactory.h"
+#include "Card/Card.h"
 #include <iostream>
 #include <string>
 #include <memory>
 CardManager::CardManager()
 {
-    initManager();
-    hero.initHero();
-}
-void CardManager::initManager()
-{
     std::shared_ptr<CardFactory> factory;
     factory = std::make_shared<MinionCardFactory>();
-    std::shared_ptr<Card> firelordCard = factory->createCard(CardType::FIRELORD);
+    std::shared_ptr<Card> firelordCard = factory->createCard(FIRELORD);
     cardPocket.emplace_back(firelordCard);
-    std::shared_ptr<Card> thalnosCard = factory->createCard(CardType::THALNOS);
+    std::shared_ptr<Card> thalnosCard = factory->createCard(THALNOS);
     cardPocket.emplace_back(thalnosCard);
-    std::shared_ptr<Card> techiesCard = factory->createCard(CardType::TECHIES);
+    std::shared_ptr<Card> techiesCard = factory->createCard(TECHIES);
     cardPocket.emplace_back(techiesCard);
     factory = std::make_shared<BuffCardFactory>();
-    std::shared_ptr<Card> buffCard = factory->createCard(CardType::SHAMAN);
+    std::shared_ptr<Card> buffCard = factory->createCard(SHAMAN);
     cardPocket.emplace_back(buffCard);
     factory = std::make_shared<SpellCardFactory>();
-    std::shared_ptr<Card> spellCard = factory->createCard(CardType::BRAWL);
+    std::shared_ptr<Card> spellCard = factory->createCard(BRAWL);
     cardPocket.emplace_back(spellCard);
 }
-void CardManager::getCardFromPocket(std::vector<std::shared_ptr<Card>> &playerHand)
-{
-    for (int i = 0; i < 10; i++)
-    {
-        int cardRandom = rand() % cardPocket.size();
-        playerHand.push_back(cardPocket[cardRandom]);
-    }
-}
 
-std::shared_ptr<Hero> CardManager::assignHeroToPlayer(unsigned int heroNum)
-{
-
-    return std::make_shared<Hero>(*hero.getHero()[heroNum]);
-}
-
-std::shared_ptr<Card> CardManager::drawRandomCard()
+std::shared_ptr<Card> CardManager::getCardFromPocket()
 {
     int cardRandom = rand() % cardPocket.size();
-    return cardPocket[cardRandom];
+    std::shared_ptr<Card> cardRet = cardPocket[cardRandom];
+    return cardRet;
 }
 
-void CardManager::pushCardToTable(std::vector<std::shared_ptr<Card>> &playerTable, CardType type)
+void CardManager::generateCardFromCardType(std::vector<std::shared_ptr<Card>> &playerTable, CardType type)
 {
     std::shared_ptr<CardFactory> factory;
     switch (type)

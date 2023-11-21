@@ -1,14 +1,12 @@
 #ifndef MY_SOCKET_H
 #define MY_SOCKET_H
-
+#include "Player/Player.h"
 #include <iostream>
 #include <string>
 #include <vector>
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <unistd.h>
-#include "Helper/Helper.h"
-#include "CardFactory/Card.h"
 #define PORT 8081
 
 class MySocket
@@ -27,8 +25,8 @@ public:
     }
 
     ~MySocket();
-    void sendInitCardPool(const CardType *host, size_t hostSize, const CardType *client, size_t clientSize);
-    void recvInitCardPool(CardType *&host, int &hostSize, CardType *&client, int &clientSize);
+    void sendInitCardPool(std::vector<std::shared_ptr<Card>> &hostPlayer, std::vector<std::shared_ptr<Card>> &clientPlayer);
+    void recvInitCardPool(Player &hostPlayer, Player &clientPlayer);
     void sendPlayerChoice(int choice);
     int receivePlayerChoice();
 
