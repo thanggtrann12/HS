@@ -2,42 +2,23 @@
 #include <gmock/gmock.h>
 #include "UI/Ui.h"
 #include "Player/Player.h"
-
-class MockUi : public Ui
-{
-public:
-    MOCK_METHOD(void, onUiStateChangeOnState, (Ui::UiState, std::vector<Player>&, PlayerId, unsigned int&), ());
-};
-
-class MockPlayer : public Player
-{
-public:
-    MockPlayer(PlayerId playerId, Ui* ui) : Player(playerId, ui) {}
-
-    MOCK_METHOD(void, drawCard, (unsigned int), ());
-    MOCK_METHOD(void, updateCard, (CardType), ());
-    MOCK_METHOD(unsigned int, pickACardToPlay, (), ());
-    MOCK_METHOD(void, activeCardOnHand, (Player&, Player&, std::vector<std::shared_ptr<Card>>::iterator), ());
-    MOCK_METHOD(void, setHero, (HeroType), ());
-    MOCK_METHOD(std::string, getBasicInfo, (), ());
-    MOCK_METHOD(std::shared_ptr<Hero>&, getHero, (), ());
-    MOCK_METHOD(void, attackOpponent, (Player&), ());
-};
+#include "mock/mock_Ui.h"
+#include "mock/mock_Player.h"
+#define _ testing::_
 
 class PlayerTest : public ::testing::Test
 {
 protected:
     void SetUp() override
     {
-        mockUi = std::make_unique<MockUi>();
+        mockUi = std::make_unique<Mock_Ui>();
     }
 
     void TearDown() override
     {
-
     }
 
-    std::unique_ptr<MockUi> mockUi;
+    std::unique_ptr<Mock_Ui> mockUi;
 };
 
 TEST_F(PlayerTest, DrawCardIncreasesHandSize)
@@ -67,9 +48,60 @@ TEST_F(PlayerTest, AttackOpponentHero)
     Player player_2(PLAYER_2, mockUi.get());
     player_1.setHero(BUTCHER);
     player_2.setHero(SLARK);
-    unsigned int damage =  player_1.getHero()->getAttack();
-    int hp_left = player_2.getHero()->getHP() - damage;
-    player_1.getHero()->attackDefenderHero(player_2);
-    EXPECT_EQ(player_2.getHero()->getHP(), hp_left);
+
+    unsigned int initialHP = player_2.getHero()->getHP();
+    unsigned int damage = player_1.getHero()->getAttack();
+
+    player_1.attackOpponent(player_2);
+
+    EXPECT_EQ(player_2.getHero()->getHP(), initialHP - damage);
 }
 
+TEST_F(PlayerTest, UpdateCardUpdatesLastCardInHand)
+{
+    Player player(PLAYER_1, mockUi.get());
+    CardType cardType = BRAWL;
+    unsigned int handSize = 3;
+    player.drawCard(handSize);
+
+    CardType initialCardType = player.getHand().back()->getCardType();
+
+    player.updateCard(cardType);
+
+    CardType updatedCardType = player.getHand().back()->getCardType();
+
+    EXPECT_NE(initialCardType, updatedCardType);
+    EXPECT_EQ(updatedCardType, cardType);
+}
+
+TEST_F(PlayerTest, ActiveCardOnHand)
+{
+    Player player_1(PLAYER_1, mockUi.get());
+    Player player_2(PLAYER_2, mockUi.get());
+    player_1.setHero(BUTCHER);
+    player_2.setHero(SLARK);
+    player_2.updateCard(THALNOS);
+    unsigned int initialHP = player_1.getHero()->getHP();
+    unsigned int damage = player_2.getHero()->getAttack();
+    player_2.attackOpponent(player_1);
+    player_2.getHand()[player_2.getHand().size() - 1]->play(PLAYER_2, player_2, player_1);
+
+    EXPECT_EQ(player_1.getHero()->getHP(), initialHP - damage - player_2.getHand()[player_2.getHand().size() - 1]->getAttack());
+}
+
+TEST_F(PlayerTest, GetBasicInfoReturnsNonEmptyString)
+{
+    Player player(PLAYER_1, mockUi.get());
+    player.setHero(BUTCHER);
+    std::string basicInfo = player.getBasicInfo();
+    EXPECT_FALSE(basicInfo.empty());
+}
+
+TEST_F(PlayerTest, GetHeroReturnsNonNullPointer)
+{
+    Player player(PLAYER_1, mockUi.get());
+    player.setHero(BUTCHER);
+    std::shared_ptr<Hero> hero = player.getHero();
+
+    EXPECT_NE(hero, nullptr);
+}

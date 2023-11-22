@@ -11,6 +11,7 @@ public:
     Engine(Player &player1, Player &player2, Ui *ui);
     void startGame();
     bool isGameOver(PlayerId playerID);
+    ~Engine();
 
 private:
     void initializeOperationMode();
@@ -22,10 +23,8 @@ private:
     void processSinglePlayerTurn();
     void registerUiModule(Ui *subUi);
     void onUiStateChange(Ui::UiState state, std::vector<Player> &players, PlayerId playerId, unsigned int &clone);
-    ~Engine();
+
 private:
-
-
 protected:
     std::shared_ptr<MySocket> mySocket = std::make_shared<MySocket>();
     Ui *uiObs;
@@ -36,7 +35,6 @@ protected:
     PlayerId hostPlayerID = PLAYER_1;
     PlayerId clientPlayerID = PLAYER_2;
     int roundCount = 0;
-
 };
 
 #endif // ENGINE_H

@@ -6,17 +6,20 @@
 #include "Player/Player.h"
 
 // Mock class for Mock_Player
-class Mock_Player : public Player {
+
+class MockPlayer : public Player
+{
 public:
-    MOCK_METHOD(void, drawCard, (unsigned int num));
-    MOCK_METHOD(void, updateCard, (CardType type));
-    MOCK_METHOD(void, attackOpponent, (Player &defender));
-    MOCK_METHOD(std::vector<std::shared_ptr<Card>>, getHand, ());
-    MOCK_METHOD(std::vector<std::shared_ptr<Card>>, getBattle, ());
-    MOCK_METHOD(PlayerId, getId, ());
+    MockPlayer(PlayerId playerId, Ui *ui) : Player(playerId, ui) {}
+
+    MOCK_METHOD(void, drawCard, (unsigned int), ());
+    MOCK_METHOD(void, updateCard, (CardType), ());
     MOCK_METHOD(unsigned int, pickACardToPlay, ());
-    MOCK_METHOD(void, activeCardOnHand, (Player &attacker, Player &defender, std::vector<std::shared_ptr<Card>>::iterator cardPlayed));
-    MOCK_METHOD(void, setHero, (HeroType type));
-    MOCK_METHOD(std::string, getBasicInfo, ());
+    MOCK_METHOD(void, activeCardOnHand, (Player &, Player &, std::vector<std::shared_ptr<Card>>::iterator), ());
+    MOCK_METHOD(void, setHero, (HeroType), ());
+    MOCK_METHOD(std::string, getBasicInfo, (), ());
+    MOCK_METHOD(std::shared_ptr<Hero> &, getHero, (), ());
+    MOCK_METHOD(void, attackOpponent, (Player &), ());
 };
+
 #endif // MOCK_PLAYER_H

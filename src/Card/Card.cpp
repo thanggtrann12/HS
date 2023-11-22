@@ -7,15 +7,14 @@
 #include "Player/Player.h"
 MinionCard::MinionCard(CardType type)
     : Card(type) {}
-void MinionCard::play(unsigned int playerId, Player &attacker,Player &defender)
+void MinionCard::play(unsigned int playerId, Player &attacker, Player &defender)
 {
     attacker.stats.push_back("Player [" + std::to_string(attacker.getId() + 1) + "] active " + this->getDesciption());
     std::string line = "Player [" + std::to_string(attacker.getId() + 1) + "] attack Player [" + std::to_string(defender.getId() + 1) + "] with " + std::to_string(attacker.getHero()->getAttack()) + " damage";
     attacker.stats.push_back(line);
     this->getBuff(attacker.shamanCout);
     unsigned int damage = this->getAttack();
-    // defender.getHero()->takeDamage(damage);
-    // attacker.getHero()->attackDefenderHero(defender);
+    defender.getHero()->takeDamage(damage);
     attacker.stats.push_back(this->getName() + " attack " + defender.getHero()->getName() + " with " + std::to_string(damage) + " damage");
     if (!defender.getBattle().empty())
         for (auto it = defender.getBattle().begin(); it != defender.getBattle().end();)
@@ -66,7 +65,7 @@ std::string BuffCard::getDesciption()
 {
     return getName() + " " + getSkill() + " ACTIVE";
 }
-void BuffCard::play(unsigned int playerId, Player &attacker,Player &defender)
+void BuffCard::play(unsigned int playerId, Player &attacker, Player &defender)
 {
     std::cout << this->getDesciption() << " at BuffCard" << std::endl;
 
@@ -116,7 +115,7 @@ std::string SpellCard::getDesciption()
 SpellCard::SpellCard(CardType type)
     : Card(type) {}
 
-void SpellCard::play(unsigned int playerId, Player &attacker,Player &defender)
+void SpellCard::play(unsigned int playerId, Player &attacker, Player &defender)
 {
 
     attacker.stats.push_back("Player [" + std::to_string(attacker.getId() + 1) + "] active " + this->getDesciption());
