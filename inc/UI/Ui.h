@@ -77,15 +77,16 @@ private:
 public:
     enum UiState
     {
-        INIT,
-        CHOICE_CARD,
-        WAIT_NEXT_TURN,
-        WAIT_FOR_CONFIRM,
-        UPDATE_BATTLE,
-        RESULT
+        INITIALIZING,
+        CHOOSING_CARD,
+        UPDATING_HANDCARD,
+        WAITING_FOR_NEXT_TURN,
+        WAITING_FOR_CONFIRMATION,
+        UPDATING_BATTLE,
+        DISPLAYING_RESULT
     };
     Ui();
-    void updateUiOnState(UiState state, std::vector<Player> &players, unsigned int playerId, unsigned int &clone);
+    void onUiStateChangeOnState(UiState state, std::vector<Player> &players, unsigned int playerId, unsigned int &clone);
 
     ~Ui();
 };

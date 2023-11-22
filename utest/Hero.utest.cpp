@@ -8,21 +8,6 @@ protected:
     Mock_Hero mockHero;
 };
 
-// Test case for initialization
-TEST_F(MockHeroTest, InitHero) {
-    EXPECT_CALL(mockHero, initHero()).Times(1);
-
-    mockHero.initHero();
-}
-
-// Test case for checking if the hero is alive
-TEST_F(MockHeroTest, IsAlive) {
-    EXPECT_CALL(mockHero, IsAlive()).WillOnce(::testing::Return(true));
-
-    bool alive = mockHero.IsAlive();
-    ASSERT_TRUE(alive);
-}
-
 // Test case for taking damage
 TEST_F(MockHeroTest, TakeDamage) {
     unsigned int damage = 10;

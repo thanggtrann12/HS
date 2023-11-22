@@ -70,14 +70,14 @@ TEST_F(UiTest, DisplayResult) {
     mockUi.displayResult(player);
 }
 
-TEST_F(UiTest, UpdateUiOnState) {
+TEST_F(UiTest, onUiStateChangeOnState) {
     Ui::UiState state;
     std::vector<Player> players;
     unsigned int playerId;
     unsigned int clone;
 
-    EXPECT_CALL(mockUi, updateUiOnState(testing::_, testing::_, testing::_, testing::_));
+    EXPECT_CALL(mockUi, onUiStateChangeOnState(testing::_, testing::_, testing::_, testing::_));
 
-    mockUi.updateUiOnState(state, players, playerId, clone);
+    mockUi.onUiStateChangeOnState(state, players, playerId, clone);
 }
 

@@ -15,8 +15,8 @@ protected:
 
 TEST_F(PlayerTest, DrawCard) {
     EXPECT_CALL(mockPlayer, drawCard(_));
-
     mockPlayer.drawCard(3);
+    EXPECT_EQ(mockPlayer.getHand().size(), 3);
 }
 
 TEST_F(PlayerTest, UpdateCard) {
@@ -33,11 +33,6 @@ TEST_F(PlayerTest, PickACardToPlay) {
     EXPECT_EQ(result, 42);
 }
 
-TEST_F(PlayerTest, AddCardToBattle) {
-    EXPECT_CALL(mockPlayer, addCardToBattle(_));
-
-    mockPlayer.addCardToBattle(mockPlayer.getHand().begin());
-}
 
 TEST_F(PlayerTest, SetHero) {
     EXPECT_CALL(mockPlayer, setHero(_));

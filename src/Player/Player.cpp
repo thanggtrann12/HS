@@ -52,14 +52,15 @@ unsigned int Player::pickACardToPlay()
         playerVector = {Player(), *this};
     }
 
-    playerUi->updateUiOnState(Ui::CHOICE_CARD, playerVector, Id, cardChoiced);
+    playerUi->onUiStateChangeOnState(Ui::CHOOSING_CARD, playerVector, Id, cardChoiced);
 
     return cardChoiced;
 }
 
-void Player::addCardToBattle(std::vector<std::shared_ptr<Card>>::iterator cardPlayed)
+void Player::activeCardOnHand(Player &attacker,Player &defender, std::vector<std::shared_ptr<Card>>::iterator cardPlayed)
 {
-    manager->generateCardFromCardType(battleCards, (*cardPlayed)->getCardType());
+  attackOpponent(defender);
+  manager->activeCard(attacker, defender, cardPlayed);
 }
 
 void Player::setHero(HeroType type)
@@ -76,10 +77,9 @@ std::shared_ptr<Hero> &Player::getHero()
 {
     return currentHero;
 }
-
-void Player::setId(PlayerId id)
+void Player::attackOpponent(Player &defender)
 {
-    Id = id;
+  defender.getHero()->takeDamage(this->getHero()->getAttack());
 }
 
 Player::~Player()

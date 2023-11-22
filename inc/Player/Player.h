@@ -25,16 +25,16 @@ public:
     std::vector<std::shared_ptr<Card>> &getHand();
     std::vector<std::shared_ptr<Card>> &getBattle();
     void updateCard(CardType type);
+    void attackOpponent(Player &defender);
     PlayerId getId();
     unsigned int pickACardToPlay();
-    void addCardToBattle(std::vector<std::shared_ptr<Card>>::iterator cardPlayed);
+    void activeCardOnHand(Player &attacker,Player &defender, std::vector<std::shared_ptr<Card>>::iterator cardPlayed);
     void setHero(HeroType type);
     std::string getBasicInfo();
     std::shared_ptr<Hero> &getHero();
-    void setId(PlayerId id);
-    ~Player();
     std::vector<std::string> stats;
     int shamanCout = 0;
+    ~Player();
 
 protected:
     PlayerId Id;

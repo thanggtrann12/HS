@@ -14,7 +14,7 @@ public:
     MOCK_METHOD(void, displayCardList, (std::vector<std::shared_ptr<Card>> &playerHandCard, int currentIndex));
     MOCK_METHOD(void, displayBattle, (std::vector<Player> &players, unsigned int playerId));
     MOCK_METHOD(void, displayResult, (Player &player));
-    MOCK_METHOD(void, updateUiOnState, (UiState state, std::vector<Player> &players, unsigned int playerId, unsigned int &clone));
+    MOCK_METHOD(void, onUiStateChangeOnState, (UiState state, std::vector<Player> &players, unsigned int playerId, unsigned int &clone));
 };
 #ifndef MOCK_UI_H
 #define MOCK_UI_H
@@ -32,7 +32,7 @@ public:
     MOCK_METHOD(void, displayCardList, (std::vector<std::shared_ptr<Card>> &playerHandCard, int currentIndex));
     MOCK_METHOD(void, displayBattle, (std::vector<Player> &players, unsigned int playerId));
     MOCK_METHOD(void, displayResult, (Player &player));
-    MOCK_METHOD(void, updateUiOnState, (UiState state, std::vector<Player> &players, unsigned int playerId, unsigned int &clone));
+    MOCK_METHOD(void, onUiStateChangeOnState, (UiState state, std::vector<Player> &players, unsigned int playerId, unsigned int &clone));
 };
 #ifndef MOCK_UI_H
 #define MOCK_UI_H
@@ -50,7 +50,7 @@ public:
     MOCK_METHOD(void, displayCardList, (std::vector<std::shared_ptr<Card>> &playerHandCard, int currentIndex));
     MOCK_METHOD(void, displayBattle, (std::vector<Player> &players, unsigned int playerId));
     MOCK_METHOD(void, displayResult, (Player &player));
-    MOCK_METHOD(void, updateUiOnState, (UiState state, std::vector<Player> &players, unsigned int playerId, unsigned int &clone));
+    MOCK_METHOD(void, onUiStateChangeOnState, (UiState state, std::vector<Player> &players, unsigned int playerId, unsigned int &clone));
 };
 #endif // MOCK_UI_H
 

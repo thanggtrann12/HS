@@ -11,10 +11,7 @@ class Hero
 public:
     Hero() : heroData(heroes[BUTCHER]) {}
     Hero(HeroType type) : heroData(heroes[type]) {}
-
-    void initHero();
     bool IsAlive();
-    std::vector<std::shared_ptr<Hero>> &getHero();
     void attackDefenderHero(Player &defender);
     void takeDamage(unsigned int damage);
     const std::string &getName() const { return heroData.name; }

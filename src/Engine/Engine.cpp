@@ -3,210 +3,196 @@
 #include <string>
 #include "Hero/Hero.h"
 #include <ctime>
-Engine::Engine(Player &player1, Player &player2, Ui *ui) : playerLists{player1, player2}
+
+constexpr unsigned int INITIAL_CARD_COUNT = 10;
+
+Engine::Engine(Player& player1, Player& player2, Ui* ui) : playerLists{player1, player2}
 {
-  addUiObserver(ui);
+    registerUiModule(ui);
+}
+
+void Engine::initializeOperationMode()
+{
+  onUiStateChange(Ui::INITIALIZING, playerLists, MAX_PLAYER, (unsigned int&)(currentGameMode));
+
+  switch (currentGameMode)
+  {
+  case MySocket::Mode::HOST:
+    for (auto &player: playerLists)
+    {
+      player.drawCard(INITIAL_CARD_COUNT);
+    }
+    if (mySocket->registerSocketMode(MySocket::Mode::HOST) == true)
+    {
+      if(mySocket->waitForClientConnect()== true)
+      {
+        updatePlayerHandCard(playerLists[hostPlayerID], playerLists[clientPlayerID]);
+      }
+    }
+    break;
+  case MySocket::Mode::CLIENT:
+    if(mySocket->registerSocketMode(MySocket::Mode::CLIENT)== true)
+    {
+      updatePlayerHandCard(playerLists[hostPlayerID], playerLists[clientPlayerID]);
+    }
+    break;
+  default:
+    for (auto &player: playerLists)
+    {
+      player.drawCard(INITIAL_CARD_COUNT);
+    }
+    break;
+  }
+
 }
 
 void Engine::startGame()
 {
-  std::srand(std::time(0));
-  playerLists[hostPlayerID].setHero(BUTCHER);
-  playerLists[clientPlayerID].setHero(SLARK);
-  if (currentGameMode == UNKNOWN)
-  {
-    updateUi(Ui::INIT, playerLists, MAX_PLAYER, (unsigned int &)currentGameMode);
-    for (int playerIndex = 0; playerIndex < (unsigned int)MAX_PLAYER; playerIndex++)
+    initializeOperationMode();
+    std::srand(std::time(0));
+
+    playerLists[hostPlayerID].setHero(BUTCHER);
+    playerLists[clientPlayerID].setHero(SLARK);
+
+    switch (currentGameMode)
     {
-      playerLists[playerIndex].drawCard(10);
-    }
-  }
+        case MySocket::Mode::HOST:
+            processHostPlayerTurn();
+            break;
 
-  MySocket socket((unsigned int)currentGameMode);
-  switch (currentGameMode)
-  {
-  case HOST:
-  {
-    auto &serverSocket = socket;
-    startHostMode(&serverSocket);
-    break;
-  }
-  case CLIENT:
-  {
-    auto &clientSocket = socket;
-    for (int playerIndex = 0; playerIndex < (unsigned int)MAX_PLAYER; playerIndex++)
+        case MySocket::Mode::CLIENT:
+            processClientPlayerTurn();
+            break;
+
+        default:
+            processSinglePlayerTurn();
+            break;
+    }
+}
+
+bool Engine::isGameOver(PlayerId playerID)
+{
+    return !playerLists[playerID].getHero()->IsAlive();
+}
+
+void Engine::endTurnForPlayer()
+{
+    std::swap(currentTurn, nextTurn);
+}
+
+void Engine::processHostPlayerTurn()
+{
+    while (true)
     {
-      playerLists[playerIndex].getHand().clear();
+        auto& hostPlayer = playerLists[hostPlayerID];
+        auto& clientPlayer = playerLists[clientPlayerID];
+
+        unsigned int clientChoiceCard = mySocket->receivePlayerChoice();
+        processPlayerTurn(clientPlayerID, clientChoiceCard, playerLists);
+        onUiStateChange(Ui::WAITING_FOR_CONFIRMATION, playerLists, hostPlayerID, clientChoiceCard);
+
+        unsigned int cardPlayed = hostPlayer.pickACardToPlay();
+        mySocket->sendPlayerChoice(cardPlayed);
+        processPlayerTurn(hostPlayerID, cardPlayed, playerLists);
+        onUiStateChange(Ui::WAITING_FOR_NEXT_TURN, playerLists, hostPlayerID, clientChoiceCard);
+        roundCount++;
     }
-    startClientMode(&clientSocket);
-    break;
-  }
-  default:
-    startSingleMode();
-    break;
-  }
 }
 
-bool Engine::isEndGame(PlayerId playerID)
+void Engine::processClientPlayerTurn()
 {
-  return playerLists[playerID].getHero()->IsAlive();
-}
-
-void Engine::endTurn()
-{
-  std::swap(currentTurn, nextTurn);
-}
-
-void Engine::startHostMode(MySocket *host)
-{
-  while (true)
-  {
-
-    if (host != nullptr)
+    while (true)
     {
-      auto &hostPlayer = playerLists[hostPlayerID];
-      auto &clientPlayer = playerLists[clientPlayerID];
+        auto& hostPlayer = playerLists[hostPlayerID];
+        auto& clientPlayer = playerLists[clientPlayerID];
 
-      generateCardsForEachMode(host, hostPlayer, nullptr, clientPlayer);
-      // Host receives client's choice
-      unsigned int clientChoiceCard = host->receivePlayerChoice();
-      // Handle client's turn
-      handlingPlayerTurn(clientPlayerID, clientChoiceCard, playerLists);
-      updateUi(Ui::WAIT_FOR_CONFIRM, playerLists, hostPlayerID, clientChoiceCard);
+        unsigned int cardPlayed = clientPlayer.pickACardToPlay();
 
-      // Host plays its card
-      unsigned int cardPlayed = hostPlayer.pickACardToPlay();
-      host->sendPlayerChoice(cardPlayed);
+        mySocket->sendPlayerChoice(cardPlayed);
+        processPlayerTurn(clientPlayerID, cardPlayed, playerLists);
+        onUiStateChange(Ui::WAITING_FOR_NEXT_TURN, playerLists, clientPlayerID, cardPlayed);
 
-      // Handle host's turn
-      handlingPlayerTurn(hostPlayerID, cardPlayed, playerLists);
-      updateUi(Ui::WAIT_NEXT_TURN, playerLists, hostPlayerID, clientChoiceCard);
-      roundCount++;
+        unsigned int serverChoiceCard = mySocket->receivePlayerChoice();
+        processPlayerTurn(hostPlayerID, serverChoiceCard, playerLists);
+        onUiStateChange(Ui::WAITING_FOR_CONFIRMATION, playerLists, hostPlayerID, serverChoiceCard);
     }
-  }
 }
 
-void Engine::startClientMode(MySocket *client)
+void Engine::processSinglePlayerTurn()
 {
-  while (true)
-  {
+    unsigned int cardChoiced;
 
-    if (client != nullptr)
+    while (true)
     {
-      auto &hostPlayer = playerLists[hostPlayerID];
-      auto &clientPlayer = playerLists[clientPlayerID];
-
-      // Client receives host's card choices
-      generateCardsForEachMode(nullptr, hostPlayer, client, clientPlayer);
-      // Client plays its card
-      unsigned int cardPlayed = clientPlayer.pickACardToPlay();
-      client->sendPlayerChoice(cardPlayed);
-      // Handle client's turn
-      handlingPlayerTurn(clientPlayerID, cardPlayed, playerLists);
-      updateUi(Ui::WAIT_NEXT_TURN, playerLists, clientPlayerID, cardPlayed);
-
-      // Client receives host's choice
-      unsigned int serverChoiceCard = client->receivePlayerChoice();
-
-      // Handle host's turn
-      handlingPlayerTurn(hostPlayerID, serverChoiceCard, playerLists);
-      updateUi(Ui::WAIT_FOR_CONFIRM, playerLists, hostPlayerID, serverChoiceCard);
+        auto& currentPlayer = playerLists[currentTurn];
+        auto& opponentPlayer = playerLists[nextTurn];
+        unsigned int cardPlayed = currentPlayer.pickACardToPlay();
+        processPlayerTurn(static_cast<PlayerId>(currentTurn), cardPlayed, playerLists);
+        onUiStateChange(Ui::WAITING_FOR_CONFIRMATION, playerLists, static_cast<PlayerId>(currentTurn), cardPlayed);
+        endTurnForPlayer();
     }
-  }
 }
 
-void Engine::startSingleMode()
+void Engine::processPlayerTurn(PlayerId playerID, unsigned int cardPlayed, std::vector<Player>& players)
 {
-  unsigned int cardChoiced;
-  while (true)
-  {
-    auto &currentPlayer = playerLists[currentTurn];
-    auto &opponentPlayer = playerLists[nextTurn];
-    unsigned int cardPlayed = currentPlayer.pickACardToPlay();
-    handlingPlayerTurn((PlayerId)currentTurn, cardPlayed, playerLists);
-    generateCardsForEachMode(nullptr, currentPlayer, nullptr, opponentPlayer);
-    updateUi(Ui::WAIT_FOR_CONFIRM, playerLists, (PlayerId)currentTurn, cardPlayed);
-    endTurn();
+    auto cardIterator = players[playerID].getHand().begin() + cardPlayed;
+
+    for (size_t playerIndex = 0; playerIndex < MAX_PLAYER; playerIndex++)
+    {
+        if (isGameOver((PlayerId)playerIndex))
+            onUiStateChange(Ui::DISPLAYING_RESULT, players, (PlayerId)(1-playerIndex), cardPlayed);
+    }
+
+    players[playerID].activeCardOnHand(players[playerID], players[1 - playerID], cardIterator);
+
+    if (roundCount == 3)
+    {
+        players[playerID].drawCard(1);
+        players[1 - playerID].drawCard(1);
+        updatePlayerHandCard(players[playerID], players[1 - playerID]);
+        roundCount = 0;
+    }
+
+    onUiStateChange(Ui::UPDATING_BATTLE, players, playerID, cardPlayed);
+
+    for (size_t playerIndex = 0; playerIndex < MAX_PLAYER; playerIndex++)
+    {
+        players[playerIndex].stats.clear();
+    }
+
     roundCount++;
-  }
-  updateUi(Ui::RESULT, playerLists, (PlayerId)currentTurn, cardChoiced);
 }
 
-void Engine::handlingPlayerTurn(PlayerId playerID, unsigned int cardPlayed, std::vector<Player> &players)
+void Engine::updatePlayerHandCard(Player& hostPlayer, Player& clientPlayer)
 {
-  auto cardIterator = players[playerID].getHand()[cardPlayed];
-  for (size_t playerIndex = 0; playerIndex < MAX_PLAYER; playerIndex++)
-  {
-    if (!players[playerIndex].getHero()->IsAlive())
-      updateUi(Ui::RESULT, players, (PlayerId)(1 - playerIndex), cardPlayed);
-  }
-
-  if (cardIterator->getCardType() != CardType::BRAWL)
-  {
-    players[playerID].addCardToBattle(players[playerID].getHand().begin() + cardPlayed);
-    cardIterator->play(playerID, players);
-    players[playerID].getHand().erase(players[playerID].getHand().begin() + cardPlayed);
-  }
-  else
-  {
-    cardIterator->play(playerID, players);
-    players[playerID].getHand().erase(players[playerID].getHand().begin() + cardPlayed);
-  }
-  generateCardsForEachMode(nullptr, players[playerID], nullptr, players[1 - playerID]);
-  updateUi(Ui::UPDATE_BATTLE, players, playerID, cardPlayed);
-  for (size_t playerIndex = 0; playerIndex < MAX_PLAYER; playerIndex++)
-  {
-    players[playerIndex].stats.clear();
-  }
-}
-
-void Engine::generateCardsForEachMode(MySocket *host, Player &hostPlayer, MySocket *client, Player &clientPlayer)
-{
-
-  switch (currentGameMode)
-  {
-  case CLIENT:
-    if (client != nullptr)
+    switch (currentGameMode)
     {
-      client->recvInitCardPool(hostPlayer, clientPlayer);
-    }
-    break;
-  case HOST:
-    if (roundCount == 3)
-    {
-      hostPlayer.drawCard(1);
-      clientPlayer.drawCard(1);
-      roundCount = 0;
-    }
+        case MySocket::Mode::CLIENT:
+            if (mySocket->recvInitCardPool(hostPlayer, clientPlayer))
+            {
+                onUiStateChange(Ui::UPDATING_HANDCARD, playerLists, clientPlayerID,
+                                (unsigned int&)(currentGameMode));
+            }
+            break;
 
-    if (host != nullptr)
-    {
-      host->sendInitCardPool(hostPlayer.getHand(), clientPlayer.getHand());
+        case MySocket::Mode::HOST:
+            if (mySocket->sendInitCardPool(hostPlayer, clientPlayer))
+            {
+                onUiStateChange(Ui::UPDATING_HANDCARD, playerLists, hostPlayerID,
+                                (unsigned int&)(currentGameMode));
+            }
+            break;
     }
-    break;
-  default:
-    if (roundCount == 3)
-    {
-      hostPlayer.drawCard(1);
-      clientPlayer.drawCard(1);
-      hostPlayer.stats.push_back(hostPlayer.getBasicInfo() + " draw " + hostPlayer.getHand().at(hostPlayer.getHand().size() - 1)->getDesciption());
-      clientPlayer.stats.push_back(clientPlayer.getBasicInfo() + " draw " + clientPlayer.getHand().at(clientPlayer.getHand().size() - 1)->getDesciption());
-      roundCount = 0;
-    }
-    break;
-  }
 }
 
-void Engine::addUiObserver(Ui *subUi)
+void Engine::registerUiModule(Ui* subUi)
 {
-  uiObs = subUi;
+    uiObs = subUi;
 }
 
-void Engine::updateUi(Ui::UiState state, std::vector<Player> &players, PlayerId playerId, unsigned int &clone)
+void Engine::onUiStateChange(Ui::UiState state, std::vector<Player>& players, PlayerId playerId, unsigned int& clone)
 {
-  uiObs->updateUiOnState(state, players, playerId, clone);
+    uiObs->onUiStateChangeOnState(state, players, playerId, clone);
 }
 
-Engine::~Engine()
-{
-}
+Engine::~Engine() {}

@@ -22,27 +22,30 @@ void waitForConfirm()
   if (key == 10)
     return;
 }
-void Ui::updateUiOnState(UiState state, std::vector<Player> &players, unsigned int playerId, unsigned int &clone)
+void Ui::onUiStateChangeOnState(UiState state, std::vector<Player> &players, unsigned int playerId, unsigned int &clone)
 {
   switch (state)
   {
-  case INIT:
+  case INITIALIZING:
     displayMenuScreen(clone);
     break;
-  case CHOICE_CARD:
-    // displayPlayerCard(players[playerId], clone);
-    selectCard(players[playerId], clone);
-    break;
-  case WAIT_NEXT_TURN:
-    std::cout << std::string(120, ' ') << "Please wait for other turn..." << std::endl;
-    break;
-  case WAIT_FOR_CONFIRM:
+  case UPDATING_HANDCARD:
+    displayCardList(players[playerId].getHand(), clone);
     waitForConfirm();
     break;
-  case UPDATE_BATTLE:
+  case CHOOSING_CARD:
+    selectCard(players[playerId], clone);
+    break;
+  case WAITING_FOR_NEXT_TURN:
+    std::cout << std::string(120, ' ') << "Please wait for other turn..." << std::endl;
+    break;
+  case WAITING_FOR_CONFIRMATION:
+    waitForConfirm();
+    break;
+  case UPDATING_BATTLE:
     displayBattle(players, playerId);
     break;
-  case RESULT:
+  case DISPLAYING_RESULT:
     displayResult(players[playerId]);
     break;
 
@@ -99,7 +102,7 @@ void Ui::displayMenuScreen(unsigned int &choicedMode)
     const std::string menuOptions[] = {
         "Host a game",
         "Join a game",
-        "Play offline",
+        "Play single ",
         "Read Game Rules"};
 
     for (int i = 1; i <= numOptions; ++i)
@@ -135,7 +138,6 @@ void Ui::displayMenuScreen(unsigned int &choicedMode)
       break;
     case 10:
       choicedMode = currentIndex + 1;
-      std::cout << choicedMode << std::endl;
       restoreTerminalAttributes(original_termios);
       return;
     }
@@ -413,7 +415,7 @@ void Ui::displayCardList(std::vector<std::shared_ptr<Card>> &playerHandCard, int
   std::pair<std::vector<std::vector<std::string>>, std::vector<std::vector<std::string>>> splitResult = splitVector(cardLists);
   std::vector<std::vector<std::string>> firstGroup = splitResult.first;
   std::vector<std::vector<std::string>> secondGroup = splitResult.second;
-
+  std::cout << std::string(115, ' ')<<"============== Your card =============="<<std::endl;
   displayCard(firstGroup);
   displayCard(secondGroup);
 }

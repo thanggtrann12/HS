@@ -8,7 +8,6 @@
 // Mock class for Mock_Hero
 class Mock_Hero : public Hero {
 public:
-    MOCK_METHOD(void, initHero, ());
     MOCK_METHOD(bool, IsAlive, ());
     MOCK_METHOD(void, attackDefenderHero, (Player &defender));
     MOCK_METHOD(void, takeDamage, (unsigned int damage));

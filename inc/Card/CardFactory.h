@@ -10,7 +10,7 @@ class MinionCard : public Card
 {
 public:
     MinionCard(CardType type);
-    void play(unsigned int playerId, std::vector<Player> &players) override;
+    void play(unsigned int playerId, Player &attacker,Player &defender) override;
     std::string getDesciption() override;
 };
 
@@ -18,7 +18,7 @@ class BuffCard : public Card
 {
 public:
     BuffCard(CardType type);
-    void play(unsigned int playerId, std::vector<Player> &players) override;
+    void play(unsigned int playerId, Player &attacker,Player &defender) override;
     std::string getDesciption() override;
 };
 
@@ -26,7 +26,7 @@ class SpellCard : public Card
 {
 public:
     SpellCard(CardType type);
-    void play(unsigned int playerId, std::vector<Player> &players) override;
+    void play(unsigned int playerId, Player &attacker,Player &defender) override;
     std::string getDesciption() override;
 };
 

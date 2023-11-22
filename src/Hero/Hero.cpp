@@ -2,18 +2,6 @@
 #include <iostream>
 #include <algorithm>
 #include "Player/Player.h"
-void Hero::initHero()
-{
-    Hero butcher(BUTCHER);
-    heroPocket.push_back(std::make_shared<Hero>(butcher));
-    Hero slark(SLARK);
-    heroPocket.push_back(std::make_shared<Hero>(slark));
-}
-
-std::vector<std::shared_ptr<Hero>> &Hero::getHero()
-{
-    return heroPocket;
-}
 bool Hero::IsAlive()
 {
     return heroData.health > 0;

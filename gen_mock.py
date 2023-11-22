@@ -89,8 +89,8 @@ file_paths = [
     base_path+"/inc/assets/HeroData.h",
     base_path+"/inc/assets/CardData.h"
 ]
-for filename in os.listdir(base_path+"/utest/mock"):
-    file_path = os.path.join(base_path+"/utest/mock", filename)
+for filename in os.listdir(base_path+"\\utest\\mock"):
+    file_path = os.path.join(base_path+"\\utest\\mock", filename)
     try:
         if os.path.isfile(file_path) or os.path.islink(file_path):
             os.unlink(file_path)

@@ -10,7 +10,7 @@ class Card
 {
 public:
     virtual ~Card() = default;
-    virtual void play(unsigned int playerId, std::vector<Player> &players) = 0;
+    virtual void play(unsigned int playerId, Player &attacker,Player &defender) = 0;
     const std::string &getName() const { return card.name; }
     int getHP() const { return card.health; }
     int getAttack() const { return card.attack; }
