@@ -8,11 +8,13 @@
 // Mock class for Mock_MySocket
 class Mock_MySocket : public MySocket {
 public:
-    MOCK_METHOD(void, sendInitCardPool, (std::vector<std::shared_ptr<Card>> &hostPlayer, std::vector<std::shared_ptr<Card>> &clientPlayer));
-    MOCK_METHOD(void, recvInitCardPool, (Player &hostPlayer, Player &clientPlayer));
+    MOCK_METHOD(bool, registerSocketMode, (Mode mode));
+    MOCK_METHOD(bool, waitForClientConnect, ());
+    MOCK_METHOD(bool, sendInitCardPool, (Player &hostPlayer, Player &clientPlayer));
+    MOCK_METHOD(bool, recvInitCardPool, (Player &hostPlayer, Player &clientPlayer));
     MOCK_METHOD(void, sendPlayerChoice, (int choice));
     MOCK_METHOD(int, receivePlayerChoice, ());
-    MOCK_METHOD(void, initializeServer, ());
-    MOCK_METHOD(void, initializeClient, ());
+    MOCK_METHOD(bool, initializeServer, ());
+    MOCK_METHOD(bool, initializeClient, ());
 };
 #endif // MOCK_MYSOCKET_H

@@ -2,7 +2,6 @@
 #include "gmock/gmock.h"
 #include "mock/mock_Hero.h"
 
-// Test fixture for Mock_Hero
 class MockHeroTest : public ::testing::Test {
 protected:
     Mock_Hero mockHero;
