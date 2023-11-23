@@ -19,6 +19,7 @@ public:
     Engine(Player &player1, Player &player2, Ui *ui);
     void startGame();
     bool isEndGame(PlayerId playerID);
+    ~Engine();
 
 private:
     void endTurn();
@@ -29,7 +30,6 @@ private:
     void startSingleMode();
     void addUiObserver(Ui *subUi);
     void updateUi(Ui::UiState state, std::vector<Player> &players, PlayerId playerId, unsigned int &clone);
-    ~Engine();
 
 protected:
     Ui *uiObs;

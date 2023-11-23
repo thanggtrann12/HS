@@ -1,74 +1,113 @@
+#include <memory>
+#include <vector>
 #include "gtest/gtest.h"
-#include "gmock/gmock.h"
 #include "Player/Player.h"
-#include "mock/mock_Player.h"
-#include "mock/mock_Card.h"
-#include "Card/Card.h"
-using ::testing::Return;
-using ::testing::_;
+#include "UI/Ui.h"
+#include "Hero/Hero.h"
+#include "gmock/gmock.h"
 
-// Test fixture for Player class
-class PlayerTest : public testing::Test {
-protected:
-    Mock_Player mockPlayer;  // Mock object to be used in tests
+class UiMock : public Ui
+{
+public:
+    MOCK_METHOD(void, updateUiOnState, (UiState state, std::vector<Player> &players, unsigned int playerId, unsigned int &clone));
 };
 
-TEST_F(PlayerTest, DrawCard) {
-    EXPECT_CALL(mockPlayer, drawCard(_));
+class PlayerTest : public ::testing::Test
+{
+protected:
+    void SetUp() override
+    {
+        uiMock = new UiMock();
+        player1 = new Player(PlayerId::PLAYER_1, uiMock);
+        player2 = new Player(PlayerId::PLAYER_2, uiMock);
+    }
 
-    mockPlayer.drawCard(3);
+    void TearDown() override
+    {
+        delete player1;
+        delete player2;
+        delete uiMock;
+    }
+
+    UiMock *uiMock;
+    Player *player1;
+    Player *player2;
+};
+TEST_F(PlayerTest, TestGetId)
+{
+    EXPECT_EQ(player1->getId(), PlayerId::PLAYER_1);
+    EXPECT_EQ(player2->getId(), PlayerId::PLAYER_2);
 }
 
-TEST_F(PlayerTest, UpdateCard) {
-    EXPECT_CALL(mockPlayer, updateCard(CardType::BRAWL));
-    mockPlayer.updateCard(CardType::BRAWL);
+TEST_F(PlayerTest, TestDrawCard)
+{
+    unsigned int num = 3;
+    player1->drawCard(num);
+    std::vector<std::shared_ptr<Card>> &handCards = player1->getHand();
+    EXPECT_EQ(handCards.size(), num);
 }
 
-
-TEST_F(PlayerTest, PickACardToPlay) {
-    EXPECT_CALL(mockPlayer, pickACardToPlay())
-        .WillOnce(Return(42));
-
-    unsigned int result = mockPlayer.pickACardToPlay();
-    EXPECT_EQ(result, 42);
+TEST_F(PlayerTest, TestUpdateCard)
+{
+    player1->drawCard(1);
+    std::vector<std::shared_ptr<Card>> &handCards = player1->getHand();
+    CardType type = CardType::BRAWL;
+    player1->updateCard(type);
+    EXPECT_FALSE(handCards.empty());
+    EXPECT_EQ(player1->getHand()[1]->getCardType(), CardType::BRAWL);
 }
 
-TEST_F(PlayerTest, AddCardToBattle) {
-    EXPECT_CALL(mockPlayer, addCardToBattle(_));
-
-    mockPlayer.addCardToBattle(mockPlayer.getHand().begin());
+TEST_F(PlayerTest, TestGetHand)
+{
+    std::vector<std::shared_ptr<Card>> &handCards = player1->getHand();
+    EXPECT_TRUE(handCards.empty());
 }
 
-TEST_F(PlayerTest, SetHero) {
-    EXPECT_CALL(mockPlayer, setHero(_));
-
-    mockPlayer.setHero(HeroType::BUTCHER);
+TEST_F(PlayerTest, TestGetBattle)
+{
+    std::vector<std::shared_ptr<Card>> &battleCards = player1->getBattle();
+    EXPECT_TRUE(battleCards.empty());
 }
 
-TEST_F(PlayerTest, GetBasicInfo) {
-    EXPECT_CALL(mockPlayer, getBasicInfo())
-        .WillOnce(Return("Mocked Player Info"));
+// TEST_F(PlayerTest, TestPickACardToPlay)
+// {
+//     // Expectations
+//     player1->drawCard(10);
+//     player2->drawCard(10);
+//     EXPECT_CALL(*uiMock, updateUiOnState(testing::_, testing::_, testing::_, testing::_))
+//         .WillOnce(testing::DoAll(testing::SetArgReferee<3>(2), testing::Return()));
 
-    std::string result = mockPlayer.getBasicInfo();
-    EXPECT_EQ(result, "Mocked Player Info");
+//     // Assertion
+//     EXPECT_EQ(player1->pickACardToPlay(), 2);
+//     EXPECT_EQ(player2->pickACardToPlay(), 2);
+// }
+
+TEST_F(PlayerTest, TestActiveCardOnHand)
+{
+    player1->setHero(HeroType::BUTCHER);
+    player2->setHero(HeroType::SLARK);
+    player1->drawCard(1);
+    std::vector<std::shared_ptr<Card>> &handCards1 = player1->getHand();
+    std::vector<std::shared_ptr<Card>>::iterator cardPlayed = handCards1.begin();
+
+    EXPECT_NO_FATAL_FAILURE(player1->activeCardOnHand(*player1, *player2, cardPlayed));
 }
 
-TEST_F(PlayerTest, SetId) {
-    EXPECT_CALL(mockPlayer, setId(_));
-    mockPlayer.setId(PlayerId::PLAYER_1);
+TEST_F(PlayerTest, TestSetHero)
+{
+    player1->setHero(HeroType::BUTCHER);
+    EXPECT_EQ(player1->getHero()->getType(), HeroType::BUTCHER);
 }
 
-TEST_F(PlayerTest, GetId) {
-    PlayerId id = mockPlayer.getId();
-    EXPECT_EQ(id, PlayerId::PLAYER_1);
+TEST_F(PlayerTest, TestGetBasicInfo)
+{
+    player1->setHero(HeroType::BUTCHER);
+    EXPECT_EQ(player1->getBasicInfo(), "Player [1]'s Hero: Butcher HP[120] ATTACK [6]");
 }
 
-TEST_F(PlayerTest, GetHand) {
-    EXPECT_CALL(mockPlayer, getHand());
-    mockPlayer.getHand();
-}
-
-TEST_F(PlayerTest, GetBattle) {
-    EXPECT_CALL(mockPlayer, getBattle());
-    mockPlayer.getBattle();
+TEST_F(PlayerTest, TestGetHero)
+{
+    player1->setHero(HeroType::BUTCHER);
+    std::shared_ptr<Hero> &hero = player1->getHero();
+    EXPECT_EQ(hero->getType(), HeroType::BUTCHER);
 }

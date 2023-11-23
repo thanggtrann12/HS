@@ -57,9 +57,14 @@ unsigned int Player::pickACardToPlay()
     return cardChoiced;
 }
 
-void Player::addCardToBattle(std::vector<std::shared_ptr<Card>>::iterator cardPlayed)
+void Player::activeCardOnHand(Player &attacker, Player &defender, std::vector<std::shared_ptr<Card>>::iterator cardPlayed)
 {
-    manager->generateCardFromCardType(battleCards, (*cardPlayed)->getCardType());
+    attackOpponent(defender);
+    manager->activeCard(attacker, defender, cardPlayed);
+}
+void Player::attackOpponent(Player &defender)
+{
+    defender.getHero()->takeDamage(this->getHero()->getAttack());
 }
 
 void Player::setHero(HeroType type)
@@ -75,11 +80,6 @@ std::string Player::getBasicInfo()
 std::shared_ptr<Hero> &Player::getHero()
 {
     return currentHero;
-}
-
-void Player::setId(PlayerId id)
-{
-    Id = id;
 }
 
 Player::~Player()

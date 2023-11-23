@@ -1,43 +1,71 @@
 #include "gtest/gtest.h"
-#include "gmock/gmock.h"
-#include "mock/mock_Hero.h"
+#include "Hero/Hero.h"
+#include "Player/Player.h"
 
-// Test fixture for Mock_Hero
-class MockHeroTest : public ::testing::Test {
-protected:
-    Mock_Hero mockHero;
-};
+TEST(HeroTest, InitHero)
+{
+    Hero hero;
+    hero.initHero();
+    std::vector<std::shared_ptr<Hero>> heroPocket = hero.getHero();
 
-// Test case for initialization
-TEST_F(MockHeroTest, InitHero) {
-    EXPECT_CALL(mockHero, initHero()).Times(1);
-
-    mockHero.initHero();
+    ASSERT_EQ(heroPocket.size(), 2);
+    ASSERT_EQ(heroPocket[0]->getDescription(), "Butcher HP[120] ATTACK [6]");
+    ASSERT_EQ(heroPocket[1]->getDescription(), "Slark HP[72] ATTACK [10]");
 }
 
-// Test case for checking if the hero is alive
-TEST_F(MockHeroTest, IsAlive) {
-    EXPECT_CALL(mockHero, IsAlive()).WillOnce(::testing::Return(true));
+TEST(HeroTest, IsAlive)
+{
+    Hero hero;
+    hero.initHero();
 
-    bool alive = mockHero.IsAlive();
-    ASSERT_TRUE(alive);
+    ASSERT_TRUE(hero.getHero()[0]->IsAlive());
+    ASSERT_TRUE(hero.getHero()[1]->IsAlive());
+
+    hero.getHero()[1]->takeDamage(100);
+
+    ASSERT_TRUE(hero.getHero()[0]->IsAlive());
+    ASSERT_FALSE(hero.getHero()[1]->IsAlive());
 }
 
-// Test case for taking damage
-TEST_F(MockHeroTest, TakeDamage) {
-    unsigned int damage = 10;
-    EXPECT_CALL(mockHero, takeDamage(damage)).Times(1);
-    mockHero.takeDamage(damage);
+TEST(HeroTest, AttackDefenderHero)
+{
+    Player Player_1(PLAYER_1, nullptr);
+    Player_1.setHero(HeroType::BUTCHER);
+    auto &attacker = Player_1.getHero();
+
+    Player Player_2(PLAYER_2, nullptr);
+    Player_2.setHero(HeroType::SLARK);
+    auto &defender = Player_2.getHero();
+
+    ASSERT_EQ(attacker->getDescription(), "Butcher HP[120] ATTACK [6]");
+    ASSERT_EQ(defender->getDescription(), "Slark HP[72] ATTACK [10]");
+
+    attacker->attackDefenderHero(Player_2);
+
+    ASSERT_EQ(attacker->getDescription(), "Butcher HP[120] ATTACK [6]");
+    ASSERT_EQ(defender->getDescription(), "Slark HP[66] ATTACK [10]");
 }
 
-// Test case for getting hero description
-TEST_F(MockHeroTest, GetDescription) {
-    // Set up a description for the hero
-    std::string expectedDescription = "Mock Hero Description";
-    ON_CALL(mockHero, getDescription()).WillByDefault(::testing::Return(expectedDescription));
+TEST(HeroTest, TakeDamage)
+{
+    Hero hero;
+    hero.initHero();
 
-    std::string description = mockHero.getDescription();
-    ASSERT_EQ(description, expectedDescription);
+    ASSERT_EQ(hero.getHero()[0]->getDescription(), "Butcher HP[120] ATTACK [6]");
+    ASSERT_EQ(hero.getHero()[1]->getDescription(), "Slark HP[72] ATTACK [10]");
+
+    hero.getHero()[0]->takeDamage(50);
+    hero.getHero()[1]->takeDamage(150);
+
+    ASSERT_EQ(hero.getHero()[0]->getDescription(), "Butcher HP[70] ATTACK [6]");
+    ASSERT_EQ(hero.getHero()[1]->getDescription(), "Slark HP[0] ATTACK [10]");
 }
 
-// Add more test cases as needed
+TEST(HeroTest, GetDescription)
+{
+    Hero hero;
+    hero.initHero();
+
+    ASSERT_EQ(hero.getHero()[0]->getDescription(), "Butcher HP[120] ATTACK [6]");
+    ASSERT_EQ(hero.getHero()[1]->getDescription(), "Slark HP[72] ATTACK [10]");
+}

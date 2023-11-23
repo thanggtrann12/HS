@@ -10,6 +10,7 @@ public:
     CardManager();
     std::shared_ptr<Card> getCardFromPocket();
     void generateCardFromCardType(std::vector<std::shared_ptr<Card>> &playerTable, CardType type);
+    void activeCard(Player &attacker, Player &defender, std::vector<std::shared_ptr<Card>>::iterator cardPlayed);
     ~CardManager(){};
 
 private:

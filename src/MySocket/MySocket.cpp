@@ -24,27 +24,20 @@ void MySocket::sendInitCardPool(std::vector<std::shared_ptr<Card>> &hostPlayer, 
     size_t combined_length = hostHandSize + clientHandSize + 1;
     CardType *combined_array = new CardType[combined_length];
 
-    // Set the size of the host player's hand
     combined_array[0] = static_cast<CardType>(hostHandSize);
 
-    // Fill in host player's card types
     for (size_t i = 0; i < hostHandSize; ++i)
     {
         combined_array[i + 1] = hostPlayer[i]->getCardType();
-        // std::cout << static_cast<int>(hostPlayer[i]->getCardType()) << std::endl;
     }
 
-    // Fill in client player's card types
     for (size_t i = 0; i < clientHandSize; ++i)
     {
         combined_array[i + hostHandSize + 1] = clientPlayer[i]->getCardType();
-        // std::cout << static_cast<int>(clientPlayer[i]->getCardType()) << std::endl;
     }
 
-    // Send the entire array
     send(clientSocket_, combined_array, combined_length * sizeof(CardType), 0);
 
-    // Don't forget to free the dynamically allocated array
     delete[] combined_array;
 }
 
@@ -58,26 +51,18 @@ void MySocket::recvInitCardPool(Player &hostPlayer, Player &clientPlayer)
     char buffer[4056];
     ssize_t total_size_bytes = recv(clientSocket_, buffer, sizeof(buffer), 0);
 
-    // Cast the received buffer to the CardType array
     CardType *receiveArr = reinterpret_cast<CardType *>(buffer);
     size_t arrayLength = total_size_bytes / sizeof(CardType);
     size_t hostHandSize = static_cast<size_t>(receiveArr[0]);
-
-    // std::cout << "hostHandSize: " << hostHandSize << std::endl;
-    // std::cout << "arrayLength: " << arrayLength << std::endl;
-
-    // Update host player cards
     for (size_t i = 1; i <= hostHandSize; i++)
     {
         hostPlayer.updateCard(receiveArr[i]);
-        // std::cout << static_cast<int>(receiveArr[i]) << std::endl;
     }
 
     // Update client player cards
     for (size_t i = hostHandSize + 1; i < arrayLength; i++)
     {
         clientPlayer.updateCard(receiveArr[i]);
-        // std::cout << static_cast<int>(receiveArr[i]) << std::endl;
     }
 }
 
@@ -122,7 +107,7 @@ void MySocket::initializeServer()
         exit(EXIT_FAILURE);
     }
 
-    std::cout << "Server is waiting for a client to connect..." << std::endl;
+    std::cout << std::string(120, ' ') << "Server is waiting for a client to connect..." << std::endl;
 
     clientSocket_ = accept(serverSocket_, NULL, NULL);
     if (clientSocket_ == -1)
@@ -130,6 +115,7 @@ void MySocket::initializeServer()
         std::cerr << "Error accepting client connection." << std::endl;
         exit(EXIT_FAILURE);
     }
+    std::cout << std::string(120, ' ') << "Client turn please wait ..." << std::endl;
 }
 
 void MySocket::initializeClient()

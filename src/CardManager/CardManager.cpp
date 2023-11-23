@@ -1,6 +1,7 @@
 #include "CardManager/CardManager.h"
 #include "assets/CardData.h"
 #include "Card/CardFactory.h"
+#include "Player/Player.h"
 #include "Card/Card.h"
 #include <iostream>
 #include <string>
@@ -56,4 +57,13 @@ void CardManager::generateCardFromCardType(std::vector<std::shared_ptr<Card>> &p
         playerTable.emplace_back(factory->createCard(CardType::BRAWL));
         break;
     }
+}
+void CardManager::activeCard(Player &attacker, Player &defender, std::vector<std::shared_ptr<Card>>::iterator cardPlayed)
+{
+    (*cardPlayed)->play(attacker.getId(), attacker, defender);
+    if ((*cardPlayed)->getCardType() != CardType::BRAWL)
+    {
+        generateCardFromCardType(attacker.getBattle(), (*cardPlayed)->getCardType());
+    }
+    attacker.getHand().erase(cardPlayed);
 }

@@ -1,4 +1,3 @@
-
 #include <iostream>
 #include <string>
 #include <memory>
@@ -7,18 +6,15 @@
 #include "Player/Player.h"
 MinionCard::MinionCard(CardType type)
     : Card(type) {}
-void MinionCard::play(unsigned int playerId, std::vector<Player> &players)
+void MinionCard::play(unsigned int playerId, Player &attacker, Player &defender)
 {
-    auto &attacker = players[playerId];
-    auto &defender = players[1 - playerId];
-    attacker.stats.push_back("Player [" + std::to_string(attacker.getId() + 1) + "] active " + this->getDesciption());
+    attacker.stats.push_back("Player [" + std::to_string(attacker.getId() + 1) + "] active " + getDesciption());
     std::string line = "Player [" + std::to_string(attacker.getId() + 1) + "] attack Player [" + std::to_string(defender.getId() + 1) + "] with " + std::to_string(attacker.getHero()->getAttack()) + " damage";
     attacker.stats.push_back(line);
-    this->getBuff(attacker.shamanCout);
-    unsigned int damage = this->getAttack();
+    getBuff(attacker.shamanCout);
+    unsigned int damage = getAttack();
     defender.getHero()->takeDamage(damage);
-    attacker.getHero()->attackDefenderHero(defender);
-    attacker.stats.push_back(this->getName() + " attack " + defender.getHero()->getName() + " with " + std::to_string(damage) + " damage");
+    attacker.stats.push_back(getName() + " attack " + defender.getHero()->getName() + " with " + std::to_string(damage) + " damage");
     if (!defender.getBattle().empty())
         for (auto it = defender.getBattle().begin(); it != defender.getBattle().end();)
         {
@@ -39,14 +35,15 @@ void MinionCard::play(unsigned int playerId, std::vector<Player> &players)
                 }
                 if (card->getCardType() == CardType::SHAMAN)
                 {
-                    defender.shamanCout--;
+                    if (defender.shamanCout > 0)
+                        defender.shamanCout--;
                 }
                 it = defender.getBattle().erase(it);
             }
             else
             {
                 ++it;
-                attacker.stats.push_back(this->getName() + " attack " + card->getName() + " with " + std::to_string(damage) + " damage");
+                attacker.stats.push_back(getName() + " attack " + card->getName() + " with " + std::to_string(damage) + " damage");
             }
         }
     else
@@ -68,15 +65,11 @@ std::string BuffCard::getDesciption()
 {
     return getName() + " " + getSkill() + " ACTIVE";
 }
-void BuffCard::play(unsigned int playerId, std::vector<Player> &players)
+void BuffCard::play(unsigned int playerId, Player &attacker, Player &defender)
 {
-    std::cout << this->getDesciption() << " at BuffCard" << std::endl;
-    auto &attacker = players[playerId];
-    auto &defender = players[1 - playerId];
-    attacker.stats.push_back("Player [" + std::to_string(attacker.getId() + 1) + "] active " + this->getDesciption());
+    attacker.stats.push_back("Player [" + std::to_string(attacker.getId() + 1) + "] active " + getDesciption());
     std::string line = "Player [" + std::to_string(attacker.getId() + 1) + "] attack Player [" + std::to_string(defender.getId() + 1) + "] with " + std::to_string(attacker.getHero()->getAttack()) + " damage";
     attacker.stats.push_back(line);
-    attacker.getHero()->attackDefenderHero(defender);
 
     for (auto &minion : attacker.getBattle())
     {
@@ -119,23 +112,20 @@ std::string SpellCard::getDesciption()
 SpellCard::SpellCard(CardType type)
     : Card(type) {}
 
-void SpellCard::play(unsigned int playerId, std::vector<Player> &players)
+void SpellCard::play(unsigned int playerId, Player &attacker, Player &defender)
 {
-    auto &attacker = players[playerId];
-    auto &defender = players[1 - playerId];
-    attacker.stats.push_back("Player [" + std::to_string(attacker.getId() + 1) + "] active " + this->getDesciption());
+    attacker.stats.push_back("Player [" + std::to_string(attacker.getId() + 1) + "] active " + getDesciption());
     std::string line = "Player [" + std::to_string(attacker.getId() + 1) + "] attack Player [" + std::to_string(defender.getId() + 1) + "] with " + std::to_string(attacker.getHero()->getAttack()) + " damage";
     attacker.stats.push_back(line);
-    attacker.getHero()->attackDefenderHero(defender);
     if (!defender.getBattle().empty())
     {
         int randomIndex = rand() % defender.getBattle().size();
         auto &cardRemoved = defender.getBattle()[randomIndex];
         if (cardRemoved->getCardType() == CardType::TECHIES)
         {
-            attacker.stats.push_back(attacker.getHero()->getName() + "Get 3 damage on Techies elimination");
+            attacker.stats.push_back("Player [" + std::to_string(attacker.getId() + 1) + "] Get 3 damage on Techies elimination");
             attacker.getHero()->takeDamage(3);
-            defender.stats.push_back(defender.getHero()->getName() + "Get 3 damage on Techies elimination");
+            defender.stats.push_back("Player [" + std::to_string(defender.getId() + 1) + "] Get 3 damage on Techies elimination");
             defender.getHero()->takeDamage(3);
         }
         defender.stats.push_back("Card " + cardRemoved->getDesciption() + " have been removed from table by Brawl");
@@ -143,6 +133,6 @@ void SpellCard::play(unsigned int playerId, std::vector<Player> &players)
     }
     else
     {
-        defender.stats.push_back(attacker.getHero()->getName() + " had no card on table");
+        defender.stats.push_back("Player [" + std::to_string(defender.getId() + 1) + "] had no card on table");
     }
 }

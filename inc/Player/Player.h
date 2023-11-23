@@ -27,11 +27,11 @@ public:
     void updateCard(CardType type);
     PlayerId getId();
     unsigned int pickACardToPlay();
-    void addCardToBattle(std::vector<std::shared_ptr<Card>>::iterator cardPlayed);
     void setHero(HeroType type);
+    void activeCardOnHand(Player &attacker, Player &defender, std::vector<std::shared_ptr<Card>>::iterator cardPlayed);
     std::string getBasicInfo();
     std::shared_ptr<Hero> &getHero();
-    void setId(PlayerId id);
+    void attackOpponent(Player &defender);
     ~Player();
     std::vector<std::string> stats;
     int shamanCout = 0;
