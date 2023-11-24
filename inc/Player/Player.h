@@ -37,6 +37,9 @@ public:
     int shamanCout = 0;
 
 protected:
+#ifdef GTEST_FRIEND
+  GTEST_FRIEND
+#endif
     PlayerId Id;
     Ui *playerUi = nullptr;
     std::shared_ptr<Hero> currentHero;

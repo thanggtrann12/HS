@@ -1,3 +1,7 @@
+
+#define GTEST_FRIEND \
+FRIEND_TEST(PlayerTest, PickACardToPlay);
+
 #include <memory>
 #include <vector>
 #include "gtest/gtest.h"
@@ -69,19 +73,6 @@ TEST_F(PlayerTest, TestGetBattle)
     EXPECT_TRUE(battleCards.empty());
 }
 
-// TEST_F(PlayerTest, TestPickACardToPlay)
-// {
-//     // Expectations
-//     player1->drawCard(10);
-//     player2->drawCard(10);
-//     EXPECT_CALL(*uiMock, updateUiOnState(testing::_, testing::_, testing::_, testing::_))
-//         .WillOnce(testing::DoAll(testing::SetArgReferee<3>(2), testing::Return()));
-
-//     // Assertion
-//     EXPECT_EQ(player1->pickACardToPlay(), 2);
-//     EXPECT_EQ(player2->pickACardToPlay(), 2);
-// }
-
 TEST_F(PlayerTest, TestActiveCardOnHand)
 {
     player1->setHero(HeroType::BUTCHER);
@@ -110,4 +101,16 @@ TEST_F(PlayerTest, TestGetHero)
     player1->setHero(HeroType::BUTCHER);
     std::shared_ptr<Hero> &hero = player1->getHero();
     EXPECT_EQ(hero->getType(), HeroType::BUTCHER);
+}
+
+TEST_F(PlayerTest, PickACardToPlay) {
+    EXPECT_CALL(*uiMock,updateUiOnState(::testing::_,::testing::_,::testing::_,::testing::_)).Times(2);
+    player1->playerUi = uiMock;
+    player1->setHero(BUTCHER);
+    player1->drawCard(10);
+    player1->pickACardToPlay();
+    player2->playerUi = uiMock;
+    player2->setHero(SLARK);
+    player2->drawCard(10);
+    player2->pickACardToPlay();
 }

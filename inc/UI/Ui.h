@@ -67,12 +67,12 @@ class Player;
 class Ui
 {
 private:
-    void displayMenuScreen(unsigned int &choicedMode);
-    void selectCard(Player &player, unsigned int &choicedCard);
-    void displayPlayerCard(Player &player, unsigned int &choicedCard);
-    void displayCardList(std::vector<std::shared_ptr<Card>> &playerHandCard, int currentIndex);
-    void displayBattle(std::vector<Player> &players, unsigned int playerId);
-    void displayResult(Player &player);
+    virtual void displayMenuScreen(unsigned int &choicedMode);
+    virtual void selectCard(Player &player, unsigned int &choicedCard);
+    virtual void displayPlayerCard(Player &player, unsigned int &choicedCard);
+    virtual void displayCardList(std::vector<std::shared_ptr<Card>> &playerHandCard, int currentIndex);
+    virtual void displayBattle(std::vector<Player> &players, unsigned int playerId);
+    virtual void displayResult(Player &player);
 
 public:
     enum UiState
@@ -85,7 +85,7 @@ public:
         RESULT
     };
     Ui();
-    void updateUiOnState(UiState state, std::vector<Player> &players, unsigned int playerId, unsigned int &clone);
+   virtual void updateUiOnState(UiState state, std::vector<Player> &players, unsigned int playerId, unsigned int &clone);
 
     ~Ui();
 };

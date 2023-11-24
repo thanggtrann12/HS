@@ -1,5 +1,7 @@
 # cmake .. -DCMAKE_BUILD_TYPE=Debug -G "Unix Makefiles"
-
+# make gen_coverage
+# sed -i 's/C++_Tranining.*.dir.*U://g' CodeCoverageInfoFile.info
+# genhtml CodeCoverageInfoFile.info --num-spaces 4 --output-directory ./CodeCoverageOutput
 cmake_minimum_required(VERSION 3.12)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -14,6 +16,9 @@ set(GMOCK_DIR ${CMAKE_SOURCE_DIR}/lib/googletest/googlemock)
 # # Include the Google Test source code
 add_subdirectory(${GTEST_DIR})
 add_subdirectory(${GMOCK_DIR})
+set(CMAKE_CXX_FLAGS "-fprofile-arcs -ftest-coverage" CACHE STRING "CXX Flags" FORCE)
+set(CMAKE_EXE_LINKER_FLAGS "-lgcov" CACHE STRING "EXE Linker Flags" FORCE)
+
 
 set(SOURCES
     ${CMAKE_SOURCE_DIR}/src/Player/Player.cpp
@@ -45,8 +50,12 @@ ${CMAKE_SOURCE_DIR}/utest/Player.utest.cpp
 ${CMAKE_SOURCE_DIR}/utest/Hero.utest.cpp
 ${CMAKE_SOURCE_DIR}/utest/MySocket.utest.cpp
 ${CMAKE_SOURCE_DIR}/utest/Card.utest.cpp
+${CMAKE_SOURCE_DIR}/utest/CardManager.utest.cpp
 )
-
+add_custom_target(gen_coverage
+COMMAND lcov --capture --directory . --rc lcov_branch_coverage=1 --output-file ./CodeCoverageInfoFile.info
+COMMAND lcov --remove ./CodeCoverageInfoFile.info *googlemock* *googletest* */usr/include* */c++* */test* */utest* */HippoMocks* */mingw/* --rc lcov_branch_coverage=1 --output-file ./CodeCoverageInfoFile.info
+)
 
 # # Set the binary and library output directories
 set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/build)
@@ -57,6 +66,6 @@ add_executable(${PROJECT_NAME} main.cpp ${SOURCES} ${HEADERS} )
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/inc)
 
 
-add_executable(unittest_${PROJECT_NAME} ${TEST_SOURCES} ${CMAKE_SOURCE_DIR}/utest/mock)
+add_executable(unittest_${PROJECT_NAME} ${TEST_SOURCES})
 target_include_directories(unittest_${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/inc ${GTEST_DIR}/include ${GMOCK_DIR}/include)
 target_link_libraries(unittest_${PROJECT_NAME} gtest gtest_main gmock)

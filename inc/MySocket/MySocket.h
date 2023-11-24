@@ -31,6 +31,9 @@ public:
     int receivePlayerChoice();
 
 private:
+#ifdef GTEST_FRIEND
+  GTEST_FRIEND
+#endif
     int mode_;
     int serverSocket_;
     int clientSocket_;
