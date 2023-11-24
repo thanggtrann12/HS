@@ -1,5 +1,6 @@
 #!/bin/bash
-
+make
+../generated/unittest_HeartStone.exe
 # Run the command to generate coverage
 make gen_coverage
 
